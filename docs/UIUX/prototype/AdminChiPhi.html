@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quản trị: Chi phí và sử dụng · GameStudio prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0F1115}
+a{color:#8AB4FF}a:hover{color:#B8D0FF}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:6px;border:1px solid #2A2F3A;background:#1F232C;color:#E6E8EE;font:500 13px/1 'Be Vietnam Pro',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none}
+.btn.sm{height:28px;padding:0 10px;font-size:12px}
+.nav{display:flex;align-items:center;height:34px;padding:0 12px;border-radius:6px;color:#A0A7B4;text-decoration:none;font-size:13px}
+.nav.on{background:#1F232C;color:#E6E8EE;font-weight:600}
+.tab{height:32px;padding:0 12px;border-radius:6px;border:0;background:transparent;color:#A0A7B4;font:500 13px 'Be Vietnam Pro',sans-serif;cursor:pointer}
+.tab.on{background:#1F232C;color:#E6E8EE}
+select{font:inherit;font-size:13px;color:#E6E8EE;background:#1F232C;border:1px solid #3A4150;border-radius:6px;height:32px;padding:0 8px}
+.kpi{background:#171A21;border:1px solid #2A2F3A;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.kl{font-size:12px;color:#A0A7B4}.kv{font-size:24px;line-height:32px;font-weight:600}
+.col{flex:1;display:flex;flex-direction:column-reverse;gap:1px;min-width:0}
+.lg{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#A0A7B4}
+.sw{width:10px;height:10px;border-radius:2px;display:inline-block}
+table{border-collapse:collapse;width:100%}th{font-weight:500;color:#A0A7B4;text-align:left;font-size:12px;padding:8px 10px;border-bottom:1px solid #2A2F3A;white-space:nowrap}td{padding:8px 10px;border-bottom:1px solid #2A2F3A;font-size:13px;white-space:nowrap}
+td.r,th.r{text-align:right}
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;background:#4C8DFF;color:#0B1220;font:600 12px sans-serif;padding:6px 10px;border-radius:6px;text-decoration:none">Danh mục màn hình</a>
+<div style="font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#E6E8EE;background:#0F1115;font-size:14px;line-height:22px;min-height:1000px;display:flex;flex-direction:column">
+  <header style="height:48px;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid #2A2F3A;background:#171A21">
+    <a href="index-thu-vien.html" style="font-weight:700;font-size:15px;color:#E6E8EE;text-decoration:none">GameStudio</a>
+    <a href="index-thu-vien.html" class="nav">Thư viện</a><a href="AdminTongQuan.html" class="nav on">Quản trị</a>
+    <div style="flex:1"></div>
+    <button class="btn" aria-label="Tài khoản của Huy" style="width:32px;padding:0;justify-content:center;border-radius:16px;background:#2D3A55">H</button>
+  </header>
+  <div style="display:flex;flex-wrap:wrap;flex:1">
+    <nav aria-label="Quản trị" style="flex:1 1 220px;max-width:220px;padding:12px;border-right:1px solid #2A2F3A;display:flex;flex-direction:column;gap:2px;box-sizing:border-box">
+      <a href="AdminTongQuan.html" class="nav">Tổng quan</a>
+      <a href="AdminNguoiDung.html" class="nav">Người dùng</a>
+      <a href="AdminHanMuc.html" class="nav">Hạn mức</a>
+      <a href="AdminChiPhi.html" class="nav on">Chi phí và sử dụng</a>
+      <a href="AdminHeThong.html" class="nav">Hệ thống</a>
+      <a href="AdminKiemDuyet.html" class="nav">Kiểm duyệt</a>
+      <a href="AdminKiemToan.html" class="nav">Nhật ký kiểm toán</a>
+      <a href="AdminThongBao.html" class="nav">Thông báo hệ thống</a>
+    </nav>
+    <main style="flex:999 1 560px;min-width:0;padding:24px;display:flex;flex-direction:column;gap:16px;max-width:1180px">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px"><h1 style="margin:0;font-size:20px;font-weight:600">Chi phí và sử dụng</h1><div style="flex:1"></div><label class="kl" style="display:flex;gap:6px;align-items:center">Khoảng <select><option>14 ngày (10/11–23/11)</option></select></label><label class="kl" style="display:flex;gap:6px;align-items:center">Nhóm theo <select><option>Ngày</option></select></label></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+        <div class="kpi"><span class="kl">Tổng</span><span class="kv">52,60 USD</span></div>
+        <div class="kpi"><span class="kl">Hôm nay</span><span class="kv">6,10 USD</span></div>
+        <div class="kpi"><span class="kl">Trung bình mỗi ngày</span><span class="kv">3,76 USD</span></div>
+        <div class="kpi"><span class="kl">Lượt gọi AI</span><span class="kv">1.320</span></div>
+      </div>
+      <section style="background:#171A21;border:1px solid #2A2F3A;border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;flex-wrap:wrap;gap:14px"><span class="lg"><span class="sw" style="background:#4C8DFF"></span>Sinh game</span><span class="lg"><span class="sw" style="background:#B392F0"></span>Sửa</span><span class="lg"><span class="sw" style="background:#E3884A"></span>Ảnh</span><span class="lg"><span class="sw" style="background:#39C5BB"></span>Âm thanh</span><span class="lg"><span class="sw" style="background:#8B93A1"></span>Hội thoại NPC</span></div>
+        <div role="img" aria-label="Biểu đồ cột chồng chi phí AI theo ngày, 14 ngày, cao nhất 6,10 USD hôm nay" style="display:flex;gap:6px;align-items:flex-end;height:200px;border-bottom:1px solid #3A4150;padding-top:8px">
+          <div class="col" style="height:40%"><div style="flex:3;background:#4C8DFF"></div><div style="flex:2;background:#B392F0"></div><div style="flex:1;background:#E3884A"></div><div style="flex:1;background:#8B93A1"></div></div>
+          <div class="col" style="height:52%"><div style="flex:3;background:#4C8DFF"></div><div style="flex:3;background:#B392F0"></div><div style="flex:1;background:#E3884A"></div><div style="flex:1;background:#8B93A1"></div></div>
+          <div class="col" style="height:35%"><div style="flex:2;background:#4C8DFF"></div><div style="flex:2;background:#B392F0"></div><div style="flex:1;background:#39C5BB"></div></div>
+          <div class="col" style="height:60%"><div style="flex:4;background:#4C8DFF"></div><div style="flex:2;background:#B392F0"></div><div style="flex:2;background:#E3884A"></div><div style="flex:1;background:#8B93A1"></div></div>
+          <div class="col" style="height:48%"><div style="flex:3;background:#4C8DFF"></div><div style="flex:2;background:#B392F0"></div><div style="flex:1;background:#39C5BB"></div><div style="flex:1;background:#8B93A1"></div></div>
+          <div class="col" style="height:22%"><div style="flex:1;background:#B392F0"></div><div style="flex:1;background:#8B93A1"></div></div>
+          <div class="col" style="height:18%"><div style="flex:1;background:#B392F0"></div><div style="flex:1;background:#8B93A1"></div></div>
+          <div class="col" style="height:66%"><div style="flex:4;background:#4C8DFF"></div><div style="flex:3;background:#B392F0"></div><div style="flex:2;background:#E3884A"></div><div style="flex:1;background:#8B93A1"></div></div>
+          <div class="col" style="height:58%"><div style="flex:3;background:#4C8DFF"></div><div style="flex:3;background:#B392F0"></div><div style="flex:1;background:#E3884A"></div><div style="flex:1;background:#39C5BB"></div></div>
+          <div class="col" style="height:70%"><div style="flex:4;background:#4C8DFF"></div><div style="flex:3;background:#B392F0"></div><div style="flex:2;background:#E3884A"></div><div style="flex:1;background:#8B93A1"></div></div>
+          <div class="col" style="height:55%"><div style="flex:3;background:#4C8DFF"></div><div style="flex:2;background:#B392F0"></div><div style="flex:2;background:#39C5BB"></div><div style="flex:1;background:#8B93A1"></div></div>
+          <div class="col" style="height:30%"><div style="flex:2;background:#B392F0"></div><div style="flex:1;background:#8B93A1"></div></div>
+          <div class="col" style="height:78%"><div style="flex:5;background:#4C8DFF"></div><div style="flex:3;background:#B392F0"></div><div style="flex:2;background:#E3884A"></div><div style="flex:1;background:#8B93A1"></div></div>
+          <div class="col" style="height:92%"><div style="flex:5;background:#4C8DFF"></div><div style="flex:4;background:#B392F0"></div><div style="flex:2;background:#E3884A"></div><div style="flex:1;background:#39C5BB"></div><div style="flex:1;background:#8B93A1"></div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:#A0A7B4"><span>10/11</span><span>17/11</span><span>Hôm nay</span></div>
+      </section>
+      <div role="tablist" style="display:flex;flex-wrap:wrap;gap:4px"><button class="tab on" role="tab" aria-selected="true">Theo người</button><button class="tab" role="tab">Theo game</button><button class="tab" role="tab">Theo loại việc</button><button class="tab" role="tab">Hội thoại theo NPC</button></div>
+      <div style="overflow-x:auto;background:#171A21;border:1px solid #2A2F3A;border-radius:10px"><table>
+        <thead><tr><th>Người</th><th class="r">Chi phí (USD)</th><th class="r">Lượt gọi</th><th class="r">Token vào</th><th class="r">Token ra</th><th class="r">% tổng</th></tr></thead>
+        <tbody>
+          <tr><td>Lan</td><td class="r">23,10</td><td class="r">560</td><td class="r">2,5 tr</td><td class="r">0,4 tr</td><td class="r">44%</td></tr>
+          <tr><td>Bình</td><td class="r">14,20</td><td class="r">380</td><td class="r">1,6 tr</td><td class="r">0,2 tr</td><td class="r">27%</td></tr>
+          <tr><td>An</td><td class="r">9,80</td><td class="r">260</td><td class="r">1,1 tr</td><td class="r">0,2 tr</td><td class="r">19%</td></tr>
+          <tr><td>Huy</td><td class="r">5,50</td><td class="r">120</td><td class="r">0,6 tr</td><td class="r">0,1 tr</td><td class="r">10%</td></tr>
+        </tbody>
+      </table></div>
+      <section style="background:#171A21;border:1px solid #2A2F3A;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
+        <h2 style="margin:0;font-size:15px;font-weight:600">Sự kiện vượt hạn mức (2)</h2>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:13px"><span style="color:#F85149">✕</span>23/11 15:40 · Lan · AI/ngày · 5,02 / 5,00 USD<div style="flex:1"></div><a href="AdminHanMuc.html" class="btn sm">Nâng hạn mức</a></div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:13px"><span style="color:#F85149">✕</span>19/11 11:02 · Bình · Job đồng thời · 3 / 2<div style="flex:1"></div><a href="AdminHanMuc.html" class="btn sm">Nâng hạn mức</a></div>
+      </section>
+      <p style="margin:0;font-size:12px;color:#A0A7B4">Số liệu minh hoạ.</p>
+    </main>
+  </div>
+</div>
+</body>
+</html>

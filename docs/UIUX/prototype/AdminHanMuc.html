@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quản trị: Hạn mức · GameStudio prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0F1115}
+a{color:#8AB4FF}a:hover{color:#B8D0FF}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:6px;border:1px solid #2A2F3A;background:#1F232C;color:#E6E8EE;font:500 13px/1 'Be Vietnam Pro',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none}
+.btn.sm{height:28px;padding:0 10px;font-size:12px}
+.nav{display:flex;align-items:center;height:34px;padding:0 12px;border-radius:6px;color:#A0A7B4;text-decoration:none;font-size:13px}
+.nav.on{background:#1F232C;color:#E6E8EE;font-weight:600}
+.tab{height:32px;padding:0 12px;border-radius:6px;border:0;background:transparent;color:#A0A7B4;font:500 13px 'Be Vietnam Pro',sans-serif;cursor:pointer}
+.tab.on{background:#1F232C;color:#E6E8EE}
+input{font:inherit;font-size:13px;color:#E6E8EE;background:#1F232C;border:1px solid #3A4150;border-radius:6px;height:30px;padding:0 8px;box-sizing:border-box}
+input.n{width:72px;text-align:right}
+table{border-collapse:collapse;width:100%}th{font-weight:500;color:#A0A7B4;text-align:left;font-size:12px;padding:8px 10px;border-bottom:1px solid #2A2F3A;white-space:nowrap}td{padding:8px 10px;border-bottom:1px solid #2A2F3A;font-size:13px;white-space:nowrap}
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;background:#4C8DFF;color:#0B1220;font:600 12px sans-serif;padding:6px 10px;border-radius:6px;text-decoration:none">Danh mục màn hình</a>
+<div style="font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#E6E8EE;background:#0F1115;font-size:14px;line-height:22px;min-height:1000px;display:flex;flex-direction:column">
+  <header style="height:48px;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid #2A2F3A;background:#171A21">
+    <a href="index-thu-vien.html" style="font-weight:700;font-size:15px;color:#E6E8EE;text-decoration:none">GameStudio</a>
+    <a href="index-thu-vien.html" class="nav">Thư viện</a><a href="AdminTongQuan.html" class="nav on">Quản trị</a>
+    <div style="flex:1"></div>
+    <button class="btn" aria-label="Tài khoản của Huy" style="width:32px;padding:0;justify-content:center;border-radius:16px;background:#2D3A55">H</button>
+  </header>
+  <div style="display:flex;flex-wrap:wrap;flex:1">
+    <nav aria-label="Quản trị" style="flex:1 1 220px;max-width:220px;padding:12px;border-right:1px solid #2A2F3A;display:flex;flex-direction:column;gap:2px;box-sizing:border-box">
+      <a href="AdminTongQuan.html" class="nav">Tổng quan</a>
+      <a href="AdminNguoiDung.html" class="nav">Người dùng</a>
+      <a href="AdminHanMuc.html" class="nav on">Hạn mức</a>
+      <a href="AdminChiPhi.html" class="nav">Chi phí và sử dụng</a>
+      <a href="AdminHeThong.html" class="nav">Hệ thống</a>
+      <a href="AdminKiemDuyet.html" class="nav">Kiểm duyệt</a>
+      <a href="AdminKiemToan.html" class="nav">Nhật ký kiểm toán</a>
+      <a href="AdminThongBao.html" class="nav">Thông báo hệ thống</a>
+    </nav>
+    <main style="flex:999 1 560px;min-width:0;padding:24px;display:flex;flex-direction:column;gap:16px;max-width:1180px">
+      <h1 style="margin:0;font-size:20px;font-weight:600">Hạn mức</h1>
+      <section style="background:#171A21;border:1px solid #2A2F3A;border-radius:10px;padding:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+        <div style="display:flex;flex-direction:column;gap:2px"><strong>Mặc định hệ thống</strong><span style="font-size:13px">AI 5,00 USD/ngày · 2 job đồng thời · 20 GB · 20 game</span><span style="font-size:12px;color:#A0A7B4">Áp cho người dùng không có hạn mức riêng. Ngày tính theo giờ Việt Nam.</span></div>
+        <div style="flex:1"></div><button class="btn">Sửa</button>
+      </section>
+      <div role="tablist" style="display:flex;gap:4px"><button class="tab on" role="tab" aria-selected="true">Theo người dùng</button><button class="tab" role="tab">Hội thoại theo game</button></div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center"><label><span style="position:absolute;left:-9999px">Lọc</span><input placeholder="Lọc theo tên…" style="width:220px"></label><label style="font-size:13px;display:flex;gap:6px;align-items:center"><input type="checkbox" checked style="height:auto"> Chỉ người dùng từ 80% trở lên</label></div>
+      <div style="overflow-x:auto;background:#171A21;border:1px solid #2A2F3A;border-radius:10px"><table>
+        <thead><tr><th>Người dùng</th><th>AI/ngày (USD)</th><th>Đã dùng hôm nay</th><th>Job đồng thời</th><th>Lưu trữ (GB)</th><th>Game</th><th>Nguồn</th></tr></thead>
+        <tbody>
+          <tr><td>Lan</td><td><input class="n" value="5,00" aria-label="AI mỗi ngày của Lan"></td><td><span style="color:#F85149">✕ 5,02 · 100%</span></td><td><input class="n" value="2" aria-label="Job của Lan"></td><td><input class="n" value="20" aria-label="Lưu trữ của Lan"> <span style="color:#A0A7B4">6,4</span></td><td><input class="n" value="20" aria-label="Số game của Lan"> <span style="color:#A0A7B4">12</span></td><td>Mặc định</td></tr>
+          <tr><td>Bình</td><td><input class="n" value="5,00" aria-label="AI mỗi ngày của Bình"></td><td><span style="color:#D29922">▲ 4,30 · 86%</span></td><td><input class="n" value="2" aria-label="Job của Bình"></td><td><input class="n" value="20" aria-label="Lưu trữ của Bình"> <span style="color:#A0A7B4">3,1</span></td><td><input class="n" value="20" aria-label="Số game của Bình"> <span style="color:#A0A7B4">5</span></td><td>Mặc định</td></tr>
+          <tr><td>An</td><td><input class="n" value="8,00" aria-label="AI mỗi ngày của An"></td><td>1,20 · 15%</td><td><input class="n" value="3" aria-label="Job của An"></td><td><input class="n" value="50" aria-label="Lưu trữ của An"> <span style="color:#A0A7B4">31,0</span></td><td><input class="n" value="20" aria-label="Số game của An"> <span style="color:#A0A7B4">4</span></td><td>Riêng <button class="btn sm" aria-label="Về mặc định">↺</button></td></tr>
+        </tbody>
+      </table></div>
+      <p style="margin:0;font-size:12px;color:#A0A7B4">Sửa tại ô rồi rời ô để lưu từng hàng; mỗi lần đổi ghi vào nhật ký kiểm toán. Hạn mức nâng có hiệu lực ngay, ô chat của người dùng tự bật lại.</p>
+    </main>
+  </div>
+</div>
+</body>
+</html>

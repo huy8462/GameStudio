@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tạo game mới · GameStudio prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0F1115}
+a{color:#8AB4FF}a:hover{color:#B8D0FF}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:6px;border:1px solid #2A2F3A;background:#1F232C;color:#E6E8EE;font:500 13px/1 'Be Vietnam Pro',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none}
+.btn.p{background:#4C8DFF;border-color:#4C8DFF;color:#0B1220}
+input[type=text]{font:inherit;color:#E6E8EE;background:#1F232C;border:1px solid #3A4150;border-radius:6px;height:32px;padding:0 10px;box-sizing:border-box}
+.opt{display:inline-flex;align-items:center;gap:6px;font-size:14px}
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;background:#4C8DFF;color:#0B1220;font:600 12px sans-serif;padding:6px 10px;border-radius:6px;text-decoration:none">Danh mục màn hình</a>
+<div style="font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#E6E8EE;background:#0F1115;font-size:14px;line-height:22px;min-height:1000px;display:flex;flex-direction:column">
+  <header style="height:48px;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid #2A2F3A;background:#171A21">
+    <a href="index-thu-vien.html" style="font-weight:700;font-size:15px;color:#E6E8EE;text-decoration:none">GameStudio</a>
+    <span style="color:#A0A7B4">/</span><span style="font-weight:600">Tạo game mới</span>
+    <div style="flex:1"></div>
+    <ol aria-label="Các bước" style="display:flex;gap:8px;align-items:center;list-style:none;margin:0;padding:0;font-size:13px">
+      <li style="color:#3FB950">✓ 1 Mô tả</li><li style="color:#3A4150">──</li>
+      <li aria-current="step" style="color:#E6E8EE;font-weight:600">◐ 2 Làm rõ</li><li style="color:#3A4150">──</li>
+      <li style="color:#A0A7B4">○ 3 Brief</li>
+    </ol>
+    <div style="flex:1"></div>
+    <a href="index-thu-vien.html" class="btn" style="background:transparent">Huỷ</a>
+  </header>
+  <div style="display:flex;flex-wrap:wrap;flex:1">
+    <aside style="flex:1 1 360px;max-width:420px;border-right:1px solid #2A2F3A;background:#171A21;padding:16px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box">
+      <div style="font-size:12px;color:#A0A7B4;font-weight:500">Chat tiếp nhận</div>
+      <div style="align-self:flex-end;max-width:85%;background:#1F232C;border-radius:10px;padding:10px 12px;font-size:13px">Một làng chài ven sông miền Tây thế kỷ 19, người chơi đi bộ góc nhìn thứ ba, có chợ nổi, 5 NPC, đàn vịt, chiều tà có xe máy chạy qua cầu.</div>
+      <div style="display:flex;gap:8px;font-size:12px;color:#A0A7B4"><span style="width:56px;height:40px;background:#26333A;border-radius:4px"></span><span style="width:56px;height:40px;background:#3A3226;border-radius:4px"></span><span style="align-self:center">2 ảnh tham chiếu</span></div>
+      <div style="max-width:90%;border-radius:10px;padding:10px 12px;font-size:13px;border:1px solid #2A2F3A"><span style="color:#B392F0;font-weight:600;font-size:12px">AI</span><br>Mình đã hiểu phần lớn. Còn 3 câu hỏi nhỏ để dựng đúng ý bạn.</div>
+      <div style="flex:1"></div>
+      <p style="margin:0;font-size:12px;color:#A0A7B4">Phiên được lưu sau mỗi lượt. Đóng trang rồi mở lại sẽ tiếp tục đúng câu đang chờ.</p>
+    </aside>
+    <main style="flex:999 1 560px;min-width:0;padding:24px 32px;display:flex;flex-direction:column;gap:16px;max-width:860px">
+      <div><h1 style="margin:0;font-size:20px;line-height:28px;font-weight:600">Vài câu hỏi để hiểu đúng ý bạn</h1><p style="margin:4px 0 0;color:#A0A7B4;font-size:13px">Vòng 1/2 · 3 câu</p></div>
+      <fieldset style="margin:0;border:1px solid #2A2F3A;border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;background:#171A21">
+        <legend style="padding:0 6px;font-weight:600">Góc nhìn người chơi?</legend>
+        <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+          <label class="opt"><input type="radio" name="cam" checked> Thứ ba sau lưng</label>
+          <label class="opt"><input type="radio" name="cam"> Nhìn từ trên</label>
+          <label class="opt"><input type="radio" name="cam"> Thứ nhất</label>
+          <label class="opt" style="flex:1 1 200px"><span style="position:absolute;left:-9999px">Câu trả lời khác</span><input type="text" placeholder="Gõ câu khác…" style="width:100%"></label>
+        </div>
+        <span style="font-size:12px;color:#A0A7B4">Mặc định: Thứ ba sau lưng</span>
+      </fieldset>
+      <fieldset style="margin:0;border:1px solid #6B5320;border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;background:#1E1A12">
+        <legend style="padding:0 6px;font-weight:600;color:#D29922">▲ Mô tả có hai chi tiết khác nhau</legend>
+        <span>"thế kỷ 19" và "xe máy". Chọn một (bắt buộc):</span>
+        <div style="display:flex;flex-wrap:wrap;gap:16px">
+          <label class="opt"><input type="radio" name="era"> Thế kỷ 19, bỏ xe máy</label>
+          <label class="opt"><input type="radio" name="era"> Hiện đại, giữ xe máy</label>
+        </div>
+      </fieldset>
+      <fieldset style="margin:0;border:1px solid #2A2F3A;border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;background:#171A21">
+        <legend style="padding:0 6px;font-weight:600">Chợ nổi có mua bán được không?</legend>
+        <div style="display:flex;flex-wrap:wrap;gap:16px">
+          <label class="opt"><input type="radio" name="cho" checked> Chỉ để ngắm, NPC rao hàng</label>
+          <label class="opt"><input type="radio" name="cho"> Có mua bán đơn giản</label>
+        </div>
+        <span style="font-size:12px;color:#A0A7B4">Mặc định: Chỉ để ngắm</span>
+      </fieldset>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding-top:8px">
+        <button class="btn">Dùng mặc định cho các câu còn lại</button>
+        <div style="flex:1"></div>
+        <button class="btn p">Tiếp tục →</button>
+      </div>
+      <div style="border:1px solid #2A2F3A;border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:12px;color:#A0A7B4;font-weight:500">Bước 3 sẽ hiện brief một trang</div>
+        <div style="font-size:13px;color:#A0A7B4">Tóm tắt · Thể loại · Bối cảnh · Phong cách · Người chơi · Zone · NPC · Động vật · Tính năng tuỳ chọn · Giả định · Ước lượng tải. Nút chính: <strong style="color:#E6E8EE">Xác nhận và tạo game</strong>.</div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

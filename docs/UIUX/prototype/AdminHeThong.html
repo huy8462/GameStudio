@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quản trị: Hệ thống · GameStudio prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0F1115}
+a{color:#8AB4FF}a:hover{color:#B8D0FF}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:6px;border:1px solid #2A2F3A;background:#1F232C;color:#E6E8EE;font:500 13px/1 'Be Vietnam Pro',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none}
+.btn.sm{height:28px;padding:0 10px;font-size:12px}
+.nav{display:flex;align-items:center;height:34px;padding:0 12px;border-radius:6px;color:#A0A7B4;text-decoration:none;font-size:13px}
+.nav.on{background:#1F232C;color:#E6E8EE;font-weight:600}
+.tab{height:32px;padding:0 12px;border-radius:6px;border:0;background:transparent;color:#A0A7B4;font:500 13px 'Be Vietnam Pro',sans-serif;cursor:pointer}
+.tab.on{background:#1F232C;color:#E6E8EE}
+.b{display:inline-flex;align-items:center;gap:4px;padding:0 8px;border-radius:4px;font-size:12px;line-height:22px;font-weight:500;background:#1F232C}
+.kpi{background:#171A21;border:1px solid #2A2F3A;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;font-size:13px}
+.kl{font-size:12px;color:#A0A7B4}.kv{font-size:22px;line-height:30px;font-weight:600}
+select{font:inherit;font-size:13px;color:#E6E8EE;background:#1F232C;border:1px solid #3A4150;border-radius:6px;height:28px;padding:0 6px}
+table{border-collapse:collapse;width:100%}th{font-weight:500;color:#A0A7B4;text-align:left;font-size:12px;padding:8px 10px;border-bottom:1px solid #2A2F3A;white-space:nowrap}td{padding:8px 10px;border-bottom:1px solid #2A2F3A;font-size:13px;white-space:nowrap}
+h2{margin:0;font-size:15px;font-weight:600}
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;background:#4C8DFF;color:#0B1220;font:600 12px sans-serif;padding:6px 10px;border-radius:6px;text-decoration:none">Danh mục màn hình</a>
+<div style="font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#E6E8EE;background:#0F1115;font-size:14px;line-height:22px;min-height:1000px;display:flex;flex-direction:column">
+  <header style="height:48px;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid #2A2F3A;background:#171A21">
+    <a href="index-thu-vien.html" style="font-weight:700;font-size:15px;color:#E6E8EE;text-decoration:none">GameStudio</a>
+    <a href="index-thu-vien.html" class="nav">Thư viện</a><a href="AdminTongQuan.html" class="nav on">Quản trị</a>
+    <div style="flex:1"></div>
+    <button class="btn" aria-label="Tài khoản của Huy" style="width:32px;padding:0;justify-content:center;border-radius:16px;background:#2D3A55">H</button>
+  </header>
+  <div style="display:flex;flex-wrap:wrap;flex:1">
+    <nav aria-label="Quản trị" style="flex:1 1 220px;max-width:220px;padding:12px;border-right:1px solid #2A2F3A;display:flex;flex-direction:column;gap:2px;box-sizing:border-box">
+      <a href="AdminTongQuan.html" class="nav">Tổng quan</a>
+      <a href="AdminNguoiDung.html" class="nav">Người dùng</a>
+      <a href="AdminHanMuc.html" class="nav">Hạn mức</a>
+      <a href="AdminChiPhi.html" class="nav">Chi phí và sử dụng</a>
+      <a href="AdminHeThong.html" class="nav on">Hệ thống</a>
+      <a href="AdminKiemDuyet.html" class="nav">Kiểm duyệt</a>
+      <a href="AdminKiemToan.html" class="nav">Nhật ký kiểm toán</a>
+      <a href="AdminThongBao.html" class="nav">Thông báo hệ thống</a>
+    </nav>
+    <main style="flex:999 1 560px;min-width:0;padding:24px;display:flex;flex-direction:column;gap:16px;max-width:1180px">
+      <h1 style="margin:0;font-size:20px;font-weight:600">Hệ thống</h1>
+      <div role="tablist" style="display:flex;gap:4px"><button class="tab on" role="tab" aria-selected="true">Vận hành</button><button class="tab" role="tab">Dịch vụ AI</button><button class="tab" role="tab">Nguồn CC0</button></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+        <div class="kpi"><span class="kl">API P95 (1 giờ)</span><span class="kv">182 ms</span><span style="color:#3FB950">✓ dưới 500 ms</span></div>
+        <div class="kpi"><span class="kl">Job</span><span class="kv">2 · 3 · 1</span><span class="kl">Chờ · Chạy · Lỗi 24 giờ</span></div>
+        <div class="kpi"><span class="kl">Lưu trữ</span><span class="kv">412 / 1.000 GB</span><div style="height:6px;background:#1F232C;border-radius:3px"><div style="width:41%;height:6px;background:#58A6FF;border-radius:3px"></div></div></div>
+        <div class="kpi"><span class="kl">Sao lưu</span><span><span style="color:#3FB950">✓</span> CSDL 01:00 hôm nay</span><span><span style="color:#D29922">▲</span> Kho đối tượng 9 ngày trước</span><span class="kl">Diễn tập khôi phục: 15/11</span></div>
+      </div>
+      <section style="display:flex;flex-direction:column;gap:8px">
+        <h2>Worker</h2>
+        <div style="overflow-x:auto;background:#171A21;border:1px solid #2A2F3A;border-radius:10px"><table>
+          <thead><tr><th>Worker</th><th>Trạng thái</th><th>Khe</th><th>Nhịp</th><th>Engine</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>worker-1</td><td><span class="b" style="color:#3FB950">● Sẵn sàng</span></td><td>nặng 1/1 · nhẹ 0/1</td><td>5 giây trước</td><td style="font-family:'JetBrains Mono',monospace;font-size:12px">0.4.2</td><td></td></tr>
+            <tr><td>worker-2</td><td><span class="b" style="color:#F85149">✕ Không đạt doctor</span> <span style="font-size:12px;color:#A0A7B4">Blender 4.4 (cần 4.5)</span></td><td>—</td><td>12 giây trước</td><td style="font-family:'JetBrains Mono',monospace;font-size:12px">0.4.2</td><td><button class="btn sm">Xem doctor</button></td></tr>
+          </tbody>
+        </table></div>
+      </section>
+      <section style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center"><h2>Job toàn hệ thống</h2><div style="flex:1"></div><label class="kl" style="display:flex;gap:6px;align-items:center">Trạng thái <select><option>Đang chạy</option></select></label><label class="kl" style="display:flex;gap:6px;align-items:center">Loại <select><option>Mọi loại</option></select></label></div>
+        <div style="overflow-x:auto;background:#171A21;border:1px solid #2A2F3A;border-radius:10px"><table>
+          <thead><tr><th>Job</th><th>Game</th><th>Người</th><th>Tiến độ</th><th>Đã chạy</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Build z2 (phần thay đổi)</td><td>Làng chài ven sông</td><td>Lan</td><td><span class="b" style="color:#58A6FF">◐ 45%</span></td><td>3 phút</td><td><button class="btn sm">Huỷ</button></td></tr>
+            <tr><td>Nâng cấp engine 1.2 → 1.4</td><td>Làng quê</td><td>Huy</td><td><span class="b" style="color:#58A6FF">◐ 20%</span></td><td>2 phút</td><td><button class="btn sm">Huỷ</button></td></tr>
+            <tr><td>QA nhẹ z1</td><td>Làng chài ven sông</td><td>Lan</td><td><span class="b" style="color:#F85149">✕ Lỗi</span></td><td>09:40</td><td><button class="btn sm">Thử lại</button></td></tr>
+          </tbody>
+        </table></div>
+        <p style="margin:0;font-size:12px;color:#A0A7B4">Thời gian trung bình 7 ngày: build 6,2 phút · QA 2,1 phút · bake 48 phút · nâng cấp 11 phút.</p>
+      </section>
+      <section style="display:flex;flex-direction:column;gap:8px">
+        <h2>Dịch vụ AI <span style="font-weight:400;font-size:12px;color:#A0A7B4">(tab Dịch vụ AI, minh hoạ)</span></h2>
+        <div style="overflow-x:auto;background:#171A21;border:1px solid #2A2F3A;border-radius:10px"><table>
+          <thead><tr><th>Loại việc</th><th>Nhà cung cấp</th><th>Mô hình</th><th>Bật</th><th>Khoá API</th></tr></thead>
+          <tbody>
+            <tr><td>intake</td><td>anthropic</td><td><select aria-label="Mô hình intake"><option>[mô hình đã chọn]</option></select></td><td><input type="checkbox" checked aria-label="Bật intake"></td><td><span class="b" style="color:#3FB950">✓ Đã cấu hình</span></td></tr>
+            <tr><td>image</td><td>[nhà cung cấp ảnh]</td><td><select aria-label="Mô hình image"><option>[mô hình đã chọn]</option></select></td><td><input type="checkbox" checked aria-label="Bật image"></td><td><span class="b" style="color:#D29922">▲ Chưa cấu hình</span></td></tr>
+          </tbody>
+        </table></div>
+        <p style="margin:0;font-size:12px;color:#A0A7B4">Khoá API chỉ cấu hình ở máy chủ. Trang này chỉ hiện trạng thái, không có ô nhập khoá.</p>
+      </section>
+    </main>
+  </div>
+</div>
+</body>
+</html>

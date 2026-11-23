@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thư viện game · GameStudio prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0F1115}
+a{color:#8AB4FF}a:hover{color:#B8D0FF}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:6px;border:1px solid #2A2F3A;background:#1F232C;color:#E6E8EE;font:500 13px/1 'Be Vietnam Pro',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none}
+.btn.p{background:#4C8DFF;border-color:#4C8DFF;color:#0B1220}
+.btn.sm{height:28px;padding:0 10px;font-size:12px}
+.b{display:inline-flex;align-items:center;gap:4px;padding:0 8px;border-radius:4px;font-size:12px;line-height:22px;font-weight:500;background:#1F232C}
+.tab{height:32px;padding:0 12px;border-radius:6px;border:0;background:transparent;color:#A0A7B4;font:500 13px 'Be Vietnam Pro',sans-serif;cursor:pointer}
+.tab.on{background:#1F232C;color:#E6E8EE}
+input,select{font:inherit;color:#E6E8EE;background:#1F232C;border:1px solid #3A4150;border-radius:6px;height:32px;padding:0 10px;box-sizing:border-box}
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;background:#4C8DFF;color:#0B1220;font:600 12px sans-serif;padding:6px 10px;border-radius:6px;text-decoration:none">Danh mục màn hình</a>
+<div style="font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#E6E8EE;background:#0F1115;font-size:14px;line-height:22px;min-height:1000px">
+  <header style="height:48px;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid #2A2F3A;background:#171A21">
+    <a href="index-thu-vien.html" style="font-weight:700;font-size:15px;color:#E6E8EE;text-decoration:none">GameStudio</a>
+    <nav style="display:flex;gap:4px"><a href="index-thu-vien.html" class="tab on" style="display:inline-flex;align-items:center;text-decoration:none">Thư viện</a><a href="AdminTongQuan.html" class="tab" style="display:inline-flex;align-items:center;text-decoration:none">Quản trị</a></nav>
+    <div style="flex:1"></div>
+    <label style="position:relative;display:flex;align-items:center"><span style="position:absolute;left:-9999px">Tìm game</span><input placeholder="Tìm game…" style="width:240px"></label>
+    <button class="btn" aria-label="Thông báo, 2 chưa đọc" style="position:relative;width:32px;padding:0;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"></path></svg><span style="position:absolute;top:-4px;right:-4px;background:#F85149;color:#0F1115;border-radius:8px;font-size:10px;line-height:14px;padding:0 4px;font-weight:700">2</span></button>
+    <button class="btn" aria-label="Tài khoản của Huy" style="width:32px;padding:0;justify-content:center;border-radius:16px;background:#2D3A55">H</button>
+  </header>
+  <div style="background:#2A2414;border-bottom:1px solid #5A4A1E;padding:8px 24px;font-size:13px;display:flex;gap:8px;align-items:center"><span style="color:#D29922;font-weight:600">▲ Bảo trì</span><span>Máy build bảo trì 20:00–21:00 thứ Sáu, job sẽ tạm dừng.</span><div style="flex:1"></div><button class="btn sm" style="background:transparent">Đóng</button></div>
+  <main style="max-width:1280px;margin:0 auto;padding:24px;display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+      <h1 style="margin:0;font-size:20px;line-height:28px;font-weight:600">Thư viện game</h1>
+      <span style="font-size:13px;color:#A0A7B4">12/20 game</span>
+      <div style="flex:1"></div>
+      <a href="NhapGame.html" class="btn">Nhập game</a>
+      <a href="TaoGame.html" class="btn p">+ Tạo game mới</a>
+    </div>
+    <div role="tablist" style="display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #2A2F3A;padding-bottom:8px">
+      <button class="tab on" role="tab" aria-selected="true">Đang dở (4)</button>
+      <button class="tab" role="tab">Của tôi (8)</button>
+      <button class="tab" role="tab">Được chia sẻ (4)</button>
+      <button class="tab" role="tab">Lưu trữ (2)</button>
+      <button class="tab" role="tab">Thùng rác (1)</button>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+      <label style="display:flex;align-items:center;gap:8px"><span style="position:absolute;left:-9999px">Lọc theo tên</span><input placeholder="Lọc theo tên…" style="width:260px"></label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#A0A7B4">Sắp xếp <select><option>Sửa gần nhất</option><option>Tên A–Z</option></select></label>
+      <div style="flex:1"></div>
+      <div style="display:flex;gap:4px"><button class="tab on">Lưới</button><button class="tab">Danh sách</button></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
+      <article style="background:#171A21;border:1px solid #2A2F3A;border-radius:10px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:150px;background:#1E3A44;display:flex;align-items:flex-end;padding:12px;box-sizing:border-box;font-size:12px;color:#B9D4DB">Ảnh góc chuẩn · Bến sông</div>
+        <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-weight:600;font-size:15px">Làng chài ven sông</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px"><span class="b" style="color:#D29922">⟳ Cần build lại</span><span class="b" style="color:#A0A7B4">2 việc</span></div>
+          <div style="font-size:12px;color:#A0A7B4">Chủ · sửa 5 phút trước bởi Lan</div>
+          <div style="display:flex;gap:8px;align-items:center"><a href="KhongGianLamViec.html" class="btn sm">Làm tiếp</a><div style="flex:1"></div><button class="btn sm" aria-label="Thêm thao tác" style="background:transparent;border-color:transparent">⋯</button></div>
+        </div>
+      </article>
+      <article style="background:#171A21;border:1px solid #2A2F3A;border-radius:10px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:150px;background:#3B2E22;display:flex;align-items:flex-end;padding:12px;box-sizing:border-box;font-size:12px;color:#DCC9B4">Ảnh góc chuẩn · Sân đình</div>
+        <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-weight:600;font-size:15px">Đình làng mùa hội</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px"><span class="b" style="color:#3FB950">✓ Đã xuất bản #2</span><span class="b" style="color:#A0A7B4">4 thay đổi</span></div>
+          <div style="font-size:12px;color:#A0A7B4">Được sửa · hôm qua bởi Huy</div>
+          <div style="display:flex;gap:8px;align-items:center"><a href="KhongGianLamViec.html" class="btn sm">Làm tiếp</a><div style="flex:1"></div><button class="btn sm" aria-label="Thêm thao tác" style="background:transparent;border-color:transparent">⋯</button></div>
+        </div>
+      </article>
+      <article style="background:#171A21;border:1px solid #2A2F3A;border-radius:10px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:150px;background:#26361F;display:flex;align-items:flex-end;padding:12px;box-sizing:border-box;font-size:12px;color:#C6D8BC">Ảnh góc chuẩn · Ruộng lúa</div>
+        <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-weight:600;font-size:15px">Làng quê</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px"><span class="b" style="color:#D29922">▲ Cần nâng cấp</span><span class="b" style="color:#A0A7B4">1 việc</span></div>
+          <div style="font-size:12px;color:#A0A7B4">Chủ · nhập từ gói, 3 ngày trước</div>
+          <div style="display:flex;gap:8px;align-items:center"><a href="KhongGianLamViec.html" class="btn sm">Làm tiếp</a><div style="flex:1"></div><button class="btn sm" aria-label="Thêm thao tác" style="background:transparent;border-color:transparent">⋯</button></div>
+        </div>
+      </article>
+      <article style="background:#171A21;border:1px dashed #3A4150;border-radius:10px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:150px;background:#1F232C;display:flex;align-items:center;justify-content:center;font-size:13px;color:#A0A7B4">✎ Bản nháp</div>
+        <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-weight:600;font-size:15px">"Làng ven biển có chợ cá…"</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px"><span class="b" style="color:#58A6FF">✎ Đang mô tả</span><span class="b" style="color:#A0A7B4">Còn 2 câu hỏi</span></div>
+          <div style="font-size:12px;color:#A0A7B4">Hết hạn sau 28 ngày</div>
+          <div style="display:flex;gap:8px;align-items:center"><a href="TaoGame.html" class="btn sm">Tiếp tục</a><div style="flex:1"></div><button class="btn sm" aria-label="Thêm thao tác" style="background:transparent;border-color:transparent">⋯</button></div>
+        </div>
+      </article>
+    </div>
+    <p style="margin:8px 0 0;font-size:12px;color:#A0A7B4">Đang dở gồm game chưa ở giai đoạn Đã xuất bản hoặc còn thay đổi chưa xuất bản, sắp theo lần sửa cuối.</p>
+  </main>
+</div>
+</body>
+</html>

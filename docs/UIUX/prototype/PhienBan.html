@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phiên bản · GameStudio prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0F1115}
+a{color:#8AB4FF}a:hover{color:#B8D0FF}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:6px;border:1px solid #2A2F3A;background:#1F232C;color:#E6E8EE;font:500 13px/1 'Be Vietnam Pro',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none}
+.btn.p{background:#4C8DFF;border-color:#4C8DFF;color:#0B1220}
+select{font:inherit;font-size:13px;color:#E6E8EE;background:#1F232C;border:1px solid #3A4150;border-radius:6px;height:32px;padding:0 8px}
+.v{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:6px;font-size:13px;line-height:20px}
+.meta{font-size:12px;color:#A0A7B4}
+.b{display:inline-flex;padding:0 6px;border-radius:4px;font-size:11px;line-height:18px;font-weight:500;background:#1F232C}
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;background:#4C8DFF;color:#0B1220;font:600 12px sans-serif;padding:6px 10px;border-radius:6px;text-decoration:none">Danh mục màn hình</a>
+<div style="font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#E6E8EE;background:#0F1115;font-size:14px;line-height:22px;min-height:1000px;display:flex;flex-direction:column">
+  <header style="height:48px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid #2A2F3A;background:#171A21">
+    <a href="KhongGianLamViec.html" class="btn" aria-label="Về không gian làm việc" style="width:32px;padding:0;justify-content:center;background:transparent;border-color:transparent">←</a>
+    <strong>Làng chài ven sông</strong><span style="color:#A0A7B4">· Phiên bản</span>
+  </header>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;padding:12px 24px;border-bottom:1px solid #2A2F3A;align-items:center">
+    <label class="meta" style="display:flex;gap:6px;align-items:center">Nguồn <select><option>Mọi nguồn</option><option>Chat</option><option>Editor</option><option>Nhập</option><option>Nâng cấp</option></select></label>
+    <label class="meta" style="display:flex;gap:6px;align-items:center">Tác giả <select><option>Mọi tác giả</option></select></label>
+    <label style="display:flex;gap:6px;align-items:center;font-size:13px"><input type="checkbox"> Chỉ mốc gắn sao</label>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;flex:1">
+    <nav aria-label="Dòng thời gian" style="flex:1 1 380px;max-width:460px;border-right:1px solid #2A2F3A;padding:16px;display:flex;flex-direction:column;gap:4px;box-sizing:border-box">
+      <div class="meta" style="padding:0 12px 4px;font-weight:500">Hôm nay</div>
+      <div class="v" style="background:#1F232C"><div><strong>#57</strong> Dời giếng sang trái 3 m <span class="b" style="color:#4C8DFF">Hiện tại</span></div><div class="meta">Lan · Editor · 10:01</div></div>
+      <div class="v"><div><strong>#56</strong> Thêm đàn vịt 8 con ở bến</div><div class="meta">Huy · Chat · 09:50</div></div>
+      <div class="v"><div><strong>#55</strong> Nhập gói lang-que.zip</div><div class="meta">Huy · Nhập · 09:30</div></div>
+      <div class="v"><div><strong>#54</strong> Sửa lịch trình ông lão</div><div class="meta">Lan · Editor · 09:12</div></div>
+      <div class="meta" style="padding:8px 12px 4px;font-weight:500">Hôm qua</div>
+      <div class="v" style="outline:1px solid #4C8DFF"><div><strong>#53</strong> Đổi màu mái chợ <span class="b" style="color:#3FB950">Xuất bản #2</span></div><div class="meta">Huy · Editor · 16:20</div></div>
+      <div class="v"><div><strong>#35</strong> ★ "Trước khi đổi chợ"</div><div class="meta">Lan · Editor · 10:02</div></div>
+      <button class="btn" style="margin-top:8px;align-self:flex-start">Tải thêm</button>
+    </nav>
+    <main style="flex:999 1 560px;min-width:0;padding:20px 24px;display:flex;flex-direction:column;gap:14px">
+      <h1 style="margin:0;font-size:18px;font-weight:600">So sánh #53 (bản xuất bản #2) → #57 (hiện tại)</h1>
+      <div style="background:#171A21;border:1px solid #2A2F3A;border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;font-size:13px">
+        <div class="meta" style="font-weight:500">world.json · z1</div>
+        <div><span style="color:#D29922">～</span> Giếng nước: vị trí X 13,5 → 10,5</div>
+        <div><span style="color:#3FB950">＋</span> Đàn vịt "Vịt bến sông" (8 con)</div>
+        <div class="meta" style="font-weight:500;padding-top:6px">entities/npc/ong-lao.json</div>
+        <div><span style="color:#D29922">～</span> Lịch trình: 16:00 Nhà → Chợ</div>
+        <div class="meta" style="font-weight:500;padding-top:6px">world.json · z3 (từ gói nhập)</div>
+        <div><span style="color:#3FB950">＋</span> Zone "Chợ quê"</div>
+        <a href="#" style="font-size:12px">Xem JSON</a>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn">Đặt tên / gắn sao</button><button class="btn p">Khôi phục mốc #53</button></div>
+      <p class="meta" style="margin:0">Khôi phục tạo mốc mới với nội dung của mốc cũ, lịch sử giữ nguyên.</p>
+    </main>
+  </div>
+</div>
+</body>
+</html>

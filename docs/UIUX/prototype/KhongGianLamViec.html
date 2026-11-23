@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Không gian làm việc · GameStudio prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0F1115}
+a{color:#8AB4FF}a:hover{color:#B8D0FF}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:6px;border:1px solid #2A2F3A;background:#1F232C;color:#E6E8EE;font:500 13px/1 'Be Vietnam Pro',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none}
+.btn.p{background:#4C8DFF;border-color:#4C8DFF;color:#0B1220}
+.btn.sm{height:28px;padding:0 10px;font-size:12px}
+.btn.gh{background:transparent;border-color:transparent;color:#A0A7B4}
+.b{display:inline-flex;align-items:center;gap:4px;padding:0 8px;border-radius:4px;font-size:12px;line-height:22px;font-weight:500;background:#1F232C}
+.tab{height:30px;padding:0 10px;border-radius:6px;border:0;background:transparent;color:#A0A7B4;font:500 12px 'Be Vietnam Pro',sans-serif;cursor:pointer;white-space:nowrap}
+.tab.on{background:#1F232C;color:#E6E8EE}
+.step{display:flex;align-items:center;gap:10px;height:28px;font-size:13px}
+.pend{display:flex;align-items:center;gap:8px;font-size:13px;padding:6px 0;border-bottom:1px solid #2A2F3A}
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;background:#4C8DFF;color:#0B1220;font:600 12px sans-serif;padding:6px 10px;border-radius:6px;text-decoration:none">Danh mục màn hình</a>
+<div style="font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#E6E8EE;background:#0F1115;font-size:14px;line-height:22px;min-height:1000px;display:flex;flex-direction:column">
+  <header style="min-height:48px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 16px;box-sizing:border-box;border-bottom:1px solid #2A2F3A;background:#171A21">
+    <a href="index-thu-vien.html" class="btn gh" aria-label="Về thư viện" style="width:32px;padding:0;justify-content:center">←</a>
+    <strong style="font-size:15px">Làng chài ven sông</strong>
+    <span class="b" style="color:#A0A7B4">Chủ</span>
+    <button class="b" style="color:#D29922;border:1px solid #5A4A1E;cursor:pointer;font-family:inherit">⟳ Cần build lại</button>
+    <span style="font-size:12px;color:#A0A7B4">Đã lưu · <a href="PhienBan.html">#57</a></span>
+    <span class="b" style="color:#4C8DFF">● Bạn đang sửa</span>
+    <div style="flex:1"></div>
+    <button class="btn">Build (4) ▾</button>
+    <button class="btn">QA ▾</button>
+    <a href="XuatBan.html" class="btn">Xuất bản</a>
+    <a href="XuatBan.html" class="btn">Chia sẻ</a>
+    <span class="b" style="color:#58A6FF">◐ 1 job</span>
+  </header>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:4px 16px;font-size:12px;background:#14171D;border-bottom:1px solid #2A2F3A;color:#A0A7B4">Game có 4 thay đổi chưa xuất bản so với bản #2. <a href="PhienBan.html">Xem thay đổi</a></div>
+  <div style="display:flex;flex-wrap:wrap;flex:1;min-height:880px">
+    <aside style="flex:0 1 360px;min-width:280px;border-right:1px solid #2A2F3A;background:#171A21;display:flex;flex-direction:column">
+      <div role="tablist" style="display:flex;gap:4px;padding:8px;border-bottom:1px solid #2A2F3A"><button class="tab on" role="tab" aria-selected="true">Chat</button><button class="tab" role="tab">Cây</button><button class="tab" role="tab">Asset</button><div style="flex:1"></div><button class="tab" aria-label="Thu gọn cột">«</button></div>
+      <div style="flex:1;padding:12px;display:flex;flex-direction:column;gap:12px;font-size:13px;line-height:20px">
+        <div style="border:1px solid #2A2F3A;border-radius:10px;padding:10px 12px"><span style="color:#B392F0;font-weight:600;font-size:12px">AI · Tóm tắt tiến độ</span><br>Làng chài ven sông đang ở bước Build phần thay đổi. Đã xong: brief v3, style bible, build z1 và z2. Còn 3 việc: 1 đề xuất chờ duyệt, 1 job QA lỗi, 4 thay đổi chưa xuất bản. Nên làm tiếp: build lại zone z2.</div>
+        <div style="background:#171A21;border:1px solid #3A4150;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;gap:6px;align-items:center"><span style="color:#B392F0;font-weight:600;font-size:12px">Đề xuất · AI</span><div style="flex:1"></div><span style="font-size:11px;color:#A0A7B4">09:15</span></div>
+          <div>Thêm zone Chợ quê nối với cổng làng.</div>
+          <label style="display:flex;gap:6px;align-items:center"><input type="checkbox" checked> Thêm zone "Chợ quê" (z3) <span class="b" style="color:#D29922;margin-left:auto">⟳ Cần build</span></label>
+          <label style="display:flex;gap:6px;align-items:center"><input type="checkbox" checked> Thêm 4 NPC bán hàng <span class="b" style="color:#D29922;margin-left:auto">⟳ Cần build</span></label>
+          <div style="background:#1F232C;border-radius:6px;padding:6px 8px;font-size:12px"><strong>Cập nhật brief v3 → v4</strong><br>Số zone: 2 → 3 · Địa điểm: + Chợ quê</div>
+          <div style="font-size:12px;color:#A0A7B4">Ảnh hưởng: chỉ build z3, khoảng 11 phút</div>
+          <div style="display:flex;gap:8px"><button class="btn p sm">Duyệt và cập nhật brief</button><button class="btn sm">Bỏ</button></div>
+        </div>
+        <div style="border:1px solid #2A2F3A;border-radius:10px;padding:10px 12px;opacity:.75"><span style="color:#A0A7B4;font-size:12px">⊘ Hết hạn</span><br>Game đã đổi sau khi đề xuất được tạo. <button class="btn sm" style="margin-top:6px">Tạo lại đề xuất</button></div>
+      </div>
+      <div style="padding:12px;border-top:1px solid #2A2F3A;display:flex;gap:8px"><label style="flex:1"><span style="position:absolute;left:-9999px">Nhắn cho AI</span><input placeholder="Nhắn cho AI: thêm, sửa, hỏi về game…" style="width:100%;font:inherit;font-size:13px;color:#E6E8EE;background:#1F232C;border:1px solid #3A4150;border-radius:6px;height:36px;padding:0 10px;box-sizing:border-box"></label><button class="btn p" aria-label="Gửi" style="height:36px">➤</button></div>
+    </aside>
+    <section aria-label="Khung xem trước 3D" style="flex:999 1 480px;min-width:0;position:relative;background:#22313A;display:flex;flex-direction:column">
+      <div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:rgba(15,17,21,.85);border-bottom:1px solid #2A2F3A;font-size:12px">
+        <button class="btn sm">Bay ▾</button><button class="btn sm">z1 ▾</button><button class="btn sm">16:00</button><button class="btn sm">Vừa ▾</button><button class="btn sm">QR</button><button class="btn sm" aria-label="Toàn màn hình">⛶</button>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#E6E8EE;padding:8px 12px;background:rgba(15,17,21,.6);align-self:flex-start;margin:8px;border-radius:4px">fps 58/30 · dc 96/120 · tri 410k/450k · gpu 310/512 MB</div>
+      <div style="flex:1;position:relative;min-height:520px;overflow:hidden">
+        <div style="position:absolute;left:0;right:0;bottom:0;height:46%;background:#3E5236"></div>
+        <div style="position:absolute;left:0;right:0;bottom:30%;height:9%;background:#4F6E7A"></div>
+        <div style="position:absolute;left:18%;bottom:40%;width:120px;height:80px;background:#6B5640;border-radius:4px 4px 0 0"></div>
+        <div style="position:absolute;left:18%;bottom:calc(40% + 80px);width:140px;height:36px;margin-left:-10px;background:#4A3A2A;clip-path:polygon(50% 0,100% 100%,0 100%)"></div>
+        <div style="position:absolute;left:52%;bottom:36%;width:44px;height:44px;border-radius:22px;background:#7A7F86;outline:2px solid #FFB224;outline-offset:4px"></div>
+        <div style="position:absolute;left:52%;bottom:calc(36% + 60px);font-size:12px;background:#0F1115;padding:2px 8px;border-radius:4px;margin-left:-20px">Giếng nước</div>
+        <div style="position:absolute;left:68%;bottom:42%;width:90px;height:60px;background:#5D4B38;border-radius:4px 4px 0 0"></div>
+        <div style="position:absolute;right:12px;top:12px;font-size:12px;background:#0F1115;padding:4px 8px;border-radius:4px;color:#D29922">Bản xem trước là #53, dữ liệu là #57</div>
+      </div>
+      <div style="display:flex;gap:6px;justify-content:center;padding:8px;background:rgba(15,17,21,.85)"><button class="btn sm">Di chuyển</button><button class="btn sm">Xoay</button><button class="btn sm">Co giãn</button><button class="btn sm">Lưới 0,5 ▾</button></div>
+    </section>
+    <aside style="flex:0 1 400px;min-width:300px;border-left:1px solid #2A2F3A;background:#171A21;display:flex;flex-direction:column">
+      <div role="tablist" style="display:flex;flex-wrap:wrap;gap:4px;padding:8px;border-bottom:1px solid #2A2F3A"><button class="tab on" role="tab" aria-selected="true">Tiến độ (3)</button><button class="tab" role="tab">Thuộc tính</button><button class="tab" role="tab">Môi trường</button><button class="tab" role="tab">NPC</button><button class="tab" role="tab">Động vật</button><button class="tab" role="tab">Hội thoại</button><button class="tab" role="tab">JSON</button></div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:8px"><span style="font-size:12px;color:#A0A7B4">Dữ liệu #57 · cập nhật 10:02</span><div style="flex:1"></div><button class="btn sm gh">⟳ Làm mới</button></div>
+        <ol aria-label="Giai đoạn" style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px">
+          <li class="step"><span style="color:#3FB950;width:16px">✓</span>Mô tả và làm rõ</li>
+          <li class="step"><span style="color:#3FB950;width:16px">✓</span>Xác nhận brief<span style="margin-left:auto;font-size:12px;color:#A0A7B4">v3</span></li>
+          <li class="step"><span style="color:#3FB950;width:16px">✓</span>Duyệt style bible<span style="margin-left:auto;font-size:12px;color:#A0A7B4">s2</span></li>
+          <li class="step"><span style="color:#3FB950;width:16px">✓</span>Build mọi zone<span style="margin-left:auto;font-size:12px;color:#A0A7B4">z1 ✓ z2 ✓</span></li>
+          <li class="step" aria-current="step" style="font-weight:600;background:#1C2A44;border-radius:6px;padding:0 6px;margin:0 -6px"><span style="color:#4C8DFF;width:16px">◐</span>Build phần thay đổi<span style="margin-left:auto;font-size:12px;color:#A0A7B4;font-weight:400">z2: 4 bước cũ</span></li>
+          <li class="step" style="color:#A0A7B4"><span style="width:16px">○</span>QA nhẹ</li>
+          <li class="step" style="color:#A0A7B4"><span style="width:16px">○</span>Xuất bản<span style="margin-left:auto;font-size:12px">đang có bản #2</span></li>
+          <li class="step" style="color:#A0A7B4"><span style="width:16px">○</span>Đã xuất bản</li>
+        </ol>
+        <button class="btn p" style="height:40px;justify-content:center;font-size:14px">▶ Build lại zone z2 (khoảng 14 phút)</button>
+        <div>
+          <div style="font-size:12px;color:#A0A7B4;font-weight:500;padding-bottom:4px">Việc còn treo (3)</div>
+          <div class="pend"><span style="color:#F85149">✕</span>Job QA z1 lỗi lúc 09:40<div style="flex:1"></div><button class="btn sm">Thử lại</button></div>
+          <div class="pend"><span style="color:#58A6FF">●</span>1 đề xuất chờ duyệt<div style="flex:1"></div><button class="btn sm gh">Mở</button></div>
+          <div class="pend"><span style="color:#58A6FF">●</span>4 thay đổi chưa xuất bản so với #2<div style="flex:1"></div><a href="PhienBan.html" class="btn sm gh">Xem</a></div>
+        </div>
+        <div style="border:1px solid #3A4150;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px;background:#1A1E26">
+          <div style="font-weight:600">Build phần thay đổi</div>
+          <div style="font-size:13px">Sẽ chạy 4 bước ở 1 zone, khoảng 14 phút.</div>
+          <table style="border-collapse:collapse;font-size:12px;width:100%">
+            <tr><td style="padding:3px 0">z2 · placement</td><td style="color:#A0A7B4">dữ liệu đổi (#54–#57)</td></tr>
+            <tr><td style="padding:3px 0">z2 · lighting.bake</td><td style="color:#A0A7B4">phụ thuộc placement</td></tr>
+            <tr><td style="padding:3px 0">z2 · packager</td><td></td></tr>
+            <tr><td style="padding:3px 0">z2 · qa</td><td></td></tr>
+          </table>
+          <div style="font-size:12px;color:#A0A7B4">z1 dùng lại từ lần build trước.</div>
+          <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn sm">Huỷ</button><button class="btn p sm">Bắt đầu build</button></div>
+        </div>
+        <p style="margin:0;font-size:11px;color:#A0A7B4">Hộp trên mở khi bấm nút chính (minh hoạ).</p>
+      </div>
+    </aside>
+  </div>
+</div>
+</body>
+</html>

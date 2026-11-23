@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quản trị: Tổng quan · GameStudio prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0F1115}
+a{color:#8AB4FF}a:hover{color:#B8D0FF}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:6px;border:1px solid #2A2F3A;background:#1F232C;color:#E6E8EE;font:500 13px/1 'Be Vietnam Pro',sans-serif;cursor:pointer;white-space:nowrap;text-decoration:none}
+.btn.p{background:#4C8DFF;border-color:#4C8DFF;color:#0B1220}
+.btn.sm{height:28px;padding:0 10px;font-size:12px}
+.nav{display:flex;align-items:center;height:34px;padding:0 12px;border-radius:6px;color:#A0A7B4;text-decoration:none;font-size:13px}
+.nav.on{background:#1F232C;color:#E6E8EE;font-weight:600}
+.kpi{background:#171A21;border:1px solid #2A2F3A;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.kl{font-size:12px;color:#A0A7B4}.kv{font-size:24px;line-height:32px;font-weight:600}
+.alert{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #2A2F3A;font-size:13px}
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;background:#4C8DFF;color:#0B1220;font:600 12px sans-serif;padding:6px 10px;border-radius:6px;text-decoration:none">Danh mục màn hình</a>
+<div style="font-family:'Be Vietnam Pro',system-ui,sans-serif;color:#E6E8EE;background:#0F1115;font-size:14px;line-height:22px;min-height:1000px;display:flex;flex-direction:column">
+  <header style="height:48px;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid #2A2F3A;background:#171A21">
+    <a href="index-thu-vien.html" style="font-weight:700;font-size:15px;color:#E6E8EE;text-decoration:none">GameStudio</a>
+    <a href="index-thu-vien.html" class="nav">Thư viện</a><a href="AdminTongQuan.html" class="nav on">Quản trị</a>
+    <div style="flex:1"></div>
+    <button class="btn" aria-label="Tài khoản của Huy" style="width:32px;padding:0;justify-content:center;border-radius:16px;background:#2D3A55">H</button>
+  </header>
+  <div style="display:flex;flex-wrap:wrap;flex:1">
+    <nav aria-label="Quản trị" style="flex:1 1 220px;max-width:220px;padding:12px;border-right:1px solid #2A2F3A;display:flex;flex-direction:column;gap:2px;box-sizing:border-box">
+      <a href="AdminTongQuan.html" class="nav on">Tổng quan</a>
+      <a href="AdminNguoiDung.html" class="nav">Người dùng</a>
+      <a href="AdminHanMuc.html" class="nav">Hạn mức</a>
+      <a href="AdminChiPhi.html" class="nav">Chi phí và sử dụng</a>
+      <a href="AdminHeThong.html" class="nav">Hệ thống</a>
+      <a href="AdminKiemDuyet.html" class="nav">Kiểm duyệt</a>
+      <a href="AdminKiemToan.html" class="nav">Nhật ký kiểm toán</a>
+      <a href="AdminThongBao.html" class="nav">Thông báo hệ thống</a>
+    </nav>
+    <main style="flex:999 1 560px;min-width:0;padding:24px;display:flex;flex-direction:column;gap:20px;max-width:1180px">
+      <div style="display:flex;align-items:center;gap:12px"><h1 style="margin:0;font-size:20px;font-weight:600">Tổng quan</h1><div style="flex:1"></div><span style="font-size:12px;color:#A0A7B4">cập nhật 14:05</span><button class="btn sm" aria-label="Làm mới">↻</button></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px">
+        <div class="kpi"><span class="kl">Người dùng hoạt động 7 ngày</span><span class="kv">11<span style="font-size:14px;color:#A0A7B4">/14</span></span></div>
+        <div class="kpi"><span class="kl">Job 24 giờ</span><span class="kv">43</span><span style="font-size:12px"><span style="color:#3FB950">✓ 38</span> · <span style="color:#F85149">✕ 2</span> · <span style="color:#58A6FF">◐ 3</span></span></div>
+        <div class="kpi"><span class="kl">Chi phí AI hôm nay</span><span class="kv">6,10 <span style="font-size:14px;color:#A0A7B4">USD</span></span><span style="font-size:12px;color:#A0A7B4">26,30 USD / 7 ngày</span></div>
+        <div class="kpi"><span class="kl">Lưu trữ</span><span class="kv">41%</span><div style="height:6px;background:#1F232C;border-radius:3px"><div style="width:41%;height:6px;background:#58A6FF;border-radius:3px"></div></div></div>
+        <div class="kpi"><span class="kl">API P95 (1 giờ)</span><span class="kv">182 <span style="font-size:14px;color:#A0A7B4">ms</span></span><span style="font-size:12px;color:#3FB950">✓ dưới 500 ms</span></div>
+      </div>
+      <section style="background:#171A21;border:1px solid #2A2F3A;border-radius:10px">
+        <h2 style="margin:0;padding:14px;font-size:15px;font-weight:600;border-bottom:1px solid #2A2F3A">Cần xử lý (4)</h2>
+        <div class="alert"><span style="color:#F85149">✕</span><span>worker-2 không đạt doctor: Blender 4.4 (cần 4.5)</span><div style="flex:1"></div><a href="AdminHeThong.html" class="btn sm">Xem hệ thống</a></div>
+        <div class="alert"><span style="color:#D29922">▲</span><span>Lan đã dùng 100% hạn mức AI hôm nay</span><div style="flex:1"></div><a href="AdminHanMuc.html" class="btn sm">Xem hạn mức</a></div>
+        <div class="alert"><span style="color:#D29922">▲</span><span>Sao lưu kho đối tượng quá hạn (9 ngày)</span><div style="flex:1"></div><a href="AdminHeThong.html" class="btn sm">Xem hệ thống</a></div>
+        <div class="alert" style="border-bottom:0"><span style="color:#58A6FF">●</span><span>2 link không cần đăng nhập còn hạn trên 30 ngày</span><div style="flex:1"></div><a href="AdminKiemDuyet.html" class="btn sm">Xem kiểm duyệt</a></div>
+      </section>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center"><span style="font-size:13px;color:#A0A7B4">Lối tắt</span><a href="AdminNguoiDung.html" class="btn">+ Mời người dùng</a><a href="AdminThongBao.html" class="btn">Soạn thông báo hệ thống</a></div>
+      <p style="margin:0;font-size:12px;color:#A0A7B4">Tự làm mới mỗi 60 giây khi trang đang mở. Không có cảnh báo: hiện "Mọi thứ ổn."</p>
+    </main>
+  </div>
+</div>
+</body>
+</html>
