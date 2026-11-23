@@ -38,8 +38,14 @@ Trên Windows PowerShell phải bật UTF-8 trước, nếu không script sẽ d
 - Triển khai Docker Compose trên Ubuntu 24.04 + Caddy + restic + Uptime Kuma (032); QA Playwright + ssim.js + pixelmatch (033).
 - Giá trị đã định: công thức sát thương mặc định `max(1, atk + weapon - def)` (SRS-06 v1.1).
 
-## 4. Mã nguồn: hiện chưa có
-Một khung monorepo và dịch vụ `ai-gateway` đã được dựng thử rồi **gỡ bỏ hoàn toàn** ngày 23/11/2026 theo yêu cầu của Huy (dự án làm chủ yếu qua gói Max). Hiện `C:\GameStudio` chỉ có `docs\`, brief gốc và file này; **chưa có dòng mã nào**.
+## 4. Mã nguồn: mới có bản fork bộ gốc (E0-01)
+Một khung monorepo và dịch vụ `ai-gateway` đã được dựng thử rồi **gỡ bỏ hoàn toàn** ngày 23/11/2026 theo yêu cầu của Huy (dự án làm chủ yếu qua gói Max).
+
+Từ 23/11/2026, `C:\GameStudio` là **repo git cục bộ** (Huy chọn không dùng remote; không có GitHub). Nhánh `main` gồm:
+- `f771f5e` E0-01: fork `threejs-game-skills@8286774`. Skill nằm ở `.claude/skills/` (8 skill gốc), đã bỏ `threejs-3d-generator`/Tripo và phần Codex. Có thêm `UPSTREAM.md`, `.gitattributes` (LF) và `.gitignore` theo TSD-09 §6. `LICENSE` trùng vendor.
+- `7977f93`: tài liệu dự án (`docs/`, brief, file này).
+- Nhánh `vendor/upstream` = bản gốc nguyên vẹn. Remote `upstream` chỉ fetch (push bị vô hiệu).
+- Kiểm thử helper của bộ gốc: `npm run test:helpers` (29 test Python + 48 test Node, đạt). **Chưa có mã engine/web nào**; scaffold Vite gốc nằm trong `.claude/skills/threejs-gameplay-systems/assets/threejs-vite-game/`.
 
 Tài liệu vẫn mô tả hai thành phần đó như **kiến trúc sản phẩm tương lai**, chưa có code:
 - ADR-016 (monorepo pnpm + uv), ADR-028 (Fastify/PostgreSQL) và ADR-031 (dịch vụ AI, `ai-gateway` giữ khoá, ALG-WEB-05 hạn mức/chi phí) cùng TSD-00 §4 (cây thư mục `engine/`, `web/`), TSD-08, TSD-09, DDD-08/09.
@@ -53,10 +59,10 @@ Hiện trạng máy dev (kiểm ngày 23/11/2026):
 | pnpm | 12.16.1 | ghi ở `versions.json` | Đạt |
 | uv | 0.13.6 | có | Đạt |
 | Python | 3.14.7 (hệ thống) | **3.12** | Lệch: dùng `uv python install 3.12` + `.python-version`, không đổi Python hệ thống |
-| git | 2.55.0 | có | `C:\GameStudio` **chưa phải repo git** |
-| Blender | không có | **4.5 LTS** + Sapling, A.N.T. Landscape | Cần cho E1+ (bước Blender) và `engine doctor` đạt ở G-E0 |
+| git | 2.55.0 | có | Repo cục bộ, đã có từ E0-01 |
+| Blender | **4.2.9 LTS** và **5.2.4 LTS** ở `C:\Tools\blender-*`, không có trong PATH | **4.5 LTS** + Sapling, A.N.T. Landscape | **Lệch:** Huy báo đã cài 4.5 LTS nhưng trên máy chưa tìm thấy bản 4.5 (đã quét mọi ổ, registry, `%APPDATA%\Blender Foundation`). Cần Huy xác nhận đường dẫn, hoặc cài 4.5, hoặc đổi phiên bản bằng ADR mới thay ADR-017 |
 | Docker | không có | (máy chủ W1) | Chỉ cần nếu chạy thử Compose trên máy dev |
-| ktx, ffmpeg, gitleaks | chưa kiểm | theo SCH-DEV-03 | Kiểm khi viết `versions.json` |
+| ktx, ffmpeg, gitleaks | **không có** | theo SCH-DEV-03 | Cần cho phiếu 3 (`engine doctor`) và phiếu 4 (pre-commit gitleaks) |
 
 ## 5. Việc còn mở
 1. ~~Duyệt UIUX/DDD~~ **Đã đóng 23/11/2026**: UIUX v1.0 và DDD v1.0 đã duyệt. OIU-WEB-06 theo đề xuất: Tiến độ là tab đầu của bảng phải 400 px, mở bằng chip giai đoạn. OIU-WEB-07 theo đề xuất: tab mặc định của thư viện là "Đang dở" khi có ít nhất một mục, và nhớ tab người dùng chọn lần cuối.
@@ -80,7 +86,7 @@ Hiện trạng máy dev (kiểm ngày 23/11/2026):
 Thứ tự phiếu đề xuất (mỗi phiếu một phiên Claude Code, `/clear` giữa các phiếu):
 | # | Phiếu | Nguồn | Ghi chú |
 |---|---|---|---|
-| 1 | `git init`, `.gitignore`, fork `majidmanzarpour/threejs-game-skills` (MIT): nhánh `vendor/upstream`, ghi `UPSTREAM.md`, giữ `LICENSE`; bỏ phần Codex và skill `threejs-3d-generator` | QĐ-01, 02, 07, 08; ALG-DEV-09; SCH-DEV-06 | **Hỏi Huy:** URL repo đích và có dùng GitHub không (liên quan OIT-GEN-04) |
+| 1 | ✅ **Xong 23/11/2026** (`f771f5e`): `git init`, `.gitignore`, fork `majidmanzarpour/threejs-game-skills` (MIT): nhánh `vendor/upstream`, ghi `UPSTREAM.md`, giữ `LICENSE`; bỏ phần Codex và skill `threejs-3d-generator` | QĐ-01, 02, 07, 08; ALG-DEV-09; SCH-DEV-06 | Repo chỉ cục bộ (Huy chốt). Hệ quả: OIT-GEN-04, CI GitHub Actions (ALG-DEV-10) chưa có nơi chạy, tạm thay bằng pre-commit + script cục bộ |
 | 2 | Khung monorepo theo TSD-00 §4.1: `pnpm-workspace.yaml`, `tsconfig.base.json` (strict, `noUncheckedIndexedAccess`), `pyproject.toml` + `.python-version` 3.12 qua uv, ESLint/Prettier/Ruff | ADR-016, 017; TSD-00 §4.3 | Chỉ khung rỗng, chưa viết gói |
 | 3 | `tools/versions.json` + `engine doctor` tối thiểu trong `engine/cli` | SCH-DEV-03, IF-DEV-03, ALG-DEV-06; TST-DEV-03 | Cần cài Blender 4.5 LTS + 2 add-on, ktx, ffmpeg (libopus), gitleaks; cố định bản Three.js |
 | 4 | `.claude/` tối giản: 8 agent, hook H-01…H-05 (Node), `settings.json`, templates; `CLAUDE.md` < 150 dòng; `project.yaml`; `.githooks/pre-commit` + `gitleaks.toml` | TSD-09 §2.1, IF-DEV-01…05, ALG-DEV-03…05, 08; TST-DEV-01, 02, 05 | Lệnh slash (13 + 2) có thể để khung, hoàn thiện dần |
@@ -88,7 +94,7 @@ Thứ tự phiếu đề xuất (mỗi phiếu một phiên Claude Code, `/clear
 | 6 | Chạy scaffold gốc, đo baseline trên Galaxy A56 (`?perf=1`), ghi `budgets.json`; đo lại OIT-GEN-01 (DPR 1,5) | FR-RTM-12, 13, FR-QA-07 | **Cần Huy cầm máy A56** và nơi phục vụ bản build (máy chủ poc, CH-10) |
 | 7 | `/gate-check` G-E0 → `docs/gates/G-E0.md`, Huy điền `huyConfirm` | ALG-DEV-07, SCH-DEV-05 | |
 
-Việc cần Huy trước khi chạy phiếu 1: (a) xác nhận bắt đầu E0; (b) repo đích (GitHub riêng tư hay chỉ cục bộ); (c) cài Blender 4.5 LTS trên máy dev (thao tác cài phần mềm do Huy quyết).
+Huy đã xác nhận (23/11/2026): bắt đầu E0; repo chỉ cục bộ. Còn chặn phiếu 3: Blender 4.5 LTS chưa thấy trên máy (xem §4), thiếu ktx, ffmpeg, gitleaks. Phiếu 2, 4 (phần không cần gitleaks) và 5 làm được ngay.
 
 ## 7. Quy ước làm việc
 - Tiếng Việt; tài liệu Markdown; file mã ≤ ~300 dòng, mỗi gói có README ≤ 60 dòng; ESM, `strict` + `noUncheckedIndexedAccess`; log JSON một dòng, không bao giờ ghi khoá hay nội dung hội thoại.
