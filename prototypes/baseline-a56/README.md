@@ -12,6 +12,18 @@ Thay đổi so với scaffold gốc (rule `prototypes`, nới lỏng):
 pnpm --filter @gamestudio/prototype-baseline-a56 build   # ra prototypes/baseline-a56/dist/
 ```
 
+## Xuất bản lên poc (23/11/2026)
+
+Máy chủ poc là chính máy dev này (IP công khai `160.191.243.120`), chạy `C:\poc-public\bin\serve_poc.py` (tác vụ `poc-public`, cổng 18080, của Thiền viện online T-0082/83). Bản build chép vào `C:\poc-public\split\gamestudio-baseline-a56\` và phục vụ ở:
+
+`http://160.191.243.120:18080/<mã>/split/gamestudio-baseline-a56/index.html`
+
+- `<mã>`: trong `C:\poc-public\LIEN-KET.txt` (không ghi vào repo). Mã sai → 404. Giới hạn 400 yêu cầu/10 s mỗi IP.
+- Chép lại sau khi build: `Copy-Item prototypes\baseline-a56\dist\* C:\poc-public\split\gamestudio-baseline-a56\ -Recurse -Force`.
+- **Lưu ý:** `publish_poc.py --split` của Thiền viện online thay cả thư mục `split\` và sẽ xoá bản này; chạy lại lệnh chép ở trên sau đó.
+- Kiểm URL chạy được (không đo): `$env:GS_CHECK_URL='<URL>'; node prototypes/baseline-a56/check-url.mjs`.
+- Gỡ: `Remove-Item C:\poc-public\split\gamestudio-baseline-a56 -Recurse`.
+
 ## Đo trên A56 (Chrome Android)
 1. Mở `<URL>/?perf=1` → để máy yên 65 giây (5 s khởi động + 60 s đo), màn hình sáng, pin > 50%, không sạc.
 2. Mở `<URL>/?perf=1&dpr=1.5` → đo lần nữa (OIT-GEN-01).
