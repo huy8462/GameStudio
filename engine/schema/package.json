@@ -1,0 +1,26 @@
+{
+  "name": "@gamestudio/schema",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Schema du lieu game, chuan tac hoa JSON, bam, ngan sach (MOD-GEN-12).",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./schemas/*": "./schemas/*"
+  },
+  "files": [
+    "dist",
+    "schemas"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@noble/hashes": "2.4.0",
+    "ajv": "8.20.0"
+  }
+}

@@ -11,6 +11,7 @@ scripts/
 LICENSE
 README.md
 # Sinh ra / phụ thuộc
+engine/shared/rng/vectors.json
 pnpm-lock.yaml
 uv.lock
 **/node_modules/

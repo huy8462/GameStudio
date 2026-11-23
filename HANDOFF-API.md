@@ -107,7 +107,12 @@ Thứ tự phiếu đề xuất (mỗi phiếu một phiên Claude Code, `/clear
 | 6 | ✅ **Xong 23/11/2026** (Huy đo A56: DPR 2 → fps tb 71,7 / p5 56,8; DPR 1,5 → 60,1 / 55,6; `docs/gates/G-E0/a56-baseline.*`). Chi tiết: `prototypes/baseline-a56` = scaffold gốc + `?perf=1` (60 s đo, hiện JSON + nút sao chép) + `?dpr=` (OIT-GEN-01); build xong (`dist/` 590 KB JS, 149 KB gzip; gitleaks sạch). Kiểm trên máy dev bằng `smoke-perf.mjs` (SwiftShader, chỉ kiểm chạy được, **không phải số A56**): 0 lỗi, 26 draw call, 3.226 tri. **Đã xuất bản 23/11/2026** lên poc (chính máy này, `160.191.243.120:18080`, máy chủ `serve_poc.py` của Thiền viện online) tại `/<mã>/split/gamestudio-baseline-a56/index.html`; kiểm qua IP công khai: tải đủ, 0 lỗi | FR-RTM-12, 13, FR-QA-07 | Mã truy cập ở `C:\poc-public\LIEN-KET.txt`, không ghi vào repo. `publish_poc.py --split` của Thiền viện online sẽ xoá bản này (xem README prototype) |
 | 7 | ✅ **G-E0 ĐÃ QUA** (Huy xác nhận 24/11/2026 00:37): `docs/gates/G-E0.md`, 7/7 điều kiện tự kiểm đạt; m1 (Samsung Internet) và m2 (phần hoãn sang E1) được chấp nhận | ALG-DEV-07, SCH-DEV-05, QT-DEV-03 | Baseline A56: `docs/gates/G-E0/a56-baseline.md` (fps p5 55,6 ở DPR 1,5; chạm trần 60 fps của trình duyệt; cảnh quá nhẹ để chốt ngân sách cảnh lớn) |
 
-**E0 hoàn tất; G-E0 đã qua ngày 24/11/2026.** Bước tiếp: **E1**.
+**E0 hoàn tất; G-E0 đã qua ngày 24/11/2026.** Đang ở **E1**.
+
+**Phiếu E1 đã xong:**
+- **T-0001** (24/11/2026, `docs/tickets/T-0001.md`): `@gamestudio/rng` (PCG32 + `deriveSeed`, TS = Python theo `vectors.json`); lõi `@gamestudio/schema` (`canonicalize` RFC 8785, `sha256Hex`/`jsonHash`/`dataHash`, `evaluate`, `validate` Ajv, schema `budgets/1`); `games/_template/data/budgets.json` có baseline A56.
+
+**Phiếu E1 kế tiếp (đề xuất):** T-0002: schema `game`, `world`, `palette` + `patch.ts` (MOD-GEN-06) + Ajv standalone `dist/validators.{js,cjs}` cho hook H-03, rồi `engine validate` (TC-GEN-01).
 
 **Việc hoãn từ E0 (m2) đưa vào E1:**
 - Tạo `games/_template/data/budgets.json` + `budgets.schema.json` và ghi baseline A56: `targetFps 30`, `maxRenderDpr 1.5`, `a56Baseline` theo `docs/gates/G-E0/a56-baseline.md`.

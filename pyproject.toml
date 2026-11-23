@@ -39,7 +39,10 @@ ignore = ["PLR2004"]
 python_version = "3.12"
 strict = true
 files = ["engine/build/py"]
+mypy_path = "engine/build/py"
+explicit_package_bases = true
 
 [tool.pytest.ini_options]
 testpaths = ["engine/build"]
+pythonpath = ["engine/build/py"]
 markers = ["heavy: bước nặng (Blender, bake), chỉ chạy nightly trên worker (TSD-00 §10)"]

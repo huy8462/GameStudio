@@ -1,0 +1,25 @@
+{
+  "name": "@gamestudio/rng",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PCG32 và suy seed tất định (MOD-GEN-10, ALG-GEN-01).",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./vectors.json": "./vectors.json"
+  },
+  "files": [
+    "dist",
+    "vectors.json"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@noble/hashes": "2.4.0"
+  }
+}

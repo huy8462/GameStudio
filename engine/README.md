@@ -1,6 +1,6 @@
 # engine/
 
-Thư viện engine và công cụ build (TSD-00 §4.1, DDD-00 §4.1). Gói tạo dần theo pha; hiện có `cli/` (chỉ lệnh `doctor`).
+Thư viện engine và công cụ build (TSD-00 §4.1, DDD-00 §4.1). Gói tạo dần theo pha; hiện có `cli/` (lệnh `doctor`), `shared/rng/`, `schema/` (lõi: jcs, hash, budget, schema `budgets`), `build/py/gsrng.py`.
 
 | Thư mục | Gói | Mã | Pha |
 |---|---|---|---|

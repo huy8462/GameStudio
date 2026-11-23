@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gamestudio.local/schema/budgets/1.json",
+  "title": "budgets.json (SCH-GEN-03, SCH-RTM-03, SRS-04 §6.3, CFG-GEN-02)",
+  "type": "object",
+  "required": ["schemaVersion", "tiers"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "defaultTier": { "$ref": "#/$defs/tierId", "default": "vua" },
+    "tiers": {
+      "type": "object",
+      "required": ["thap", "vua", "cao", "toi_da"],
+      "additionalProperties": false,
+      "properties": {
+        "thap": { "$ref": "#/$defs/tierBudget" },
+        "vua": { "$ref": "#/$defs/tierBudget" },
+        "cao": { "$ref": "#/$defs/tierBudget" },
+        "toi_da": { "$ref": "#/$defs/tierBudget" }
+      }
+    },
+    "a56Baseline": { "$ref": "#/$defs/deviceBaseline" },
+    "notes": { "type": "string" }
+  },
+  "$defs": {
+    "tierId": { "enum": ["thap", "vua", "cao", "toi_da"] },
+    "count": { "type": "integer", "minimum": 0 },
+    "tierBudget": {
+      "type": "object",
+      "required": [
+        "fpsTarget",
+        "maxRenderDpr",
+        "drawCalls",
+        "materials",
+        "trisStatic",
+        "trisTotal",
+        "maxTexture",
+        "memoryMB",
+        "zoneDownloadMB",
+        "skinnedHumans",
+        "skinnedAnimals",
+        "closeUpCharacters",
+        "flockInstances",
+        "particles",
+        "dynamicLights",
+        "behaviorCpuMs",
+        "behaviorLod",
+        "combat"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "fpsTarget": { "type": "number", "exclusiveMinimum": 0, "maximum": 240 },
+        "maxRenderDpr": { "type": "number", "exclusiveMinimum": 0, "maximum": 4 },
+        "drawCalls": { "$ref": "#/$defs/count" },
+        "materials": { "$ref": "#/$defs/count" },
+        "trisStatic": { "$ref": "#/$defs/count" },
+        "trisTotal": { "$ref": "#/$defs/count" },
+        "maxTexture": { "enum": [512, 1024, 2048, 4096, 8192] },
+        "memoryMB": { "type": "number", "exclusiveMinimum": 0 },
+        "zoneDownloadMB": { "type": "number", "exclusiveMinimum": 0 },
+        "skinnedHumans": { "$ref": "#/$defs/count" },
+        "skinnedAnimals": { "$ref": "#/$defs/count" },
+        "closeUpCharacters": { "$ref": "#/$defs/count" },
+        "flockInstances": { "$ref": "#/$defs/count" },
+        "particles": { "$ref": "#/$defs/count" },
+        "dynamicLights": { "$ref": "#/$defs/count" },
+        "behaviorCpuMs": { "type": "number", "exclusiveMinimum": 0 },
+        "behaviorLod": {
+          "description": "LOD hành vi (OI-CHR-07): gần = đầy đủ, xa = giản lược, ngoài farM = dừng.",
+          "type": "object",
+          "required": ["nearM", "farM"],
+          "additionalProperties": false,
+          "properties": {
+            "nearM": { "type": "number", "exclusiveMinimum": 0 },
+            "farM": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        },
+        "combat": {
+          "description": "Chỉ dùng khi game bật chiến đấu (QĐ-13, OI-CBT-05).",
+          "type": "object",
+          "required": ["attackers", "projectiles"],
+          "additionalProperties": false,
+          "properties": {
+            "attackers": { "$ref": "#/$defs/count" },
+            "projectiles": { "$ref": "#/$defs/count" }
+          }
+        }
+      }
+    },
+    "deviceBaseline": {
+      "description": "Số đo nền trên thiết bị đích (FR-QA-07); thông tin, không phải giới hạn.",
+      "type": "object",
+      "required": ["device", "gpu", "browser", "measuredAt", "renderDpr", "fpsAvg", "fpsP5", "frameMsP95", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "device": { "type": "string" },
+        "gpu": { "type": "string" },
+        "browser": { "type": "string" },
+        "measuredAt": { "type": "string", "format": "date" },
+        "renderDpr": { "type": "number" },
+        "fpsAvg": { "type": "number" },
+        "fpsP5": { "type": "number" },
+        "frameMsP95": { "type": "number" },
+        "fpsCap": { "type": "number" },
+        "scene": { "type": "string" },
+        "source": { "type": "string" }
+      }
+    }
+  }
+}
