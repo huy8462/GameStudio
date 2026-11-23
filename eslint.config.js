@@ -13,6 +13,8 @@ export default tseslint.config(
       '**/generated/**',
       '.claude/**',
       'scripts/**',
+      // Rule prototypes (FR-DEV-04): nới lỏng; mỗi prototype tự kiểm kiểu bằng tsc khi build.
+      'prototypes/**',
       'docs/**',
       'games/**/build/**',
       '.venv/**',

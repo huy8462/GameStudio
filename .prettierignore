@@ -5,6 +5,8 @@ HANDOFF-API.md
 UPSTREAM.md
 # Mã bộ gốc: giữ nguyên để hợp nhất upstream dễ (ALG-DEV-09).
 .claude/skills/
+# Prototype: rule prototypes nới lỏng; mã scaffold gốc giữ nguyên để đối chiếu.
+prototypes/
 scripts/
 LICENSE
 README.md

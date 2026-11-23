@@ -4,5 +4,6 @@ packages:
   - 'engine/shared/*'
   - 'engine/build/*'
   - 'web/*'
+  - 'prototypes/*'
 minimumReleaseAgeExclude:
   - dependency-cruiser@18.9.0
