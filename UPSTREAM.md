@@ -46,6 +46,7 @@ Ghi công và lịch sử thay đổi so với bộ gốc (QĐ-01, QĐ-07; BR-37
 | `package.json` | sua | Thành gốc monorepo: `packageManager` pnpm, `engines` Node 24, script lint/test/depcruise/format; devDependencies cố định bản (gồm `@playwright/test`, `pngjs` của bộ gốc) | E0-02 |
 | `.gitignore` | sua | Thêm cache mypy/ruff/pytest | E0-02 |
 | `README.md` | sua | Thêm mục "Bắt đầu" | E0-02 |
+| `.claude/{agents,commands,rules,hooks,templates}/`, `.claude/settings*.json`, `CLAUDE.md` | them | Studio AI của GameStudio (TSD-09 §2.1); thay `AGENTS.md` đã xoá ở E0-01 | E0-04 |
 | `docs/**`, `GAME-ENGINE-WEB3D-BRIEF.md`, `HANDOFF-API.md` | them | Tài liệu dự án GameStudio | E0-01 |
 
 ## Quy trình lấy bản mới (ALG-DEV-09)

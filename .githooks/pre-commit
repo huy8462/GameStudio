@@ -1,0 +1,3 @@
+#!/bin/sh
+# Git pre-commit (IF-DEV-05, EP-DEV-06, FR-DEV-23). Bật: git config core.hooksPath .githooks
+exec node "$(git rev-parse --show-toplevel)/.githooks/pre-commit.mjs"

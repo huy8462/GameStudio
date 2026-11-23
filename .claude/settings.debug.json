@@ -1,0 +1,5 @@
+{
+  "//": "FR-DEV-17: MCP xem cảnh chỉ bật khi gỡ lỗi. Chép tệp này thành .claude/settings.local.json (không commit). Điền lệnh MCP thật khi cần; mặc định để trống.",
+  "enabledMcpjsonServers": [],
+  "mcpServers": {}
+}

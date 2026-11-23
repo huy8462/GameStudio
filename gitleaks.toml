@@ -1,0 +1,29 @@
+# Luật quét bí mật (TSD-09 §6, MOD-DEV-14). Mở rộng luật mặc định của gitleaks.
+title = "GameStudio"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "anthropic-api-key"
+description = "Khoá Anthropic (Claude API)"
+regex = '''sk-ant-(?:api|admin)\d{2}-[A-Za-z0-9_\-]{20,}'''
+keywords = ["sk-ant-"]
+
+[[rules]]
+id = "google-api-key"
+description = "Khoá Google API (Gemini)"
+regex = '''AIza[0-9A-Za-z_\-]{35}'''
+keywords = ["aiza"]
+
+[[rules]]
+id = "elevenlabs-api-key"
+description = "Khoá ElevenLabs"
+regex = '''(?i)(?:elevenlabs|xi[-_]api[-_]key)[\w\s"':=]{0,20}\b(sk_[a-f0-9]{48}|[a-f0-9]{32})\b'''
+keywords = ["elevenlabs", "xi-api-key", "xi_api_key"]
+
+[[rules]]
+id = "gamestudio-jwt-secret"
+description = "Khoá ký JWT của dự án (token phiên chơi, ADR-030)"
+regex = '''(?i)(?:JWT_SECRET|JWT_KEY|GS_JWT_[A-Z_]*)\s*[:=]\s*['"]?[A-Za-z0-9+/=_\-]{24,}'''
+keywords = ["jwt_secret", "jwt_key", "gs_jwt_"]

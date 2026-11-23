@@ -1,0 +1,47 @@
+{
+  "//": "DTO-DEV-09. Mẫu cho hook H-01…H-05 (SRS-09 §6.3, PSC-DEV-03…05). Glob so trên đường dẫn đã chuẩn hoá '/', không phân biệt hoa thường.",
+  "secretPaths": ["**/.env*", "**/*.key", "**/*.pem", "**/secrets/**", "/etc/gamestudio/**"],
+  "secretAllow": ["**/.env.example"],
+  "binaryExt": [".glb", ".ktx2", ".bin", ".wasm", ".basis", ".drc", ".blend", ".fbx", ".zip"],
+  "imageExt": [".png", ".jpg", ".jpeg", ".webp"],
+  "imageMaxBytes": 1048576,
+  "logMaxLines": 2000,
+  "mdMaxBytes": 40960,
+  "maxHeadings": 60,
+  "logPaths": ["**/build/**/logs/**"],
+  "schemaPaths": ["games/**/data/**/*.json"],
+  "perfPaths": ["engine/runtime/src/render/**", "**/*.glsl", "**/materials/**", "**/budgets.json"],
+  "bash": [
+    {
+      "id": "rm-root",
+      "code": "ERR-DEV-03",
+      "regex": "\\brm\\s+-[a-zA-Z]*r[a-zA-Z]*\\s+(-[a-zA-Z]+\\s+)*['\"]?(\\/|~|\\*|\\/\\*|~\\/|\\.\\/?\\*?)['\"]?(\\s|;|&|$)",
+      "flags": ""
+    },
+    {
+      "id": "remove-item-root",
+      "code": "ERR-DEV-03",
+      "regex": "\\bRemove-Item\\b(?=.*-Recurse)(?=.*\\s['\"]?([A-Za-z]:[\\\\/]?|~[\\\\/]?|[\\\\/]|\\*)['\"]?(\\s|;|$))",
+      "flags": "i"
+    },
+    {
+      "id": "push-force-main",
+      "code": "ERR-DEV-03",
+      "regex": "\\bgit\\s+push\\b(?=.*\\s(--force(-with-lease)?|-f)\\b)(?=.*\\b(main|master)\\b)",
+      "flags": ""
+    },
+    { "id": "reset-hard-origin", "code": "ERR-DEV-03", "regex": "\\bgit\\s+reset\\s+--hard\\s+origin\\b", "flags": "" },
+    {
+      "id": "read-secret-file",
+      "code": "ERR-DEV-03",
+      "regex": "\\b(cat|type|Get-Content|gc|more|less|head|tail|Select-String|sls|findstr|strings|xxd|od)\\b.*(\\.env(?!\\.example\\b)(\\.[\\w-]+)?\\b|\\.pem\\b|\\.key\\b|secrets[\\\\/])",
+      "flags": "i"
+    },
+    {
+      "id": "dump-env-secret",
+      "code": "ERR-DEV-03",
+      "regex": "(\\b(printenv|env|set)\\b.*(API_KEY|_TOKEN|SECRET)|\\b(Get-ChildItem|gci|dir|ls)\\s+env:|\\$env:\\w*(API_KEY|SECRET|TOKEN)|\\becho\\s+[\"']?\\$\\{?\\w*(API_KEY|SECRET|TOKEN))",
+      "flags": "i"
+    }
+  ]
+}

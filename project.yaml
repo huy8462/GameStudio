@@ -1,0 +1,17 @@
+# Cấu hình dự án (SCH-DEV-01, DTO-DEV-01, SRS-09 §6.1, FR-DEV-05, 06).
+rigor: minimal
+overrides:
+  - path: web/api/**
+    rigor: standard
+  - path: web/worker/**
+    rigor: standard
+  - path: web/ai-gateway/**
+    rigor: standard
+  - path: web/shared/src/permissions.ts
+    rigor: standard
+  - path: web/api/src/plugins/auth*
+    rigor: standard
+budgetsDefault: games/_template/data/budgets.json
+targetDevice: galaxy-a56
+tiers: [thap, vua, cao, toi_da]
+gates: [G-E0, G-E1, G-E2, G-E3, G-E4, G-E5, G-E6, G-E7, G-E8, G-W1, G-W2, G-W3, G-W4]

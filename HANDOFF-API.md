@@ -11,7 +11,7 @@ GameStudio là engine web game 3D dùng lại được cùng Web Studio để ng
 | BRD | `BRD-TONG-QUAN` + `BRD-01…10` | v1.0–1.1, **đã duyệt** (Huy, 22–23/11/2026). BRD-10 = làm tiếp/cập nhật game (BR-119…126) |
 | SRS | `SRS-00-TONG-QUAN` + `SRS-01…09`, phụ lục A truy vết | v1.0–1.2, **đã duyệt**; có CR-01 (làm tiếp/nhập game) và mở rộng quản trị (SRS-08 v1.2, SRS-00 v1.2). Tổng 358 FR |
 | TSD | `TSD-00-TONG-QUAN` + `TSD-01…09` | v1.1–1.3, **đã duyệt** (TSD-08 v1.3). TD-01…18 chốt 22/11 |
-| ADR | `ADR-016…034` (+ README) | **Đã chốt** 22–23/11/2026 (ADR-034: Blender 5.2 LTS). ADR-001…015 (QĐ-01…15) chưa viết, đến hạn ở E0 |
+| ADR | `ADR-001…034` (+ README) | **Đã chốt**. ADR-001…015 (QĐ-01…15) ghi 23/11/2026; ADR-016…033 (TD-01…18); ADR-034: Blender 5.2 LTS |
 | DDD | `DDD-00-TONG-QUAN` + `DDD-01…09` | v1.0, **đã duyệt** (Huy, 23/11/2026) |
 | UIUX | `UIUX-00-TONG-QUAN`, `01…04`, phụ lục, `prototype/*.html` | v1.0, **đã duyệt** (Huy, 23/11/2026); đề xuất trong mọi bảng Open item (OIU) được nhận làm giá trị nền; sửa tiếp phải qua change request |
 | POC, TEST | thư mục rỗng | chưa có tệp nào |
@@ -47,6 +47,7 @@ Từ 23/11/2026, `C:\GameStudio` là **repo git cục bộ** (Huy chọn không 
 - Nhánh `vendor/upstream` = bản gốc nguyên vẹn. Remote `upstream` chỉ fetch (push bị vô hiệu).
 - Kiểm thử helper của bộ gốc: `pnpm test:helpers` (29 test Python + 48 test Node, đạt). Scaffold Vite gốc nằm trong `.claude/skills/threejs-gameplay-systems/assets/threejs-vite-game/`.
 - E0-02: khung monorepo pnpm + uv (Python 3.12.16 do uv quản lý). Lệnh kiểm tra: `pnpm lint`, `pnpm exec tsc -p tsconfig.json`, `pnpm test`, `pnpm depcruise`, `pnpm format:check`, `uv run ruff check`. **Chưa có gói engine/web nào** (`engine/`, `web/` mới có README).
+- E0-04/05: studio AI `.claude/` + `CLAUDE.md` + `project.yaml` + pre-commit gitleaks; ADR-001…015. `node tools/scripts/structure-check.mjs` kiểm cấu trúc và LICENSE trùng vendor. 53 test Vitest đạt.
 - E0-03: gói đầu tiên `@gamestudio/cli`, lệnh `pnpm doctor` (build + chạy `engine doctor`). Chromium của Playwright (bản 1255) đã cài; `@gltf-transform/cli` 4.5.1 thêm vào devDependencies gốc.
 - Bản devDependency cố định chính xác (không `^`): TypeScript 5.9.3, Vitest 5.1.1, ESLint 10.15.0, typescript-eslint 8.73.0, Prettier 3.10.1, dependency-cruiser 18.9.0, @types/node 24.19.2, @playwright/test 1.65.1; Python: ruff 0.17.6, mypy 2.4.1, pytest 9.2.0.
 
@@ -96,12 +97,12 @@ Thứ tự phiếu đề xuất (mỗi phiếu một phiên Claude Code, `/clear
 | 1 | ✅ **Xong 23/11/2026** (`f771f5e`): `git init`, `.gitignore`, fork `majidmanzarpour/threejs-game-skills` (MIT): nhánh `vendor/upstream`, ghi `UPSTREAM.md`, giữ `LICENSE`; bỏ phần Codex và skill `threejs-3d-generator` | QĐ-01, 02, 07, 08; ALG-DEV-09; SCH-DEV-06 | Repo chỉ cục bộ (Huy chốt). Hệ quả: OIT-GEN-04, CI GitHub Actions (ALG-DEV-10) chưa có nơi chạy, tạm thay bằng pre-commit + script cục bộ |
 | 2 | ✅ **Xong 23/11/2026**: khung monorepo theo TSD-00 §4.1/DDD-00 §4: `pnpm-workspace.yaml`, `tsconfig.base.json` (strict, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`), ESLint (luật tất định + chunk combat/dialogue-ai), Prettier, `.dependency-cruiser.cjs` (7 luật DDD-00 §4.2 + DDD-08), Vitest; `pyproject.toml` (workspace uv, Ruff, mypy strict, pytest) + `.python-version` 3.12; README cho `engine/`, `web/`, `games/`, `tools/` | ADR-016, 017; TSD-00 §4.2–4.3; DDD-00 §2.1, 2.4, 4 | Chưa có gói nào; mọi kiểm tra chạy trên cây rỗng đều đạt; luật ESLint/depcruise đã thử bằng tệp vi phạm tạm (bắt đủ 6 ca) rồi xoá |
 | 3 | ✅ **Xong 23/11/2026**: gói `@gamestudio/cli` (`engine/cli`) với lệnh `engine doctor [--role] [--json]`; `tools/versions.json` + `tools/schema/versions.schema.json`; đầu dò `blender-probe.py` (phiên bản, add-on nạp được, SHA-256 thư mục add-on). Doctor trên máy dev: **đạt** (17 mục OK, 3 khoá tuỳ chọn thiếu), 3,7 s | SCH-DEV-03, IF-DEV-03, ALG-DEV-06, PSC-DEV-06; TST-DEV-03, TST-CLI-02; ADR-034 | Three.js cố định **0.187.0** (chỉ ghi nhận, chưa gói nào dùng). Lệch DDD-09: GEMINI/ELEVENLABS để tuỳ chọn ở vai trò `dev`; `DoctorCheck.optional`; versions.json thêm `probe/roles/optional/timeoutS/features` (xem `engine/cli/README.md`) |
-| 4 | `.claude/` tối giản: 8 agent, hook H-01…H-05 (Node), `settings.json`, templates; `CLAUDE.md` < 150 dòng; `project.yaml`; `.githooks/pre-commit` + `gitleaks.toml` | TSD-09 §2.1, IF-DEV-01…05, ALG-DEV-03…05, 08; TST-DEV-01, 02, 05 | Lệnh slash (13 + 2) có thể để khung, hoàn thiện dần |
-| 5 | ADR-001…015 từ QĐ-01…15 của brief | FR-DEV-11, SCH-DEV-07 | Việc tài liệu, làm song song được với 2–4 |
+| 4 | ✅ **Xong 23/11/2026**: `.claude/` gồm 8 agent, 5 hook (H-01/02/04 chặn, H-03/05 cảnh báo qua `additionalContext`) dạng exec `node <tệp>`, `settings.json` (deny đọc bí mật, allow lệnh kiểm), `settings.debug.json`, 5 rule theo `paths:`, 6 mẫu, 15 lệnh slash; `CLAUDE.md` (67 dòng), `project.yaml`, `.githooks/pre-commit` (gitleaks + CLAUDE.md < 150; đã bật `core.hooksPath`), `gitleaks.toml`, `LICENSES.md`, `tools/scripts/structure-check.mjs` | TSD-09 §2.1, IF-DEV-01…05, ALG-DEV-03…05, 08; TST-DEV-01, 02, 05 | 35 test hook + 1 test cấu trúc đạt; pre-commit đã chặn khoá giả. Chưa có: skill `engine-*` (từ E1), `ticket-new.mjs`, `token-meter.mjs`; 10 lệnh slash cần CLI E1+ ghi rõ "chưa có" |
+| 5 | ✅ **Xong 23/11/2026**: ADR-001…015 từ QĐ-01…15 (mẫu giống ADR-016+), danh mục `docs/ADR/README.md` | FR-DEV-11, SCH-DEV-07 | ADR-002/007/015 ghi diễn giải QĐ-15 (BRD-00 §6) vẫn **cần Huy xác nhận**; ADR-008 ghi "được nới bởi ADR-012" |
 | 6 | Chạy scaffold gốc, đo baseline trên Galaxy A56 (`?perf=1`), ghi `budgets.json`; đo lại OIT-GEN-01 (DPR 1,5) | FR-RTM-12, 13, FR-QA-07 | **Cần Huy cầm máy A56** và nơi phục vụ bản build (máy chủ poc, CH-10) |
 | 7 | `/gate-check` G-E0 → `docs/gates/G-E0.md`, Huy điền `huyConfirm` | ALG-DEV-07, SCH-DEV-05 | |
 
-Huy đã xác nhận (23/11/2026): bắt đầu E0; repo chỉ cục bộ; dùng Blender 5.2.4 (ADR-034). Công cụ cho phiếu 3, 4 đã cài xong; phiếu 2…5 đều làm được. Phiếu 6 vẫn cần Huy cầm A56 và nơi đưa bản build lên.
+Huy đã xác nhận (23/11/2026): bắt đầu E0; repo chỉ cục bộ; dùng Blender 5.2.4 (ADR-034). Phiếu 1–5 đã xong. **Còn lại cho G-E0:** phiếu 6 (baseline A56: cần Huy cầm máy và chỗ đưa bản build lên, máy chủ poc CH-10) và phiếu 7 (`/gate-check G-E0`).
 
 ## 7. Quy ước làm việc
 - Tiếng Việt; tài liệu Markdown; file mã ≤ ~300 dòng, mỗi gói có README ≤ 60 dòng; ESM, `strict` + `noUncheckedIndexedAccess`; log JSON một dòng, không bao giờ ghi khoá hay nội dung hội thoại.

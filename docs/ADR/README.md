@@ -2,7 +2,21 @@
 
 | ADR | Tiêu đề | Trạng thái | Nguồn |
 |---|---|---|---|
-| ADR-001…015 | Tương ứng QĐ-01…15 của brief | Viết ở E0 (FR-DEV-11) | Brief, BRD-00 |
+| [ADR-001](ADR-001-diem-xuat-phat-threejs-game-skills.md) | Điểm xuất phát là threejs-game-skills | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-01 |
+| [ADR-002](ADR-002-chi-ho-tro-claude-code.md) | Chỉ hỗ trợ Claude Code | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-02 |
+| [ADR-003](ADR-003-game-do-nguoi-dung-mo-ta.md) | Game do người dùng mô tả | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-03 |
+| [ADR-004](ADR-004-thiet-bi-toi-thieu-galaxy-a56.md) | Thiết bị tối thiểu Galaxy A56 | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-04 |
+| [ADR-005](ADR-005-dia-hinh-hai-nguon.md) | Địa hình hai nguồn | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-05 |
+| [ADR-006](ADR-006-blender-addon-va-code-bo-sung.md) | Add-on Blender + code bổ sung | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-06 |
+| [ADR-007](ADR-007-dung-noi-bo.md) | Dùng nội bộ | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-07 |
+| [ADR-008](ADR-008-khong-ai-sinh-3d.md) | Không AI sinh 3D; asset bằng code | Đã chốt 22/11/2026; ghi 23/11/2026; được nới bởi ADR-012 | QĐ-08 |
+| [ADR-009](ADR-009-sinh-anh-am-thanh.md) | Sinh ảnh (Gemini), âm thanh (ElevenLabs) | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-09 |
+| [ADR-010](ADR-010-thu-vien-cc0.md) | Thư viện CC0 (vật liệu, HDRI) | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-10 |
+| [ADR-011](ADR-011-bam-dung-mo-ta.md) | Bám đúng mô tả | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-11 |
+| [ADR-012](ADR-012-mo-hinh-3d-cc0.md) | Mô hình 3D CC0 ưu tiên trước generator | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-12 |
+| [ADR-013](ADR-013-chien-dau-san-bat-tuy-chon.md) | Chiến đấu, săn bắt tuỳ chọn | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-13 |
+| [ADR-014](ADR-014-hoi-thoai-npc.md) | Hội thoại NPC tĩnh, AI tuỳ chọn | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-14 |
+| [ADR-015](ADR-015-web-studio.md) | Web Studio riêng, chỉ người được mời | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-15 |
 | [ADR-016](ADR-016-monorepo-va-cong-cu.md) | Monorepo và công cụ | Đã chốt 22/11/2026 | TD-01 |
 | [ADR-017](ADR-017-phien-ban-nen.md) | Phiên bản nền | Đã chốt 22/11/2026; phần Blender bị ADR-034 thay | TD-02 |
 | [ADR-018](ADR-018-runtime-do-hoa.md) | Runtime đồ hoạ | Đã chốt 22/11/2026 | TD-03 |
