@@ -20,6 +20,7 @@ Dùng nội bộ. Vẫn giữ nguyên `LICENSE` và thông báo bản quyền MI
 - `LICENSES.md` vẫn liệt kê nguồn dữ liệu, thư viện, dịch vụ, asset CC0 (FR-DEV-24).
 - Kiểm `LICENSE` trùng `vendor/upstream` trong `tools/scripts/structure-check.mjs`.
 - Repo chỉ đặt cục bộ trên máy Huy (Huy chốt 23/11/2026).
+- Huy xác nhận 23/11/2026: QĐ-07 giữ nguyên sau QĐ-15.
 
 ## Phương án đã loại
 Phát hành công khai; bỏ LICENSE gốc.

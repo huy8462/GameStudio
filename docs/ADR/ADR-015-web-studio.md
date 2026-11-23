@@ -18,7 +18,7 @@ GameStudio có giao diện web riêng (Web Studio): chat/mô tả để sinh và
 ## Hệ quả
 - Cần backend, CSDL, kho đối tượng, hàng đợi và worker build; GD-05 (không backend) không còn đúng. Công nghệ ở ADR-027…032.
 - Một nguồn sự thật: bộ JSON game dùng chung cho chat, editor, CLI, Claude Code; engine runtime là thư viện dùng chung cho xem trước, editor và bản xuất bản.
-- Diễn giải tác động lên ADR-002 và ADR-007 ghi ở BRD-00 §6 (cần Huy xác nhận): QĐ-02 áp dụng cho quy trình phát triển; QĐ-07 vẫn giữ.
+- Tác động lên ADR-002 và ADR-007 (Huy xác nhận 23/11/2026): QĐ-02 áp dụng cho quy trình phát triển; Web Studio gọi Claude Code qua CLI, người dùng tự đăng nhập (ADR-035); QĐ-07 giữ nguyên.
 - Huy chốt 23/11/2026: phát triển chủ yếu qua gói Max; Web Studio là kiến trúc đích, làm từ W1 sau G-E1.
 
 ## Phương án đã loại

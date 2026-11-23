@@ -17,7 +17,7 @@ Quy trình phát triển engine và Web Studio chỉ dùng Claude Code, tận d�
 
 ## Hệ quả
 - Đã gỡ `AGENTS.md`, `install.sh`, `agents/openai.yaml`, `validate-skills.sh`; skill chuyển vào `.claude/skills/` (E0-01).
-- Theo QĐ-15 (diễn giải ở BRD-00 §6, cần Huy xác nhận): QĐ-02 áp dụng cho **quy trình phát triển**; bản thân Web Studio gọi Claude API qua backend (ADR-031), người dùng Web Studio không cần Claude Code.
+- Theo QĐ-15 (Huy xác nhận 23/11/2026): QĐ-02 áp dụng cho **quy trình phát triển**. Web Studio gọi **Claude Code qua CLI**, mỗi người dùng tự đăng nhập bằng tài khoản/khoá của họ (ADR-035, thay câu "gọi Claude API qua backend" trong bản diễn giải BRD-00 §6).
 - Dự án làm chủ yếu qua gói Max của Huy (Huy chốt 23/11/2026).
 
 ## Phương án đã loại

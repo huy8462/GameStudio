@@ -34,7 +34,7 @@ Trên Windows PowerShell phải bật UTF-8 trước, nếu không script sẽ d
 - Web Studio: React 19 + Vite + TS, TanStack Query, Zustand, Tailwind + Radix, @xyflow/react, Monaco; xem trước nhúng thẳng `@gamestudio/engine` (027).
 - Backend: Fastify (Node 24) cho `web/api` và `web/ai-gateway`; PostgreSQL 17 + Drizzle; pg-boss; SSE qua LISTEN/NOTIFY (028).
 - Kho đối tượng (029); xác thực Google OIDC, phiên opaque trong PostgreSQL, JWT chỉ cho token ngắn hạn (030).
-- AI: `@anthropic-ai/sdk`; `claude-opus-5-5` cho tiếp nhận/đề xuất/nháp kịch bản, `claude-haiku-5-5` cho hội thoại NPC; đầu ra JSON bằng structured outputs; khoá chỉ ở `ai-gateway`; Gemini qua `@google/genai`, ElevenLabs qua REST; mô hình theo tác vụ cấu hình được ở SCR-WEB-13 (031).
+- AI (031, **sửa bởi ADR-035, 23/11/2026**): việc soạn game của Web Studio (tiếp nhận, đề xuất, nháp kịch bản) chạy bằng **Claude Code CLI** (`claude -p --output-format json --json-schema …`), **mỗi người dùng tự đăng nhập** bằng tài khoản/khoá của họ; máy chủ không giữ thông tin đăng nhập Claude của ai; không dùng gói Max của Huy cho người khác. Gemini (`@google/genai`), ElevenLabs (REST) vẫn qua `ai-gateway` giữ khoá. Hội thoại NPC khi chạy (`claude-haiku-5-5`) chờ chốt OIT-ADR35-02.
 - Triển khai Docker Compose trên Ubuntu 24.04 + Caddy + restic + Uptime Kuma (032); QA Playwright + ssim.js + pixelmatch (033).
 - Giá trị đã định: công thức sát thương mặc định `max(1, atk + weapon - def)` (SRS-06 v1.1).
 
@@ -78,7 +78,12 @@ Bốn thư mục Blender 5.2.4, ktx, ffmpeg, gitleaks đã được thêm vào *
 3. **Số chờ đo trên A56:** OI-CHR-07 (LOD hành vi 30/80 m), OI-CBT-05 (ngân sách chiến đấu tier Vừa 3/20), OIT-GEN-01 (DPR 1,5), cùng baseline E0; các số "(đề xuất)" trong TSD chỉnh theo đo đạc.
 4. **Kho usage:** thiết kế PostgreSQL `usage_records` + `llm_calls` (SCH-WEB-06) nằm trong TSD; chưa triển khai (không còn mã nào).
 5. **Vị trí chat/Tiến độ trong TSD-08:** TSD-08 v1.2 đã sửa sơ đồ §3.2 cho chat ở cột trái, khớp SRS. Vị trí bảng Tiến độ đã chốt theo OIU-WEB-06 (mục 1). Còn lại: nếu TSD-08 §3.2 cần vẽ thêm tab Tiến độ thì làm change request nhỏ khi tới W2/W3. Không chặn E0.
-6. Khác: `tools/versions.json`, `engine doctor`, `.claude/`, lint ranh giới gói, gitleaks, `uv`/`pyproject.toml` (theo thiết kế, chưa có); OIT-GEN-02 (cấu hình máy chủ), OIT-GEN-04 (nơi chạy CI); ADR-001…015.
+6. Khác: OIT-GEN-02 (cấu hình máy chủ), OIT-GEN-04 (nơi chạy CI; repo chỉ cục bộ nên tạm dùng pre-commit).
+7. **ADR-035 (Huy chốt 23/11/2026):** QĐ-02 áp dụng cho quy trình phát triển; Web Studio gọi Claude Code qua CLI, người dùng tự đăng nhập; QĐ-07 giữ nguyên. Cần Huy chốt trước W1:
+   - **OIT-ADR35-01**: Claude Code chạy ở đâu. Đề xuất: trên máy người dùng qua cầu nối cục bộ.
+   - **OIT-ADR35-02**: hội thoại NPC khi chạy. Chọn giữa khoá Console của Huy trong `ai-gateway` hoặc chỉ kịch bản tĩnh.
+   - Đồng ý Commercial Terms của Anthropic trước khi mời người khác.
+   - Change request cho SRS/TSD/DDD/UIUX phần dịch vụ AI, làm khi bắt đầu W1.
 
 ## 6. Lộ trình (TSD-00 §11)
 - **E0:** scaffold, `tools/versions.json`, `engine doctor`, `.claude/`, baseline A56, ADR-001…015. Song song được: **W1**.
@@ -98,7 +103,7 @@ Thứ tự phiếu đề xuất (mỗi phiếu một phiên Claude Code, `/clear
 | 2 | ✅ **Xong 23/11/2026**: khung monorepo theo TSD-00 §4.1/DDD-00 §4: `pnpm-workspace.yaml`, `tsconfig.base.json` (strict, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`), ESLint (luật tất định + chunk combat/dialogue-ai), Prettier, `.dependency-cruiser.cjs` (7 luật DDD-00 §4.2 + DDD-08), Vitest; `pyproject.toml` (workspace uv, Ruff, mypy strict, pytest) + `.python-version` 3.12; README cho `engine/`, `web/`, `games/`, `tools/` | ADR-016, 017; TSD-00 §4.2–4.3; DDD-00 §2.1, 2.4, 4 | Chưa có gói nào; mọi kiểm tra chạy trên cây rỗng đều đạt; luật ESLint/depcruise đã thử bằng tệp vi phạm tạm (bắt đủ 6 ca) rồi xoá |
 | 3 | ✅ **Xong 23/11/2026**: gói `@gamestudio/cli` (`engine/cli`) với lệnh `engine doctor [--role] [--json]`; `tools/versions.json` + `tools/schema/versions.schema.json`; đầu dò `blender-probe.py` (phiên bản, add-on nạp được, SHA-256 thư mục add-on). Doctor trên máy dev: **đạt** (17 mục OK, 3 khoá tuỳ chọn thiếu), 3,7 s | SCH-DEV-03, IF-DEV-03, ALG-DEV-06, PSC-DEV-06; TST-DEV-03, TST-CLI-02; ADR-034 | Three.js cố định **0.187.0** (chỉ ghi nhận, chưa gói nào dùng). Lệch DDD-09: GEMINI/ELEVENLABS để tuỳ chọn ở vai trò `dev`; `DoctorCheck.optional`; versions.json thêm `probe/roles/optional/timeoutS/features` (xem `engine/cli/README.md`) |
 | 4 | ✅ **Xong 23/11/2026**: `.claude/` gồm 8 agent, 5 hook (H-01/02/04 chặn, H-03/05 cảnh báo qua `additionalContext`) dạng exec `node <tệp>`, `settings.json` (deny đọc bí mật, allow lệnh kiểm), `settings.debug.json`, 5 rule theo `paths:`, 6 mẫu, 15 lệnh slash; `CLAUDE.md` (67 dòng), `project.yaml`, `.githooks/pre-commit` (gitleaks + CLAUDE.md < 150; đã bật `core.hooksPath`), `gitleaks.toml`, `LICENSES.md`, `tools/scripts/structure-check.mjs` | TSD-09 §2.1, IF-DEV-01…05, ALG-DEV-03…05, 08; TST-DEV-01, 02, 05 | 35 test hook + 1 test cấu trúc đạt; pre-commit đã chặn khoá giả. Chưa có: skill `engine-*` (từ E1), `ticket-new.mjs`, `token-meter.mjs`; 10 lệnh slash cần CLI E1+ ghi rõ "chưa có" |
-| 5 | ✅ **Xong 23/11/2026**: ADR-001…015 từ QĐ-01…15 (mẫu giống ADR-016+), danh mục `docs/ADR/README.md` | FR-DEV-11, SCH-DEV-07 | ADR-002/007/015 ghi diễn giải QĐ-15 (BRD-00 §6) vẫn **cần Huy xác nhận**; ADR-008 ghi "được nới bởi ADR-012" |
+| 5 | ✅ **Xong 23/11/2026**: ADR-001…015 từ QĐ-01…15 (mẫu giống ADR-016+), danh mục `docs/ADR/README.md` | FR-DEV-11, SCH-DEV-07 | Diễn giải QĐ-15 đã được Huy xác nhận → ADR-035; ADR-008 ghi "được nới bởi ADR-012" |
 | 6 | Chạy scaffold gốc, đo baseline trên Galaxy A56 (`?perf=1`), ghi `budgets.json`; đo lại OIT-GEN-01 (DPR 1,5) | FR-RTM-12, 13, FR-QA-07 | **Cần Huy cầm máy A56** và nơi phục vụ bản build (máy chủ poc, CH-10) |
 | 7 | `/gate-check` G-E0 → `docs/gates/G-E0.md`, Huy điền `huyConfirm` | ALG-DEV-07, SCH-DEV-05 | |
 

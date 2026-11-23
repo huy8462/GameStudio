@@ -3,12 +3,12 @@
 | ADR | Tiêu đề | Trạng thái | Nguồn |
 |---|---|---|---|
 | [ADR-001](ADR-001-diem-xuat-phat-threejs-game-skills.md) | Điểm xuất phát là threejs-game-skills | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-01 |
-| [ADR-002](ADR-002-chi-ho-tro-claude-code.md) | Chỉ hỗ trợ Claude Code | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-02 |
+| [ADR-002](ADR-002-chi-ho-tro-claude-code.md) | Chỉ hỗ trợ Claude Code | Đã chốt 22/11/2026; ghi 23/11/2026. Diễn giải QĐ-15 đã được Huy xác nhận 23/11/2026, nhưng câu "Web Studio gọi Claude API" bị ADR-035 thay | QĐ-02 |
 | [ADR-003](ADR-003-game-do-nguoi-dung-mo-ta.md) | Game do người dùng mô tả | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-03 |
 | [ADR-004](ADR-004-thiet-bi-toi-thieu-galaxy-a56.md) | Thiết bị tối thiểu Galaxy A56 | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-04 |
 | [ADR-005](ADR-005-dia-hinh-hai-nguon.md) | Địa hình hai nguồn | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-05 |
 | [ADR-006](ADR-006-blender-addon-va-code-bo-sung.md) | Add-on Blender + code bổ sung | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-06 |
-| [ADR-007](ADR-007-dung-noi-bo.md) | Dùng nội bộ | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-07 |
+| [ADR-007](ADR-007-dung-noi-bo.md) | Dùng nội bộ | Đã chốt 22/11/2026; ghi 23/11/2026; Huy xác nhận giữ nguyên sau QĐ-15 (23/11/2026) | QĐ-07 |
 | [ADR-008](ADR-008-khong-ai-sinh-3d.md) | Không AI sinh 3D; asset bằng code | Đã chốt 22/11/2026; ghi 23/11/2026; được nới bởi ADR-012 | QĐ-08 |
 | [ADR-009](ADR-009-sinh-anh-am-thanh.md) | Sinh ảnh (Gemini), âm thanh (ElevenLabs) | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-09 |
 | [ADR-010](ADR-010-thu-vien-cc0.md) | Thư viện CC0 (vật liệu, HDRI) | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-10 |
@@ -32,9 +32,10 @@
 | [ADR-028](ADR-028-backend.md) | Backend | Đã chốt 22/11/2026 | TD-13 |
 | [ADR-029](ADR-029-kho-doi-tuong.md) | Kho đối tượng | Đã chốt 22/11/2026 | TD-14 |
 | [ADR-030](ADR-030-xac-thuc.md) | Xác thực | Đã chốt 22/11/2026 | TD-15 |
-| [ADR-031](ADR-031-dich-vu-ai.md) | Dịch vụ AI | Đã chốt 22/11/2026 | TD-16 |
+| [ADR-031](ADR-031-dich-vu-ai.md) | Dịch vụ AI | Đã chốt 22/11/2026; phần soạn game bằng AI bị ADR-035 thay | TD-16 |
 | [ADR-032](ADR-032-trien-khai.md) | Triển khai | Đã chốt 22/11/2026 | TD-17 |
 | [ADR-033](ADR-033-qa.md) | QA | Đã chốt 22/11/2026 | TD-18 |
 | [ADR-034](ADR-034-blender-5-2-lts.md) | Blender 5.2 LTS thay Blender 4.5 LTS | Đã chốt 23/11/2026; thay ADR-017 (phần Blender) | Huy, E0 |
+| [ADR-035](ADR-035-web-studio-goi-claude-code-cli.md) | Web Studio gọi Claude Code qua CLI, người dùng tự đăng nhập | Đã chốt 23/11/2026 (nguyên tắc); thay ADR-031 phần soạn game; mở OIT-ADR35-01, 02 | Huy, QĐ-15 |
 
 Mẫu ADR theo TSD-09 SCH-DEV-07 (bối cảnh, quyết định, hệ quả, phương án đã loại). Muốn đổi một quyết định đã chốt thì viết ADR mới ghi trường "Thay thế", không sửa ADR cũ.
