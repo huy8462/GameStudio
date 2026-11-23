@@ -34,7 +34,7 @@ Trên Windows PowerShell phải bật UTF-8 trước, nếu không script sẽ d
 - Web Studio: React 19 + Vite + TS, TanStack Query, Zustand, Tailwind + Radix, @xyflow/react, Monaco; xem trước nhúng thẳng `@gamestudio/engine` (027).
 - Backend: Fastify (Node 24) cho `web/api` và `web/ai-gateway`; PostgreSQL 17 + Drizzle; pg-boss; SSE qua LISTEN/NOTIFY (028).
 - Kho đối tượng (029); xác thực Google OIDC, phiên opaque trong PostgreSQL, JWT chỉ cho token ngắn hạn (030).
-- AI (031, **sửa bởi ADR-035, 23/11/2026**): việc soạn game của Web Studio (tiếp nhận, đề xuất, nháp kịch bản) chạy bằng **Claude Code CLI** (`claude -p --output-format json --json-schema …`), **mỗi người dùng tự đăng nhập** bằng tài khoản/khoá của họ; máy chủ không giữ thông tin đăng nhập Claude của ai; không dùng gói Max của Huy cho người khác. Gemini (`@google/genai`), ElevenLabs (REST) vẫn qua `ai-gateway` giữ khoá. Hội thoại NPC khi chạy (`claude-haiku-5-5`) chờ chốt OIT-ADR35-02.
+- AI (031, **sửa bởi ADR-035, 23/11/2026**): việc soạn game của Web Studio (tiếp nhận, đề xuất, nháp kịch bản) chạy bằng **Claude Code CLI** (`claude -p --output-format json --json-schema …`), **mỗi người dùng tự đăng nhập** bằng tài khoản/khoá của họ; máy chủ không giữ thông tin đăng nhập Claude của ai; không dùng gói Max của Huy cho người khác. Claude Code chạy trên máy người dùng qua cầu nối cục bộ. Gemini (`@google/genai`), ElevenLabs (REST) vẫn qua `ai-gateway` giữ khoá. Hội thoại NPC khi chơi chỉ kịch bản tĩnh (không còn `claude-haiku-5-5`).
 - Triển khai Docker Compose trên Ubuntu 24.04 + Caddy + restic + Uptime Kuma (032); QA Playwright + ssim.js + pixelmatch (033).
 - Giá trị đã định: công thức sát thương mặc định `max(1, atk + weapon - def)` (SRS-06 v1.1).
 
@@ -79,11 +79,11 @@ Bốn thư mục Blender 5.2.4, ktx, ffmpeg, gitleaks đã được thêm vào *
 4. **Kho usage:** thiết kế PostgreSQL `usage_records` + `llm_calls` (SCH-WEB-06) nằm trong TSD; chưa triển khai (không còn mã nào).
 5. **Vị trí chat/Tiến độ trong TSD-08:** TSD-08 v1.2 đã sửa sơ đồ §3.2 cho chat ở cột trái, khớp SRS. Vị trí bảng Tiến độ đã chốt theo OIU-WEB-06 (mục 1). Còn lại: nếu TSD-08 §3.2 cần vẽ thêm tab Tiến độ thì làm change request nhỏ khi tới W2/W3. Không chặn E0.
 6. Khác: OIT-GEN-02 (cấu hình máy chủ), OIT-GEN-04 (nơi chạy CI; repo chỉ cục bộ nên tạm dùng pre-commit).
-7. **ADR-035 (Huy chốt 23/11/2026):** QĐ-02 áp dụng cho quy trình phát triển; Web Studio gọi Claude Code qua CLI, người dùng tự đăng nhập; QĐ-07 giữ nguyên. Cần Huy chốt trước W1:
-   - **OIT-ADR35-01**: Claude Code chạy ở đâu. Đề xuất: trên máy người dùng qua cầu nối cục bộ.
-   - **OIT-ADR35-02**: hội thoại NPC khi chạy. Chọn giữa khoá Console của Huy trong `ai-gateway` hoặc chỉ kịch bản tĩnh.
-   - Đồng ý Commercial Terms của Anthropic trước khi mời người khác.
-   - Change request cho SRS/TSD/DDD/UIUX phần dịch vụ AI, làm khi bắt đầu W1.
+7. **ADR-035 (Huy chốt hết 23/11/2026):**
+   - QĐ-02 áp dụng cho quy trình phát triển; QĐ-07 giữ nguyên.
+   - Web Studio soạn game bằng Claude Code CLI **chạy trên máy người dùng qua chương trình cầu nối nhỏ**; người dùng tự đăng nhập; máy chủ không gọi Claude.
+   - Hội thoại NPC khi chơi **chỉ kịch bản tĩnh**: không có `dialogue-ai`, không có dịch vụ hội thoại.
+   - **Việc ở W1:** change request cho SRS/TSD/DDD/UIUX (danh sách trong ADR-035); thiết kế cầu nối (giao thức `127.0.0.1` + mã ghép đôi + kiểm Origin, cách cài, công cụ cho phép); Huy đồng ý Commercial Terms của Anthropic trước khi mời người khác.
 
 ## 6. Lộ trình (TSD-00 §11)
 - **E0:** scaffold, `tools/versions.json`, `engine doctor`, `.claude/`, baseline A56, ADR-001…015. Song song được: **W1**.

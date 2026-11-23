@@ -12,7 +12,7 @@ Luật:
 
 - TS strict, ESM, tệp ≤ ~300 dòng, `src/index.ts` chỉ xuất API công khai, README gói ≤ 60 dòng, test `*.test.ts` cạnh mã.
 - Tất định: không `Math.random()`/`Date.now()` trong `engine/**`; dùng `@gamestudio/rng` và `Clock` tiêm (DDD-00 §2.4).
-- Runtime không import `node:*`; chunk `combat`, `dialogue-ai` chỉ qua `import()` (kiểm bằng `pnpm lint`, `pnpm depcruise`).
+- Runtime không import `node:*`; chunk `combat` chỉ qua `import()` (kiểm bằng `pnpm lint`, `pnpm depcruise`). Không làm `dialogue-ai` (ADR-035).
 - Lệnh CLI trả mã thoát SRS-04 §7.2 và `--json` một dòng.
 - Trước khi xong: `pnpm lint`, `pnpm exec tsc -p tsconfig.json`, `pnpm test`, `pnpm depcruise`.
 

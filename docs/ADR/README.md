@@ -15,7 +15,7 @@
 | [ADR-011](ADR-011-bam-dung-mo-ta.md) | Bám đúng mô tả | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-11 |
 | [ADR-012](ADR-012-mo-hinh-3d-cc0.md) | Mô hình 3D CC0 ưu tiên trước generator | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-12 |
 | [ADR-013](ADR-013-chien-dau-san-bat-tuy-chon.md) | Chiến đấu, săn bắt tuỳ chọn | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-13 |
-| [ADR-014](ADR-014-hoi-thoai-npc.md) | Hội thoại NPC tĩnh, AI tuỳ chọn | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-14 |
+| [ADR-014](ADR-014-hoi-thoai-npc.md) | Hội thoại NPC tĩnh, AI tuỳ chọn | Đã chốt 22/11/2026; ghi 23/11/2026; phần "AI sinh khi chạy" bị ADR-035 thay (chỉ kịch bản tĩnh) | QĐ-14 |
 | [ADR-015](ADR-015-web-studio.md) | Web Studio riêng, chỉ người được mời | Đã chốt 22/11/2026; ghi 23/11/2026 | QĐ-15 |
 | [ADR-016](ADR-016-monorepo-va-cong-cu.md) | Monorepo và công cụ | Đã chốt 22/11/2026 | TD-01 |
 | [ADR-017](ADR-017-phien-ban-nen.md) | Phiên bản nền | Đã chốt 22/11/2026; phần Blender bị ADR-034 thay | TD-02 |
@@ -32,10 +32,10 @@
 | [ADR-028](ADR-028-backend.md) | Backend | Đã chốt 22/11/2026 | TD-13 |
 | [ADR-029](ADR-029-kho-doi-tuong.md) | Kho đối tượng | Đã chốt 22/11/2026 | TD-14 |
 | [ADR-030](ADR-030-xac-thuc.md) | Xác thực | Đã chốt 22/11/2026 | TD-15 |
-| [ADR-031](ADR-031-dich-vu-ai.md) | Dịch vụ AI | Đã chốt 22/11/2026; phần soạn game bằng AI bị ADR-035 thay | TD-16 |
+| [ADR-031](ADR-031-dich-vu-ai.md) | Dịch vụ AI | Đã chốt 22/11/2026; phần Claude (soạn game, hội thoại NPC) bị ADR-035 thay; Gemini/ElevenLabs giữ | TD-16 |
 | [ADR-032](ADR-032-trien-khai.md) | Triển khai | Đã chốt 22/11/2026 | TD-17 |
 | [ADR-033](ADR-033-qa.md) | QA | Đã chốt 22/11/2026 | TD-18 |
 | [ADR-034](ADR-034-blender-5-2-lts.md) | Blender 5.2 LTS thay Blender 4.5 LTS | Đã chốt 23/11/2026; thay ADR-017 (phần Blender) | Huy, E0 |
-| [ADR-035](ADR-035-web-studio-goi-claude-code-cli.md) | Web Studio gọi Claude Code qua CLI, người dùng tự đăng nhập | Đã chốt 23/11/2026 (nguyên tắc); thay ADR-031 phần soạn game; mở OIT-ADR35-01, 02 | Huy, QĐ-15 |
+| [ADR-035](ADR-035-web-studio-goi-claude-code-cli.md) | Web Studio gọi Claude Code qua CLI, người dùng tự đăng nhập | Đã chốt 23/11/2026; CLI trên máy người dùng qua cầu nối; NPC chỉ kịch bản tĩnh; thay ADR-031 phần Claude, ADR-014 phần AI khi chạy | Huy, QĐ-14, QĐ-15 |
 
 Mẫu ADR theo TSD-09 SCH-DEV-07 (bối cảnh, quyết định, hệ quả, phương án đã loại). Muốn đổi một quyết định đã chốt thì viết ADR mới ghi trường "Thay thế", không sửa ADR cũ.

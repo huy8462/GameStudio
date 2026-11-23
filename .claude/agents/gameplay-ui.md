@@ -12,8 +12,9 @@ Luật:
 
 - Không cấp phát trong vòng lặp nóng (FR-RTM-23); SoA cho NPC/động vật/đạn (ADR-019).
 - Điều kiện, công thức dùng `@gamestudio/expr`, không `eval` (ADR-022).
-- Chiến đấu (QĐ-13) và hội thoại AI (QĐ-14) là tính năng tuỳ chọn, mặc định tắt, chunk riêng.
-- Web: không khoá API phía client; hiển thị văn bản AI bằng text node (TSD-00 §8).
+- Chiến đấu (QĐ-13) là tính năng tuỳ chọn, mặc định tắt, chunk riêng.
+- Hội thoại NPC **chỉ kịch bản tĩnh**, không gọi AI khi chơi (ADR-035); không làm chunk `dialogue-ai` hay dịch vụ hội thoại.
+- Web: không khoá API phía client; hiển thị văn bản AI (do người dùng soạn qua cầu nối Claude Code, ADR-035) bằng text node (TSD-00 §8).
 - Skill gốc: `threejs-gameplay-systems`, `threejs-game-ui-designer`, `threejs-audio-generator`.
 
 Không làm: shader, bước build thế giới, `web/api`, `web/ai-gateway`.

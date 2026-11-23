@@ -15,6 +15,8 @@ Kịch bản tĩnh rẻ, tất định, chạy không cần mạng; một số g
 ## Quyết định
 Hội thoại NPC mặc định là kịch bản tĩnh theo dữ liệu (cây thoại, điều kiện, sự kiện); có thể bật hội thoại do AI sinh khi chạy, tuỳ nhu cầu từng game/NPC. Kịch bản tĩnh luôn là đường dự phòng.
 
+> **Cập nhật 23/11/2026:** phần "AI sinh khi chạy" bị **ADR-035** thay. Huy chốt hội thoại NPC khi chơi **chỉ dùng kịch bản tĩnh**. Các hệ quả về AI khi chạy dưới đây chỉ còn giá trị lịch sử.
+
 ## Hệ quả
 - `dialogue-ai` là chunk riêng, chỉ nạp khi bật (giống ADR-013).
 - AI khi chạy chỉ đi qua cổng AI phía server (`web/ai-gateway`), không bao giờ từ trình duyệt; mô hình nhỏ `claude-haiku-5-5` (ADR-031); token phiên chơi ngắn hạn, giới hạn tần suất và hạn mức.
