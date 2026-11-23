@@ -8,13 +8,11 @@ const root = spawnSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf
 const errors = [];
 
 // 1. Quét bí mật trên phần đã stage. gitleaks phải có trong PATH (tools/versions.json, engine doctor).
+// gitleaks là tệp .exe thật (không phải shim .cmd) nên gọi trực tiếp, không qua shell.
 const gl = spawnSync(
   'gitleaks',
   ['git', '--staged', '--redact', '--no-banner', '--config', join(root, 'gitleaks.toml'), root],
-  {
-    encoding: 'utf8',
-    shell: process.platform === 'win32',
-  },
+  { encoding: 'utf8' },
 );
 if (gl.error || gl.status === null) {
   errors.push('Không chạy được gitleaks (cài và thêm vào PATH; xem pnpm doctor).');
