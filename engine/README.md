@@ -1,6 +1,6 @@
 # engine/
 
-Thư viện engine và công cụ build (TSD-00 §4.1, DDD-00 §4.1). Hiện **chưa có gói**: gói tạo dần theo pha.
+Thư viện engine và công cụ build (TSD-00 §4.1, DDD-00 §4.1). Gói tạo dần theo pha; hiện có `cli/` (chỉ lệnh `doctor`).
 
 | Thư mục | Gói | Mã | Pha |
 |---|---|---|---|

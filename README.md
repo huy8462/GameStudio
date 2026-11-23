@@ -27,3 +27,4 @@ uv sync
 | `pnpm format:check` | Prettier |
 | `uv run ruff check`, `uv run ruff format --check` | Ruff cho Python |
 | `pnpm test:helpers` | Kiểm thử helper của bộ gốc |
+| `pnpm doctor` | Build `engine/cli` rồi chạy `engine doctor`: kiểm công cụ theo `tools/versions.json` (thoát 5 khi thiếu/lệch) |

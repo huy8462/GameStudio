@@ -1,0 +1,81 @@
+{
+  "$schema": "./schema/versions.schema.json",
+  "//": "SCH-DEV-03 / DTO-DEV-03 / CFG-GEN-01. Chốt ở E0 (phiếu E0-03, 23/11/2026). Nâng bản = phiếu riêng có chạy golden test (ADR-017). Blender theo ADR-034.",
+  "node": { "version": "24.21.0", "match": "minor", "check": ["node", "--version"], "parse": "v(\\d+\\.\\d+\\.\\d+)" },
+  "pnpm": { "version": "12.16.1", "match": "exact", "check": ["pnpm", "--version"], "parse": "^(\\d+\\.\\d+\\.\\d+)" },
+  "python": {
+    "version": "3.12.16",
+    "match": "minor",
+    "check": ["uv", "run", "--no-sync", "python", "--version"],
+    "parse": "Python (\\d+\\.\\d+\\.\\d+)",
+    "timeoutS": 30
+  },
+  "uv": { "version": "0.13.6", "match": "minor", "check": ["uv", "--version"], "parse": "uv (\\d+\\.\\d+\\.\\d+)" },
+  "blender": {
+    "version": "5.2.4",
+    "match": "minor",
+    "check": ["blender"],
+    "probe": "blender",
+    "roles": ["dev", "worker"],
+    "timeoutS": 60
+  },
+  "ktx": {
+    "version": "4.4.2",
+    "match": "exact",
+    "check": ["ktx", "--version"],
+    "parse": "v(\\d+\\.\\d+\\.\\d+)",
+    "roles": ["dev", "worker"],
+    "features": [{ "id": "create", "check": ["ktx", "create", "--help"], "expect": "ktx create" }]
+  },
+  "gltfTransform": {
+    "version": "4.5.1",
+    "match": "exact",
+    "check": ["pnpm", "exec", "gltf-transform", "--version"],
+    "parse": "^(\\d+\\.\\d+\\.\\d+)",
+    "timeoutS": 30
+  },
+  "ffmpeg": {
+    "version": "9.0.2",
+    "match": "minor",
+    "check": ["ffmpeg", "-hide_banner", "-version"],
+    "parse": "ffmpeg version n(\\d+\\.\\d+\\.\\d+)",
+    "roles": ["dev", "worker"],
+    "features": [{ "id": "libopus", "check": ["ffmpeg", "-hide_banner", "-encoders"], "expect": "libopus" }]
+  },
+  "gitleaks": {
+    "version": "8.30.1",
+    "match": "exact",
+    "check": ["gitleaks", "version"],
+    "parse": "(\\d+\\.\\d+\\.\\d+)"
+  },
+  "playwright": {
+    "version": "1.65.1",
+    "match": "exact",
+    "check": ["pnpm", "exec", "playwright", "--version"],
+    "parse": "Version (\\d+\\.\\d+\\.\\d+)",
+    "timeoutS": 30
+  },
+  "chromium": { "version": "1255", "match": "exact", "probe": "chromium" },
+  "three": { "version": "0.187.0", "match": "exact", "probe": "pinned" },
+  "claudeCode": {
+    "version": "2.1.319",
+    "match": "minor",
+    "check": ["claude", "--version"],
+    "parse": "^(\\d+\\.\\d+\\.\\d+)",
+    "roles": ["dev"],
+    "optional": true,
+    "timeoutS": 30
+  },
+  "addons": {
+    "sapling": {
+      "module": "bl_ext.blender_org.sapling_tree_gen",
+      "version": "1.2.0",
+      "sha256": "8f24925a97b822acba79b6ee873b301064d81e1069b90f9c9e3139901556ff5c"
+    },
+    "ant_landscape": {
+      "module": "bl_ext.blender_org.antlandscape",
+      "version": "0.2.0",
+      "sha256": "d78dbb2efae9bb2ef8ed0cb645833f65a76cd785b0d37181bf56b8e5ed4b4984"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "@gamestudio/cli",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Lệnh `engine` của GameStudio (MOD-GEN-16, MOD-CLI-01, IF-CLI-01).",
+  "type": "module",
+  "bin": {
+    "engine": "dist/main.js"
+  },
+  "files": [
+    "dist",
+    "src/doctor/blender-probe.py"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "commander": "15.1.0"
+  },
+  "engines": {
+    "node": ">=24 <25"
+  }
+}

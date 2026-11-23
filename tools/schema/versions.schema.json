@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gamestudio.local/schema/versions/1.json",
+  "title": "tools/versions.json (SCH-DEV-03, DTO-DEV-03)",
+  "type": "object",
+  "properties": {
+    "$schema": { "type": "string" },
+    "//": { "type": "string" },
+    "addons": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["module", "version", "sha256"],
+        "additionalProperties": false,
+        "properties": {
+          "module": { "type": "string", "pattern": "^bl_ext\\.[a-z_]+\\.[a-z0-9_]+$" },
+          "version": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    }
+  },
+  "additionalProperties": { "$ref": "#/$defs/tool" },
+  "$defs": {
+    "argv": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "tool": {
+      "type": "object",
+      "required": ["version", "match"],
+      "additionalProperties": false,
+      "properties": {
+        "version": { "type": "string" },
+        "match": { "enum": ["exact", "minor"] },
+        "check": { "$ref": "#/$defs/argv" },
+        "parse": { "type": "string", "description": "Regex, nhóm 1 là phiên bản" },
+        "probe": { "enum": ["blender", "chromium", "pinned"] },
+        "roles": { "type": "array", "items": { "enum": ["dev", "worker", "ci"] } },
+        "optional": { "type": "boolean" },
+        "timeoutS": { "type": "number", "exclusiveMinimum": 0 },
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "check", "expect"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string" },
+              "check": { "$ref": "#/$defs/argv" },
+              "expect": { "type": "string" }
+            }
+          }
+        }
+      },
+      "anyOf": [{ "required": ["probe"] }, { "required": ["check", "parse"] }]
+    }
+  }
+}
