@@ -22,8 +22,8 @@ risks:
   - "Lần đo 1 có một khung 4,25 s (nghi trình duyệt tạm dừng)."
   - "Phần lớn tài liệu đã duyệt chưa phản ánh ADR-034/035 (Blender 5.2, Claude Code CLI, NPC tĩnh): change request ở W1."
 proposal: "Đề xuất QUA G-E0. Baseline A56 dùng giá trị nền maxRenderDpr 1,5 cho tier Vừa (OIT-GEN-01); ghi vào budgets.json khi tạo ở E1. Bắt đầu E1 (schema, rng, expr, intake với HandoffLlmClient, bộ chạy bước, địa hình, QA khung, CLI)."
-huyConfirm: null
-status: chua_qua
+huyConfirm: { by: Huy, at: 2026-11-24T00:37, note: "Đồng ý m1 (baseline đo bằng Samsung Internet) và m2 (phần hoãn sang E1)" }
+status: da_qua
 ---
 
 # Báo cáo cổng G-E0
@@ -65,5 +65,6 @@ Xem `risks` ở đầu tệp. Quan trọng nhất: cảnh scaffold quá nhẹ, n
 **Qua G-E0.** Dùng DPR 1,5 làm giá trị nền tier Vừa. Bắt đầu E1.
 
 ## Huy xác nhận
-Người: … Thời điểm: …
-(Điền `huyConfirm: { by: Huy, at: yyyy-mm-ddThh:mm }` và đổi `status: da_qua`.)
+Người: **Huy**. Thời điểm: **24/11/2026 00:37**. Đồng ý cả m1 và m2. **G-E0 đã qua.**
+
+Theo m1: các cổng sau đề xuất đo bằng Chrome Android để khớp GD-01; Samsung Internet vẫn chấp nhận được nếu ghi rõ. Theo m2: việc hoãn được đưa vào phiếu E1.

@@ -93,7 +93,7 @@ Bốn thư mục Blender 5.2.4, ktx, ffmpeg, gitleaks đã được thêm vào *
 - **W4:** kho asset, xuất/nhập gói, chia sẻ, xuất bản, link chơi thử, JSON thô, rà soát bảo mật.
 - **Engine E1→E8:** schema/rng/expr/intake → materials/packager/runtime → water/vegetation/fx → asset/khung xương → bake ánh sáng → tương tác/NPC/hội thoại/chiến đấu → tối ưu/game thứ hai. W1–W4 chạy song song sau cổng G-E1.
 
-### 6.1 Chuẩn bị E0 (bước tiếp theo)
+### 6.1 E0 (đã qua G-E0 ngày 24/11/2026)
 Điều kiện qua G-E0 (SRS-00 §4.3; BRD-00 §9): ADR-001…015 đã viết; `engine doctor` đạt; scaffold gốc chạy trên A56 và baseline ghi vào `budgets.json`; hook, template, `project.yaml`, `CLAUDE.md` sẵn sàng. Phạm vi FR: SRS-09 toàn bộ FR-DEV trừ 06, 25; SRS-04 FR-RTM-12, 13, FR-QA-07.
 
 Thứ tự phiếu đề xuất (mỗi phiếu một phiên Claude Code, `/clear` giữa các phiếu):
@@ -105,9 +105,18 @@ Thứ tự phiếu đề xuất (mỗi phiếu một phiên Claude Code, `/clear
 | 4 | ✅ **Xong 23/11/2026**: `.claude/` gồm 8 agent, 5 hook (H-01/02/04 chặn, H-03/05 cảnh báo qua `additionalContext`) dạng exec `node <tệp>`, `settings.json` (deny đọc bí mật, allow lệnh kiểm), `settings.debug.json`, 5 rule theo `paths:`, 6 mẫu, 15 lệnh slash; `CLAUDE.md` (67 dòng), `project.yaml`, `.githooks/pre-commit` (gitleaks + CLAUDE.md < 150; đã bật `core.hooksPath`), `gitleaks.toml`, `LICENSES.md`, `tools/scripts/structure-check.mjs` | TSD-09 §2.1, IF-DEV-01…05, ALG-DEV-03…05, 08; TST-DEV-01, 02, 05 | 35 test hook + 1 test cấu trúc đạt; pre-commit đã chặn khoá giả. Chưa có: skill `engine-*` (từ E1), `ticket-new.mjs`, `token-meter.mjs`; 10 lệnh slash cần CLI E1+ ghi rõ "chưa có" |
 | 5 | ✅ **Xong 23/11/2026**: ADR-001…015 từ QĐ-01…15 (mẫu giống ADR-016+), danh mục `docs/ADR/README.md` | FR-DEV-11, SCH-DEV-07 | Diễn giải QĐ-15 đã được Huy xác nhận → ADR-035; ADR-008 ghi "được nới bởi ADR-012" |
 | 6 | ✅ **Xong 23/11/2026** (Huy đo A56: DPR 2 → fps tb 71,7 / p5 56,8; DPR 1,5 → 60,1 / 55,6; `docs/gates/G-E0/a56-baseline.*`). Chi tiết: `prototypes/baseline-a56` = scaffold gốc + `?perf=1` (60 s đo, hiện JSON + nút sao chép) + `?dpr=` (OIT-GEN-01); build xong (`dist/` 590 KB JS, 149 KB gzip; gitleaks sạch). Kiểm trên máy dev bằng `smoke-perf.mjs` (SwiftShader, chỉ kiểm chạy được, **không phải số A56**): 0 lỗi, 26 draw call, 3.226 tri. **Đã xuất bản 23/11/2026** lên poc (chính máy này, `160.191.243.120:18080`, máy chủ `serve_poc.py` của Thiền viện online) tại `/<mã>/split/gamestudio-baseline-a56/index.html`; kiểm qua IP công khai: tải đủ, 0 lỗi | FR-RTM-12, 13, FR-QA-07 | Mã truy cập ở `C:\poc-public\LIEN-KET.txt`, không ghi vào repo. `publish_poc.py --split` của Thiền viện online sẽ xoá bản này (xem README prototype) |
-| 7 | ⏳ **Báo cáo đã dựng 23/11/2026**: `docs/gates/G-E0.md` (7/7 điều kiện tự kiểm đạt; 2 điều kiện chờ Huy: m1 trình duyệt Samsung Internet, m2 phần hoãn sang E1). `status: chua_qua` tới khi Huy điền `huyConfirm` | ALG-DEV-07, SCH-DEV-05, QT-DEV-03 | Baseline A56: `docs/gates/G-E0/a56-baseline.md` (fps p5 55,6 ở DPR 1,5; chạm trần 60 fps của trình duyệt; cảnh quá nhẹ để chốt ngân sách cảnh lớn) |
+| 7 | ✅ **G-E0 ĐÃ QUA** (Huy xác nhận 24/11/2026 00:37): `docs/gates/G-E0.md`, 7/7 điều kiện tự kiểm đạt; m1 (Samsung Internet) và m2 (phần hoãn sang E1) được chấp nhận | ALG-DEV-07, SCH-DEV-05, QT-DEV-03 | Baseline A56: `docs/gates/G-E0/a56-baseline.md` (fps p5 55,6 ở DPR 1,5; chạm trần 60 fps của trình duyệt; cảnh quá nhẹ để chốt ngân sách cảnh lớn) |
 
-Huy đã xác nhận (23/11/2026): bắt đầu E0; repo chỉ cục bộ; dùng Blender 5.2.4 (ADR-034). Phiếu 1–5 đã xong. **Còn lại cho G-E0:** phiếu 6 (baseline A56: cần Huy cầm máy và chỗ đưa bản build lên, máy chủ poc CH-10) và phiếu 7 (`/gate-check G-E0`).
+**E0 hoàn tất; G-E0 đã qua ngày 24/11/2026.** Bước tiếp: **E1**.
+
+**Việc hoãn từ E0 (m2) đưa vào E1:**
+- Tạo `games/_template/data/budgets.json` + `budgets.schema.json` và ghi baseline A56: `targetFps 30`, `maxRenderDpr 1.5`, `a56Baseline` theo `docs/gates/G-E0/a56-baseline.md`.
+- `tools/scripts/token-meter.mjs`, `ticket-new.mjs`.
+- Skill `engine-*` (10–15).
+- QA giả lập thêm viewport 384 × 832.
+- Cổng sau đo A56 bằng Chrome Android (m1).
+
+**Phạm vi E1** (TSD-00 §11, SRS-00 §4.3): `@gamestudio/schema`, `rng`, `expr` (phần điều kiện), `intake` với `HandoffLlmClient`; bộ chạy bước + cache; `world.fetch/heightfield`, `terrain.erode/mesh/splat`; QA khung; CLI cơ bản. Đích G-E1: AC-01-01…07, AC-02-01, 02, AC-04-06, AC-CR01-01, 02, 06, 12.
 
 ## 7. Quy ước làm việc
 - Tiếng Việt; tài liệu Markdown; file mã ≤ ~300 dòng, mỗi gói có README ≤ 60 dòng; ESM, `strict` + `noUncheckedIndexedAccess`; log JSON một dòng, không bao giờ ghi khoá hay nội dung hội thoại.
