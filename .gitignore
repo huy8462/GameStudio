@@ -22,11 +22,25 @@ coverage/
 /release.md
 /release-notes.md
 
-# Local secrets and logs
+# Local secrets and logs (GameStudio TSD-09 §6, FR-DEV-23)
 .env
 .env.*
 !.env.example
+*.key
+*.pem
+secrets/
 *.log
+
+# GameStudio: build, cache, dữ liệu tải về, môi trường
+build/
+**/cache/
+data.bak-*/
+*.tif
+*.tiff
+*.osm.pbf
+.venv/
+.claude/settings.local.json
+.claude/hooks/hook-errors.log
 
 # OS/editor files
 .DS_Store

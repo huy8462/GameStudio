@@ -14,10 +14,10 @@ import {
   readManifestCaptures,
   settleWait,
   summarize,
-} from '../../skills/threejs-qa-release/scripts/inspect-threejs-canvas.mjs';
+} from '../../.claude/skills/threejs-qa-release/scripts/inspect-threejs-canvas.mjs';
 
-const inspectorUrl = new URL('../../skills/threejs-qa-release/scripts/inspect-threejs-canvas.mjs', import.meta.url);
-const scaffoldInspectorUrl = new URL('../../skills/threejs-gameplay-systems/assets/threejs-vite-game/scripts/inspect-threejs-canvas.mjs', import.meta.url);
+const inspectorUrl = new URL('../../.claude/skills/threejs-qa-release/scripts/inspect-threejs-canvas.mjs', import.meta.url);
+const scaffoldInspectorUrl = new URL('../../.claude/skills/threejs-gameplay-systems/assets/threejs-vite-game/scripts/inspect-threejs-canvas.mjs', import.meta.url);
 
 // Evaluate the actual browser callback in an isolated window, with browser-like
 // serialization on return. Tests need neither Playwright nor a running browser.

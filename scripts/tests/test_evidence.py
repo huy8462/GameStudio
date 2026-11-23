@@ -10,7 +10,7 @@ import tempfile
 import unittest
 
 
-SCRIPT = Path(__file__).resolve().parents[2] / "skills/threejs-game-director/scripts/check_evidence.py"
+SCRIPT = Path(__file__).resolve().parents[2] / ".claude/skills/threejs-game-director/scripts/check_evidence.py"
 SPEC = importlib.util.spec_from_file_location("check_evidence", SCRIPT)
 evidence = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(evidence)

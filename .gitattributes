@@ -1,0 +1,15 @@
+# GameStudio: chuẩn hoá xuống dòng LF trong repo để hash (ALG-GEN-02) và so khớp LICENSE với vendor (ALG-DEV-09) ổn định trên Windows.
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+*.glb binary
+*.ktx2 binary
+*.bin binary
+*.wasm binary
+*.ogg binary
+*.opus binary
