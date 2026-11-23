@@ -4,7 +4,7 @@
 |---|---|---|---|
 | ADR-001…015 | Tương ứng QĐ-01…15 của brief | Viết ở E0 (FR-DEV-11) | Brief, BRD-00 |
 | [ADR-016](ADR-016-monorepo-va-cong-cu.md) | Monorepo và công cụ | Đã chốt 22/11/2026 | TD-01 |
-| [ADR-017](ADR-017-phien-ban-nen.md) | Phiên bản nền | Đã chốt 22/11/2026 | TD-02 |
+| [ADR-017](ADR-017-phien-ban-nen.md) | Phiên bản nền | Đã chốt 22/11/2026; phần Blender bị ADR-034 thay | TD-02 |
 | [ADR-018](ADR-018-runtime-do-hoa.md) | Runtime đồ hoạ | Đã chốt 22/11/2026 | TD-03 |
 | [ADR-019](ADR-019-kien-truc-runtime.md) | Kiến trúc runtime | Đã chốt 22/11/2026 | TD-04 |
 | [ADR-020](ADR-020-va-cham-dieu-huong.md) | Va chạm, điều hướng | Đã chốt 22/11/2026 | TD-05 |
@@ -21,5 +21,6 @@
 | [ADR-031](ADR-031-dich-vu-ai.md) | Dịch vụ AI | Đã chốt 22/11/2026 | TD-16 |
 | [ADR-032](ADR-032-trien-khai.md) | Triển khai | Đã chốt 22/11/2026 | TD-17 |
 | [ADR-033](ADR-033-qa.md) | QA | Đã chốt 22/11/2026 | TD-18 |
+| [ADR-034](ADR-034-blender-5-2-lts.md) | Blender 5.2 LTS thay Blender 4.5 LTS | Đã chốt 23/11/2026; thay ADR-017 (phần Blender) | Huy, E0 |
 
 Mẫu ADR theo TSD-09 SCH-DEV-07 (bối cảnh, quyết định, hệ quả, phương án đã loại). Muốn đổi một quyết định đã chốt thì viết ADR mới ghi trường "Thay thế", không sửa ADR cũ.

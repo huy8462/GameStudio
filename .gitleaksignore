@@ -1,0 +1,3 @@
+# Báo động giả đã xác minh (TSD-09 §6). Mỗi dòng ghi lý do ở comment phía trên.
+# Commit upstream đầu tiên: phép so chuỗi "tripo_api_key=missing" trong test, không phải khoá; tệp không còn ở HEAD.
+1d67249b1d518b929341342a612e88add39b2f53:skills/threejs-game-director/scripts/audit_reference_report.py:generic-api-key:137

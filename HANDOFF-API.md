@@ -11,7 +11,7 @@ GameStudio là engine web game 3D dùng lại được cùng Web Studio để ng
 | BRD | `BRD-TONG-QUAN` + `BRD-01…10` | v1.0–1.1, **đã duyệt** (Huy, 22–23/11/2026). BRD-10 = làm tiếp/cập nhật game (BR-119…126) |
 | SRS | `SRS-00-TONG-QUAN` + `SRS-01…09`, phụ lục A truy vết | v1.0–1.2, **đã duyệt**; có CR-01 (làm tiếp/nhập game) và mở rộng quản trị (SRS-08 v1.2, SRS-00 v1.2). Tổng 358 FR |
 | TSD | `TSD-00-TONG-QUAN` + `TSD-01…09` | v1.1–1.3, **đã duyệt** (TSD-08 v1.3). TD-01…18 chốt 22/11 |
-| ADR | `ADR-016…033` (+ README) | **Đã chốt** 22/11/2026. ADR-001…015 (QĐ-01…15) chưa viết, đến hạn ở E0 |
+| ADR | `ADR-016…034` (+ README) | **Đã chốt** 22–23/11/2026 (ADR-034: Blender 5.2 LTS). ADR-001…015 (QĐ-01…15) chưa viết, đến hạn ở E0 |
 | DDD | `DDD-00-TONG-QUAN` + `DDD-01…09` | v1.0, **đã duyệt** (Huy, 23/11/2026) |
 | UIUX | `UIUX-00-TONG-QUAN`, `01…04`, phụ lục, `prototype/*.html` | v1.0, **đã duyệt** (Huy, 23/11/2026); đề xuất trong mọi bảng Open item (OIU) được nhận làm giá trị nền; sửa tiếp phải qua change request |
 | POC, TEST | thư mục rỗng | chưa có tệp nào |
@@ -29,7 +29,7 @@ Trên Windows PowerShell phải bật UTF-8 trước, nếu không script sẽ d
 
 ## 3. Quyết định công nghệ đã chốt (ADR-016…033)
 - Monorepo pnpm workspaces (TS) + uv (Python); chạy song song `pnpm -r`; không Turborepo/Nx bản đầu (016).
-- Node 24 LTS, TypeScript 5.x strict, Python 3.12, Blender 4.5 LTS; phiên bản ghi ở `tools/versions.json` (017).
+- Node 24 LTS, TypeScript 5.x strict, Python 3.12; phiên bản ghi ở `tools/versions.json` (017). **Blender 5.2 LTS** + Sapling Tree Gen 1.2.0 + A.N.T. Landscape 0.2.0 (**ADR-034**, 23/11/2026, thay phần Blender 4.5 của ADR-017; mọi chỗ "Blender 4.5" trong TSD/DDD hiểu là 5.2).
 - Runtime đồ hoạ Three.js bản cố định tại E0 (018); kiến trúc runtime, va chạm/điều hướng, dữ liệu/schema, biểu thức an toàn, điều phối build, nén asset, địa hình, bake ánh sáng (019–026).
 - Web Studio: React 19 + Vite + TS, TanStack Query, Zustand, Tailwind + Radix, @xyflow/react, Monaco; xem trước nhúng thẳng `@gamestudio/engine` (027).
 - Backend: Fastify (Node 24) cho `web/api` và `web/ai-gateway`; PostgreSQL 17 + Drizzle; pg-boss; SSE qua LISTEN/NOTIFY (028).
@@ -60,9 +60,13 @@ Hiện trạng máy dev (kiểm ngày 23/11/2026):
 | uv | 0.13.6 | có | Đạt |
 | Python | 3.14.7 (hệ thống) | **3.12** | Lệch: dùng `uv python install 3.12` + `.python-version`, không đổi Python hệ thống |
 | git | 2.55.0 | có | Repo cục bộ, đã có từ E0-01 |
-| Blender | **4.2.9 LTS** và **5.2.4 LTS** ở `C:\Tools\blender-*`, không có trong PATH | **4.5 LTS** + Sapling, A.N.T. Landscape | **Lệch:** Huy báo đã cài 4.5 LTS nhưng trên máy chưa tìm thấy bản 4.5 (đã quét mọi ổ, registry, `%APPDATA%\Blender Foundation`). Cần Huy xác nhận đường dẫn, hoặc cài 4.5, hoặc đổi phiên bản bằng ADR mới thay ADR-017 |
+| Blender | **5.2.4 LTS** `C:\Tools\blender-5.2.4-windows-x64` (Python nhúng 3.13); bản 4.2.9 vẫn còn ở `C:\Tools` nhưng không dùng | **5.2 LTS** (ADR-034) | Đạt. Add-on cài từ extensions.blender.org ngày 23/11/2026, đã bật: `bl_ext.blender_org.sapling_tree_gen` 1.2.0, `bl_ext.blender_org.antlandscape` 0.2.0 (ở `%APPDATA%\Blender Foundation\Blender\5.2\extensions\blender_org\`) |
 | Docker | không có | (máy chủ W1) | Chỉ cần nếu chạy thử Compose trên máy dev |
-| ktx, ffmpeg, gitleaks | **không có** | theo SCH-DEV-03 | Cần cho phiếu 3 (`engine doctor`) và phiếu 4 (pre-commit gitleaks) |
+| ktx | **4.4.2** `C:\Tools\ktx-4.4.2\bin` | có `ktx create` | Đạt (bộ cài KhronosGroup chính thức, SHA-256 khớp GitHub release) |
+| ffmpeg | **n9.0.2** bản LGPL `C:\Tools\ffmpeg-n9.0-latest-win64-lgpl-9.0\bin` | LGPL + libopus (ADR-024) | Đạt: có encoder `libopus`, không bật `--enable-gpl`. Nguồn BtbN/FFmpeg-Builds; SHA-256 khớp release |
+| gitleaks | **8.30.1** `C:\Tools\gitleaks-8.30.1` | có | Đạt. Quét toàn lịch sử repo: 1 báo động giả trong commit upstream `1d67249` (chuỗi so sánh trong test), đã ghi vào `.gitleaksignore` kèm lý do; còn lại không có |
+
+Bốn thư mục Blender 5.2.4, ktx, ffmpeg, gitleaks đã được thêm vào **PATH của user** (cần mở terminal hoặc Claude Code mới để nhận).
 
 ## 5. Việc còn mở
 1. ~~Duyệt UIUX/DDD~~ **Đã đóng 23/11/2026**: UIUX v1.0 và DDD v1.0 đã duyệt. OIU-WEB-06 theo đề xuất: Tiến độ là tab đầu của bảng phải 400 px, mở bằng chip giai đoạn. OIU-WEB-07 theo đề xuất: tab mặc định của thư viện là "Đang dở" khi có ít nhất một mục, và nhớ tab người dùng chọn lần cuối.
@@ -88,13 +92,13 @@ Thứ tự phiếu đề xuất (mỗi phiếu một phiên Claude Code, `/clear
 |---|---|---|---|
 | 1 | ✅ **Xong 23/11/2026** (`f771f5e`): `git init`, `.gitignore`, fork `majidmanzarpour/threejs-game-skills` (MIT): nhánh `vendor/upstream`, ghi `UPSTREAM.md`, giữ `LICENSE`; bỏ phần Codex và skill `threejs-3d-generator` | QĐ-01, 02, 07, 08; ALG-DEV-09; SCH-DEV-06 | Repo chỉ cục bộ (Huy chốt). Hệ quả: OIT-GEN-04, CI GitHub Actions (ALG-DEV-10) chưa có nơi chạy, tạm thay bằng pre-commit + script cục bộ |
 | 2 | Khung monorepo theo TSD-00 §4.1: `pnpm-workspace.yaml`, `tsconfig.base.json` (strict, `noUncheckedIndexedAccess`), `pyproject.toml` + `.python-version` 3.12 qua uv, ESLint/Prettier/Ruff | ADR-016, 017; TSD-00 §4.3 | Chỉ khung rỗng, chưa viết gói |
-| 3 | `tools/versions.json` + `engine doctor` tối thiểu trong `engine/cli` | SCH-DEV-03, IF-DEV-03, ALG-DEV-06; TST-DEV-03 | Cần cài Blender 4.5 LTS + 2 add-on, ktx, ffmpeg (libopus), gitleaks; cố định bản Three.js |
+| 3 | `tools/versions.json` + `engine doctor` tối thiểu trong `engine/cli` | SCH-DEV-03, IF-DEV-03, ALG-DEV-06; TST-DEV-03; ADR-034 | Công cụ đã đủ (§4). `blender: "5.2.x"`; add-on kiểm bằng mã module `bl_ext.blender_org.*` + `blender_manifest.toml` (extension không có gói zip để băm: `sha256` tính trên thư mục đã cài, sắp theo đường dẫn); cố định bản Three.js |
 | 4 | `.claude/` tối giản: 8 agent, hook H-01…H-05 (Node), `settings.json`, templates; `CLAUDE.md` < 150 dòng; `project.yaml`; `.githooks/pre-commit` + `gitleaks.toml` | TSD-09 §2.1, IF-DEV-01…05, ALG-DEV-03…05, 08; TST-DEV-01, 02, 05 | Lệnh slash (13 + 2) có thể để khung, hoàn thiện dần |
 | 5 | ADR-001…015 từ QĐ-01…15 của brief | FR-DEV-11, SCH-DEV-07 | Việc tài liệu, làm song song được với 2–4 |
 | 6 | Chạy scaffold gốc, đo baseline trên Galaxy A56 (`?perf=1`), ghi `budgets.json`; đo lại OIT-GEN-01 (DPR 1,5) | FR-RTM-12, 13, FR-QA-07 | **Cần Huy cầm máy A56** và nơi phục vụ bản build (máy chủ poc, CH-10) |
 | 7 | `/gate-check` G-E0 → `docs/gates/G-E0.md`, Huy điền `huyConfirm` | ALG-DEV-07, SCH-DEV-05 | |
 
-Huy đã xác nhận (23/11/2026): bắt đầu E0; repo chỉ cục bộ. Còn chặn phiếu 3: Blender 4.5 LTS chưa thấy trên máy (xem §4), thiếu ktx, ffmpeg, gitleaks. Phiếu 2, 4 (phần không cần gitleaks) và 5 làm được ngay.
+Huy đã xác nhận (23/11/2026): bắt đầu E0; repo chỉ cục bộ; dùng Blender 5.2.4 (ADR-034). Công cụ cho phiếu 3, 4 đã cài xong; phiếu 2…5 đều làm được. Phiếu 6 vẫn cần Huy cầm A56 và nơi đưa bản build lên.
 
 ## 7. Quy ước làm việc
 - Tiếng Việt; tài liệu Markdown; file mã ≤ ~300 dòng, mỗi gói có README ≤ 60 dòng; ESM, `strict` + `noUncheckedIndexedAccess`; log JSON một dòng, không bao giờ ghi khoá hay nội dung hội thoại.
