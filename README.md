@@ -9,4 +9,21 @@ Engine web game 3D dùng lại được, kèm Web Studio, để tạo, chỉnh v
 
 Trạng thái: pha E0 (xem `HANDOFF-API.md` §6.1).
 
-Kiểm thử helper của bộ gốc: `npm run test:helpers` (cần Python và Node 24).
+## Bắt đầu
+
+Cần Node 24, pnpm 12, uv (Python 3.12 do uv quản lý theo `.python-version`).
+
+```
+pnpm install
+uv sync
+```
+
+| Lệnh | Việc |
+|---|---|
+| `pnpm lint` | ESLint (gồm luật tất định: cấm `Math.random`/`Date.now` trong `engine/**`) |
+| `pnpm exec tsc -p tsconfig.json` | Kiểm kiểu toàn repo |
+| `pnpm test` | Vitest |
+| `pnpm depcruise` | Luật phụ thuộc giữa gói (TSD-00 §4.2) |
+| `pnpm format:check` | Prettier |
+| `uv run ruff check`, `uv run ruff format --check` | Ruff cho Python |
+| `pnpm test:helpers` | Kiểm thử helper của bộ gốc |

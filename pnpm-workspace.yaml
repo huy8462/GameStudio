@@ -1,0 +1,8 @@
+# DDD-00 §4.1 (MOD-GEN-10…21), ADR-016. games/* không phải gói pnpm (dữ liệu, không có package.json).
+packages:
+  - 'engine/*'
+  - 'engine/shared/*'
+  - 'engine/build/*'
+  - 'web/*'
+minimumReleaseAgeExclude:
+  - dependency-cruiser@18.9.0

@@ -1,0 +1,19 @@
+# Tài liệu đã duyệt không định dạng lại tự động (sửa qua change request).
+docs/
+GAME-ENGINE-WEB3D-BRIEF.md
+HANDOFF-API.md
+UPSTREAM.md
+# Mã bộ gốc: giữ nguyên để hợp nhất upstream dễ (ALG-DEV-09).
+.claude/skills/
+scripts/
+LICENSE
+README.md
+# Sinh ra / phụ thuộc
+pnpm-lock.yaml
+uv.lock
+**/node_modules/
+**/dist/
+**/build/
+**/cache/
+**/generated/
+.venv/

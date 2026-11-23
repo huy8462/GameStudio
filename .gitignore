@@ -39,6 +39,9 @@ data.bak-*/
 *.tiff
 *.osm.pbf
 .venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
 .claude/settings.local.json
 .claude/hooks/hook-errors.log
 

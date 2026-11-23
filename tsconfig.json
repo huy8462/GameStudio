@@ -1,0 +1,10 @@
+{
+  "//": "Cấu hình cho trình soạn thảo và ESLint ở gốc repo; không dùng để build. Gói build bằng tsconfig.json riêng.",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["engine/**/*.ts", "web/**/*.ts", "web/**/*.tsx", "tools/**/*.ts", "*.config.ts"],
+  "exclude": ["**/node_modules", "**/dist", "**/build"]
+}

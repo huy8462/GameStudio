@@ -1,0 +1,45 @@
+# Gốc workspace uv (ADR-016, DDD-00 §4.1). Python 3.12 (ADR-017).
+# Script Blender chạy bằng Python nhúng của Blender 5.2 (3.13) và không thuộc môi trường này (ADR-034).
+[project]
+name = "gamestudio"
+version = "0.0.0"
+description = "GameStudio: bước build Python (engine/build/py, engine/build/steps/*/main.py)"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+  "ruff==0.17.6",
+  "mypy==2.4.1",
+  "pytest==9.2.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+# engine/build/py sẽ có pyproject.toml riêng khi tạo gói (E1). Thêm thành viên ở đây khi đó.
+members = []
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+extend-exclude = [".claude/skills", "scripts", "docs", "build", "**/cache"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "PL"]
+ignore = ["PLR2004"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S101", "PLR2004"]
+"engine/build/blender/**" = ["S"]
+
+[tool.mypy]
+# DDD-00 §2.1: mypy --strict cho engine/build/py/**.
+python_version = "3.12"
+strict = true
+files = ["engine/build/py"]
+
+[tool.pytest.ini_options]
+testpaths = ["engine/build"]
+markers = ["heavy: bước nặng (Blender, bake), chỉ chạy nightly trên worker (TSD-00 §10)"]

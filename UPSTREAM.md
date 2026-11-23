@@ -42,6 +42,10 @@ Ghi công và lịch sử thay đổi so với bộ gốc (QĐ-01, QĐ-07; BR-37
 | `.gitignore` | sua | Thêm mục theo TSD-09 §6 | E0-01 |
 | `README.md` | sua | Thay hẳn bằng README GameStudio (bản gốc hướng dẫn `install.sh`, Codex, Tripo đã bỏ); bản gốc xem nhánh `vendor/upstream` | E0-01 |
 | `.gitattributes`, `UPSTREAM.md` | them | Chuẩn hoá LF; ghi công | E0-01 |
+| `package-lock.json` | xoa | Chuyển sang pnpm workspace, lockfile là `pnpm-lock.yaml` (ADR-016) | E0-02 |
+| `package.json` | sua | Thành gốc monorepo: `packageManager` pnpm, `engines` Node 24, script lint/test/depcruise/format; devDependencies cố định bản (gồm `@playwright/test`, `pngjs` của bộ gốc) | E0-02 |
+| `.gitignore` | sua | Thêm cache mypy/ruff/pytest | E0-02 |
+| `README.md` | sua | Thêm mục "Bắt đầu" | E0-02 |
 | `docs/**`, `GAME-ENGINE-WEB3D-BRIEF.md`, `HANDOFF-API.md` | them | Tài liệu dự án GameStudio | E0-01 |
 
 ## Quy trình lấy bản mới (ALG-DEV-09)

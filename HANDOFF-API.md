@@ -45,7 +45,9 @@ Từ 23/11/2026, `C:\GameStudio` là **repo git cục bộ** (Huy chọn không 
 - `f771f5e` E0-01: fork `threejs-game-skills@8286774`. Skill nằm ở `.claude/skills/` (8 skill gốc), đã bỏ `threejs-3d-generator`/Tripo và phần Codex. Có thêm `UPSTREAM.md`, `.gitattributes` (LF) và `.gitignore` theo TSD-09 §6. `LICENSE` trùng vendor.
 - `7977f93`: tài liệu dự án (`docs/`, brief, file này).
 - Nhánh `vendor/upstream` = bản gốc nguyên vẹn. Remote `upstream` chỉ fetch (push bị vô hiệu).
-- Kiểm thử helper của bộ gốc: `npm run test:helpers` (29 test Python + 48 test Node, đạt). **Chưa có mã engine/web nào**; scaffold Vite gốc nằm trong `.claude/skills/threejs-gameplay-systems/assets/threejs-vite-game/`.
+- Kiểm thử helper của bộ gốc: `pnpm test:helpers` (29 test Python + 48 test Node, đạt). Scaffold Vite gốc nằm trong `.claude/skills/threejs-gameplay-systems/assets/threejs-vite-game/`.
+- E0-02: khung monorepo pnpm + uv (Python 3.12.16 do uv quản lý). Lệnh kiểm tra: `pnpm lint`, `pnpm exec tsc -p tsconfig.json`, `pnpm test`, `pnpm depcruise`, `pnpm format:check`, `uv run ruff check`. **Chưa có gói engine/web nào** (`engine/`, `web/` mới có README).
+- Bản devDependency cố định chính xác (không `^`): TypeScript 5.9.3, Vitest 5.1.1, ESLint 10.15.0, typescript-eslint 8.73.0, Prettier 3.10.1, dependency-cruiser 18.9.0, @types/node 24.19.2, @playwright/test 1.65.1; Python: ruff 0.17.6, mypy 2.4.1, pytest 9.2.0.
 
 Tài liệu vẫn mô tả hai thành phần đó như **kiến trúc sản phẩm tương lai**, chưa có code:
 - ADR-016 (monorepo pnpm + uv), ADR-028 (Fastify/PostgreSQL) và ADR-031 (dịch vụ AI, `ai-gateway` giữ khoá, ALG-WEB-05 hạn mức/chi phí) cùng TSD-00 §4 (cây thư mục `engine/`, `web/`), TSD-08, TSD-09, DDD-08/09.
@@ -91,7 +93,7 @@ Thứ tự phiếu đề xuất (mỗi phiếu một phiên Claude Code, `/clear
 | # | Phiếu | Nguồn | Ghi chú |
 |---|---|---|---|
 | 1 | ✅ **Xong 23/11/2026** (`f771f5e`): `git init`, `.gitignore`, fork `majidmanzarpour/threejs-game-skills` (MIT): nhánh `vendor/upstream`, ghi `UPSTREAM.md`, giữ `LICENSE`; bỏ phần Codex và skill `threejs-3d-generator` | QĐ-01, 02, 07, 08; ALG-DEV-09; SCH-DEV-06 | Repo chỉ cục bộ (Huy chốt). Hệ quả: OIT-GEN-04, CI GitHub Actions (ALG-DEV-10) chưa có nơi chạy, tạm thay bằng pre-commit + script cục bộ |
-| 2 | Khung monorepo theo TSD-00 §4.1: `pnpm-workspace.yaml`, `tsconfig.base.json` (strict, `noUncheckedIndexedAccess`), `pyproject.toml` + `.python-version` 3.12 qua uv, ESLint/Prettier/Ruff | ADR-016, 017; TSD-00 §4.3 | Chỉ khung rỗng, chưa viết gói |
+| 2 | ✅ **Xong 23/11/2026**: khung monorepo theo TSD-00 §4.1/DDD-00 §4: `pnpm-workspace.yaml`, `tsconfig.base.json` (strict, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`), ESLint (luật tất định + chunk combat/dialogue-ai), Prettier, `.dependency-cruiser.cjs` (7 luật DDD-00 §4.2 + DDD-08), Vitest; `pyproject.toml` (workspace uv, Ruff, mypy strict, pytest) + `.python-version` 3.12; README cho `engine/`, `web/`, `games/`, `tools/` | ADR-016, 017; TSD-00 §4.2–4.3; DDD-00 §2.1, 2.4, 4 | Chưa có gói nào; mọi kiểm tra chạy trên cây rỗng đều đạt; luật ESLint/depcruise đã thử bằng tệp vi phạm tạm (bắt đủ 6 ca) rồi xoá |
 | 3 | `tools/versions.json` + `engine doctor` tối thiểu trong `engine/cli` | SCH-DEV-03, IF-DEV-03, ALG-DEV-06; TST-DEV-03; ADR-034 | Công cụ đã đủ (§4). `blender: "5.2.x"`; add-on kiểm bằng mã module `bl_ext.blender_org.*` + `blender_manifest.toml` (extension không có gói zip để băm: `sha256` tính trên thư mục đã cài, sắp theo đường dẫn); cố định bản Three.js |
 | 4 | `.claude/` tối giản: 8 agent, hook H-01…H-05 (Node), `settings.json`, templates; `CLAUDE.md` < 150 dòng; `project.yaml`; `.githooks/pre-commit` + `gitleaks.toml` | TSD-09 §2.1, IF-DEV-01…05, ALG-DEV-03…05, 08; TST-DEV-01, 02, 05 | Lệnh slash (13 + 2) có thể để khung, hoàn thiện dần |
 | 5 | ADR-001…015 từ QĐ-01…15 của brief | FR-DEV-11, SCH-DEV-07 | Việc tài liệu, làm song song được với 2–4 |
