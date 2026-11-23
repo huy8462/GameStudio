@@ -1,0 +1,11 @@
+[
+  { "id": "c1", "desc": "ADR-001…015 tương ứng QĐ-01…15 (FR-DEV-11, BR-36)", "kind": "auto" },
+  { "id": "c2", "desc": "engine doctor đạt trên máy dev (FR-DEV-20, BR-46)", "kind": "auto" },
+  { "id": "c3", "desc": "Baseline A56 bằng scaffold gốc (FR-QA-07, FR-RTM-12, 13)", "kind": "auto", "check": "a56" },
+  { "id": "c4", "desc": ".claude/ tối giản: ≤ 8 agent, 8 skill gốc, lệnh, 5 hook, mẫu; CLAUDE.md < 150 dòng; project.yaml (FR-DEV-01…05, 07…09, 14, 18)", "kind": "auto" },
+  { "id": "c5", "desc": "Fork + UPSTREAM.md + LICENSE gốc trùng vendor (FR-DEV-12, 13)", "kind": "auto" },
+  { "id": "c6", "desc": "Quét bí mật trước commit; .gitignore chặn bí mật (FR-DEV-22, 23)", "kind": "auto", "check": "security" },
+  { "id": "c7", "desc": "LICENSES.md (FR-DEV-24)", "kind": "auto" },
+  { "id": "m1", "desc": "Huy chấp nhận baseline đo bằng Samsung Internet thay Chrome Android (GD-01)", "kind": "manual" },
+  { "id": "m2", "desc": "Huy chấp nhận các phần E0 hoãn: budgets.json (E1), token-meter, ticket-new, skill engine-* (E1), CI GitHub (repo cục bộ)", "kind": "manual" }
+]

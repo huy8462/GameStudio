@@ -19,6 +19,8 @@ try {
     return d ? { frame: d.frame, calls: d.renderer.calls, tris: d.renderer.triangles, canvas: `${d.canvas.width}x${d.canvas.height}` } : null;
   });
   const panel = await page.evaluate(() => document.querySelector('pre')?.textContent?.slice(0, 80) ?? null);
+  // GS_SHOT=<đường dẫn .png>: chụp màn hình (ảnh minh hoạ cho báo cáo cổng, không phải ảnh từ A56).
+  if (process.env.GS_SHOT) await page.screenshot({ path: process.env.GS_SHOT });
   process.stdout.write(JSON.stringify({ ok: errors.length === 0 && failed.length === 0 && diag !== null && diag.frame > 10, errors, failed, diag, panel }) + '\n');
 } finally {
   await browser.close();
