@@ -126,6 +126,7 @@ export async function analyze(input: IntakeInput, deps: Deps): Promise<Result<St
     version: 0,
     createdAt: now,
     updatedAt: now,
+    lastActivityAt: now,
   };
   return advance(await persist(s, deps), deps);
 }
@@ -140,14 +141,71 @@ export async function answer(
   const s = await deps.store.load(sessionId);
   if (!s) return err('SESSION_NOT_FOUND', `Không có phiên ${sessionId}`);
   if (s.status !== 'ChoTraLoi') return err('SESSION_STATE', `Phiên đang ${s.status}, không nhận trả lời`);
-  const ap = applyAnswers(s.analysis, s.questions, answers, opts.useDefaults ?? false);
+  const useDefaults = opts.useDefaults ?? false;
+  const ap = applyAnswers(s.analysis, s.questions, answers, useDefaults);
   const allAnswers = { ...s.answers, ...ap.answered };
   const ev = enforceEvidence(ap.analysis, s.input.description, allAnswers);
+  const next: IntakeSessionState = {
+    ...s,
+    analysis: ev.analysis,
+    answers: allAnswers,
+    suggestions: [...s.suggestions, ...ev.suggestions],
+    ...(Object.keys(ap.answered).length > 0 ? { lastActivityAt: iso(deps) } : {}),
+  };
+  if (Object.keys(ap.answered).length > 0) delete next.remindedAt;
+  // AC-CR01-01, FR-INT-31: vòng còn câu chưa trả lời → giữ đúng các câu đó, KHÔNG gọi mô hình. Với --use-defaults,
+  // câu không bắt buộc chưa trả lời coi như nhận mặc định/giả định (fillDefaults), chỉ câu bắt buộc mới còn chờ.
+  const remaining = s.questions.filter((q) => !(q.id in ap.answered) && !(useDefaults && !q.mandatory));
+  if (remaining.length > 0) {
+    const saved = await persist({ ...next, status: 'ChoTraLoi', questions: remaining }, deps);
+    return { ok: true, value: { session: saved, questions: remaining } };
+  }
   // analysis.round = vòng vừa trả lời; advance hỏi vòng kế (≤ MAX_ROUNDS).
-  return advance(
-    { ...s, analysis: ev.analysis, answers: allAnswers, suggestions: [...s.suggestions, ...ev.suggestions] },
-    deps,
-  );
+  return advance(next, deps);
+}
+
+/**
+ * reopenSession (MOD-INT-22, PSC-INT-12; AC-CR01-01): trả phiên + câu đang chờ, KHÔNG gọi mô hình, không đổi
+ * lastActivityAt (mở lại để xem không tính là lượt mới, STM-INT-04).
+ */
+export async function reopenSession(
+  sessionId: string,
+  deps: Pick<Deps, 'store'>,
+): Promise<Result<{ session: IntakeSessionState; pendingQuestions: ClarifyQuestion[] }>> {
+  const s = await deps.store.load(sessionId);
+  if (!s) return err('SESSION_NOT_FOUND', `Không có phiên ${sessionId}`);
+  if (s.status === 'Huy' || s.status === 'DaXacNhan') return err('SESSION_CLOSED', `Phiên ${sessionId} đã ${s.status}`);
+  return { ok: true, value: { session: s, pendingQuestions: s.status === 'ChoTraLoi' ? s.questions : [] } };
+}
+
+const DAY_MS = 86_400_000;
+export const REMIND_AFTER_DAYS = 27;
+export const EXPIRE_AFTER_DAYS = 30;
+
+/**
+ * expireSessions (PSC-INT-12, QT-INT-10, STM-INT-04): phiên mở (ChoTraLoi/ChoXacNhan/Loi) không có lượt mới
+ * > 30 ngày → Huy; ≥ 27 ngày và chưa nhắc → ghi remindedAt (nơi gọi gửi thông báo). Nơi gọi cấp danh sách phiên.
+ */
+export async function expireSessions(
+  nowMs: number,
+  sessions: readonly IntakeSessionState[],
+  deps: Pick<Deps, 'store'>,
+): Promise<{ expired: string[]; reminded: string[] }> {
+  const expired: string[] = [];
+  const reminded: string[] = [];
+  for (const s of sessions) {
+    if (!['ChoTraLoi', 'ChoXacNhan', 'Loi'].includes(s.status)) continue;
+    const idle = nowMs - Date.parse(s.lastActivityAt ?? s.createdAt);
+    const at = new Date(nowMs).toISOString();
+    if (idle > EXPIRE_AFTER_DAYS * DAY_MS) {
+      await deps.store.save({ ...s, status: 'Huy', updatedAt: at, version: s.version + 1 });
+      expired.push(s.id);
+    } else if (idle >= REMIND_AFTER_DAYS * DAY_MS && !s.remindedAt) {
+      await deps.store.save({ ...s, remindedAt: at, updatedAt: at, version: s.version + 1 });
+      reminded.push(s.id);
+    }
+  }
+  return { expired, reminded };
 }
 
 /** Chạy lại bước sinh của phiên DangSinh/Loi (sau khi handoff có res-<n>.json). */

@@ -9,7 +9,8 @@ export type IntakeErrorCode =
   | 'HANDOFF_PENDING'
   | 'HANDOFF_INVALID'
   | 'SESSION_NOT_FOUND'
-  | 'SESSION_STATE';
+  | 'SESSION_STATE'
+  | 'SESSION_CLOSED';
 
 export interface IntakeError {
   code: IntakeErrorCode;

@@ -180,6 +180,41 @@ describe('engine new-game', { timeout: 240_000 }, () => {
     expect(short).toMatchObject({ exit: EXIT.DATA, report: { error: { code: 'ERR-INT-01' } } });
   });
 
+  it('AC-CR01-01: trả lời một phần → --resume in đúng câu còn lại, không có req mới', async () => {
+    const { gamesDir, base, respond } = setup();
+    const noTitle = { fields: Object.fromEntries(Object.entries(ANALYSIS.fields).filter(([k]) => k !== 'title')) };
+    const two = {
+      questions: [
+        ...CLARIFY.questions,
+        {
+          field: 'title',
+          text: 'Tên game?',
+          choices: [
+            { id: 't1', label: 'Làng chài', value: 'Làng chài' },
+            { id: 't2', label: 'Chiều biển', value: 'Chiều biển' },
+          ],
+        },
+      ],
+    };
+    let r = await runNewGame({ ...base, description: DESC });
+    const sid = r.report.sessionId ?? '';
+    respond(r.report.handoff?.reqFile ?? '', noTitle);
+    r = await runNewGame({ ...base, resume: sid });
+    respond(r.report.handoff?.reqFile ?? '', two);
+    r = await runNewGame({ ...base, resume: sid });
+    expect(r.report.questions?.map((q) => q.id)).toEqual(['q-scale-1', 'q-title-1']);
+    const reqs = () => readdirSync(join(gamesDir, '.intake/pending', sid)).filter((f) => f.startsWith('req-')).length;
+    expect(reqs()).toBe(2);
+
+    r = await runNewGame({ ...base, resume: sid, answers: { 'q-scale-1': 'vua' } });
+    expect(r.exit).toBe(EXIT.NEEDS_CONFIRM);
+    expect(r.report.questions?.map((q) => q.id)).toEqual(['q-title-1']);
+    // "Đóng rồi mở lại": chạy lại không câu trả lời mới → vẫn đúng câu còn lại, không gọi mô hình (không req mới).
+    r = await runNewGame({ ...base, resume: sid });
+    expect(r.report.questions?.map((q) => q.id)).toEqual(['q-title-1']);
+    expect(reqs()).toBe(2);
+  });
+
   it('cùng mô tả → cùng phiên (làm tiếp, có cảnh báo); câu trả lời khi đang chờ handoff bị bỏ qua', async () => {
     const { base } = setup();
     const a = await runNewGame({ ...base, description: DESC });

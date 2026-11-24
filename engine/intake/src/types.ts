@@ -121,6 +121,10 @@ export interface IntakeSessionState {
   warnings: string[];
   bundle?: GeneratedBundle;
   confirmed?: { briefVersion: number; hash: string };
+  /** DTO-INT-14: chỉ đổi khi có lượt mới (mô tả, trả lời); mở lại để xem không tính. */
+  lastActivityAt?: string;
+  /** Đã nhắc phiên sắp huỷ (ngày 27, QT-INT-10). */
+  remindedAt?: string;
   version: number;
   createdAt: string;
   updatedAt: string;
