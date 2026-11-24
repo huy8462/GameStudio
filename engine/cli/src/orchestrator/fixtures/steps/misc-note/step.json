@@ -1,0 +1,11 @@
+{
+  "id": "misc.note",
+  "version": "1",
+  "description": "Bước mẫu độc lập: đọc game.title và tệp notes/*.txt",
+  "deps": [],
+  "inputs": { "dataPointers": ["/game.json/title"], "files": ["notes/*.txt"], "params": {} },
+  "runner": "node",
+  "entry": "run.mjs",
+  "perZone": false,
+  "outputs": ["note.txt"]
+}

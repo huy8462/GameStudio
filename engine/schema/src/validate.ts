@@ -2,9 +2,9 @@
 // Biên dịch lúc chạy (CLI, test). Bản biên dịch sẵn cho runtime và hook H-03: scripts/gen-validators.mjs (MOD-RTM-04).
 import { Ajv2020, type ErrorObject, type Options, type ValidateFunction } from 'ajv/dist/2020.js';
 
-import { kindByPath, ROOT_IDS, SCHEMA_DOCS, type SchemaKind } from './registry.js';
+import { kindByPath, ROOT_IDS, SCHEMA_DOCS, type AnyKind } from './registry.js';
 
-export { kindByPath, SCHEMA_KINDS, type SchemaKind } from './registry.js';
+export { BUILD_KINDS, kindByPath, SCHEMA_KINDS, type AnyKind, type BuildKind, type SchemaKind } from './registry.js';
 
 export interface ValidationError {
   instancePath: string;
@@ -31,9 +31,9 @@ export function createAjv(extra: Options = {}): Ajv2020 {
 }
 
 let ajv: Ajv2020 | undefined;
-const compiled = new Map<SchemaKind, ValidateFunction>();
+const compiled = new Map<AnyKind, ValidateFunction>();
 
-function validator(kind: SchemaKind): ValidateFunction {
+function validator(kind: AnyKind): ValidateFunction {
   let fn = compiled.get(kind);
   if (fn === undefined) {
     ajv ??= createAjv();
@@ -55,7 +55,7 @@ export function toError(e: ErrorObject): ValidationError {
   return { instancePath: e.instancePath || '/', keyword: e.keyword, message: `${e.message ?? 'không hợp lệ'}${extra}` };
 }
 
-export function validate(kind: SchemaKind, data: unknown): ValidationError[] {
+export function validate(kind: AnyKind, data: unknown): ValidationError[] {
   const fn = validator(kind);
   return fn(data) ? [] : (fn.errors ?? []).map(toError);
 }

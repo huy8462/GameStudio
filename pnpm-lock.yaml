@@ -205,6 +205,9 @@ importers:
 
   engine/cli:
     dependencies:
+      '@gamestudio/rng':
+        specifier: workspace:*
+        version: link:../shared/rng
       '@gamestudio/schema':
         specifier: workspace:*
         version: link:../schema
@@ -220,6 +223,8 @@ importers:
       ajv:
         specifier: 8.20.0
         version: 8.20.0
+
+  engine/shared/expr: {}
 
   engine/shared/rng:
     dependencies:

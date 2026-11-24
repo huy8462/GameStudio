@@ -1,0 +1,11 @@
+{
+  "id": "zone.mark",
+  "version": "1",
+  "description": "Bước mẫu theo zone: đọc base.txt của terrain.base và vị trí zone",
+  "deps": ["terrain.base"],
+  "inputs": { "dataPointers": ["/world.json/zones/*/pos"], "files": [], "params": {} },
+  "runner": "node",
+  "entry": "run.mjs",
+  "perZone": true,
+  "outputs": ["zone.txt"]
+}

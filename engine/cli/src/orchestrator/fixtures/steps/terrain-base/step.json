@@ -1,0 +1,11 @@
+{
+  "id": "terrain.base",
+  "version": "1",
+  "description": "Bước mẫu (T-0004): bước toàn cục đọc world.seed, ghi base.txt",
+  "deps": [],
+  "inputs": { "dataPointers": ["/world.json/seed"], "files": [], "params": { "scale": 2 } },
+  "runner": "node",
+  "entry": "run.mjs",
+  "perZone": false,
+  "outputs": ["base.txt"]
+}

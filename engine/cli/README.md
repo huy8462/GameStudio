@@ -20,6 +20,14 @@ Lệnh `engine` (MOD-GEN-16, MOD-CLI-01, IF-CLI-01). Thư viện `commander`; `-
 - `--json`: một dòng `validate/1` `{ok, checked, skipped, files[{path, kind, errors[{instancePath, keyword, message}]}]}`.
 - Thoát 0 khi mọi tệp hợp lệ; 4 khi có tệp sai schema.
 
+## Bộ điều phối build (E1, T-0004; ADR-023)
+
+`src/orchestrator/`: `runBuild(o)` (PSC-CLI-01) đọc `step.json` (schema `step/1`), lập DAG tô-pô ổn định, nhân bước `perZone` theo zone, băm `inputHash` (PSC-GEN-02), hit cache bỏ qua, song song ≤ min(4, lõi/2), bước lỗi huỷ nhánh phụ thuộc. Chưa có lệnh `engine build` (phiếu sau).
+
+- Cache: `<buildDir>/cache/<bước>/<hex>/{out/, meta.json}`; chỉ mục `cache/index.json` (SCH-RTM-09) ghi nguyên tử có khoá.
+- Bước node: `export function run(ctx)` ghi vào `ctx.outDir`, trả `{result?, metrics?, checks?, warnings?, summary?…}`; bộ điều phối ghi `report.json` (`report/1`). Runner python/blender: phiếu sau.
+- Bước mẫu và test: `src/orchestrator/fixtures/steps/`, `*.test.ts`.
+
 ## Chạy
 
 ```

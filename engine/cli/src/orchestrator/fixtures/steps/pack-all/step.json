@@ -1,0 +1,11 @@
+{
+  "id": "pack.all",
+  "version": "1",
+  "description": "Bước mẫu toàn cục gộp đầu ra mọi zone của zone.mark",
+  "deps": ["zone.mark"],
+  "inputs": { "dataPointers": [], "files": [], "params": {} },
+  "runner": "node",
+  "entry": "run.mjs",
+  "perZone": false,
+  "outputs": ["pack.txt"]
+}

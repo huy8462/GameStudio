@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gamestudio.local/schema/report/1.json",
+  "title": "report/1: báo cáo JSON chung (SRS-04 §6.4, SCH-RTM-05, DTO-GEN-05, DTO-CLI-02)",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "kind",
+    "gameId",
+    "cached",
+    "startedAt",
+    "durationS",
+    "metrics",
+    "budget",
+    "result",
+    "checks",
+    "warnings",
+    "artifacts",
+    "summary",
+    "tool",
+    "host"
+  ],
+  "properties": {
+    "schema": { "const": "report/1" },
+    "kind": { "enum": ["build", "qa", "perf", "gate", "upgrade", "import"] },
+    "step": { "$ref": "../step/1.json#/$defs/stepId" },
+    "gameId": { "$ref": "../common/1.json#/$defs/id" },
+    "zone": { "type": "string" },
+    "tier": { "$ref": "../common/1.json#/$defs/tier" },
+    "inputHash": { "$ref": "#/$defs/hash" },
+    "outputHash": { "$ref": "#/$defs/hash" },
+    "cached": { "type": "boolean" },
+    "startedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$" },
+    "durationS": { "type": "number", "minimum": 0 },
+    "seed": { "$ref": "../common/1.json#/$defs/seed" },
+    "metrics": { "$ref": "#/$defs/numbers" },
+    "budget": { "$ref": "#/$defs/numbers" },
+    "result": { "$ref": "#/$defs/result" },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "result"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "result": { "$ref": "#/$defs/result" },
+          "value": { "type": "number" },
+          "limit": { "type": "number" },
+          "message": { "type": "string" },
+          "source": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "artifacts": { "type": "array", "items": { "type": "string" } },
+    "outputs": { "type": "array", "items": { "type": "string" }, "description": "Tương đối outDir (DTO-CLI-02)" },
+    "summary": { "type": "string" },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": { "name": { "type": "string" }, "version": { "type": "string" } }
+    },
+    "host": { "type": "string" },
+    "stepVersion": { "type": "string" }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "result": { "enum": ["pass", "warn", "fail"] },
+    "numbers": { "type": "object", "additionalProperties": { "type": "number" } }
+  }
+}

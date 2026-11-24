@@ -3,12 +3,15 @@ export { canonicalize, JcsError } from './jcs.js';
 export { dataHash, jsonHash, sha256Hex } from './hash.js';
 export { evaluate, worst, type BudgetCheck, type BudgetEvaluation, type CheckResult } from './budget.js';
 export {
+  BUILD_KINDS,
   createAjv,
   kindByPath,
   SCHEMA_KINDS,
   toError,
   validate,
   validateFiles,
+  type AnyKind,
+  type BuildKind,
   type SchemaKind,
   type ValidationError,
 } from './validate.js';

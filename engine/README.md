@@ -1,6 +1,6 @@
 # engine/
 
-Thư viện engine và công cụ build (TSD-00 §4.1, DDD-00 §4.1). Gói tạo dần theo pha; hiện có `cli/` (lệnh `doctor`, `validate`), `shared/rng/`, `shared/expr/` (biểu thức an toàn, ADR-022), `schema/` (jcs, hash, budget, pointer, patch, schema `budgets`/`game`/`world`/`palette`, validators biên dịch sẵn), `build/py/gsrng.py`.
+Thư viện engine và công cụ build (TSD-00 §4.1, DDD-00 §4.1). Gói tạo dần theo pha; hiện có `cli/` (lệnh `doctor`, `validate`; bộ điều phối build `src/orchestrator/`), `shared/rng/`, `shared/expr/` (biểu thức an toàn, ADR-022), `schema/` (jcs, hash, budget, pointer, patch, schema `budgets`/`game`/`world`/`palette`, validators biên dịch sẵn), `build/py/gsrng.py`.
 
 | Thư mục | Gói | Mã | Pha |
 |---|---|---|---|

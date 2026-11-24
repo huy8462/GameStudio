@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gamestudio.local/schema/cache-index/1.json",
+  "title": "build/<id>/cache/index.json: lần chạy thành công gần nhất mỗi (bước, zone, tier) (SCH-RTM-09, DTO-CLI-05)",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["step", "inputHash", "outputHash", "at", "durationS", "ok"],
+    "properties": {
+      "step": { "$ref": "../step/1.json#/$defs/stepId" },
+      "zone": { "type": "string" },
+      "tier": { "$ref": "../common/1.json#/$defs/tier" },
+      "inputHash": { "$ref": "../report/1.json#/$defs/hash" },
+      "outputHash": { "$ref": "../report/1.json#/$defs/hash" },
+      "at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$" },
+      "durationS": { "type": "number", "minimum": 0 },
+      "ok": { "const": true }
+    }
+  }
+}

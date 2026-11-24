@@ -21,12 +21,14 @@ Dữ liệu game: schema, chuẩn tắc hoá, băm, đánh giá ngân sách (MOD
 
 Schema: `schemas/<tên>/<major>.json`, `$id` = `https://gamestudio.local/schema/<tên>/<major>.json`. Hiện có `common/1`, `budgets/1` (SCH-GEN-03, SCH-RTM-03), `game/1` (SCH-GEN-01, SCH-CBT-01 phần `features`), `world/1` (+ `defs-1`, `parts-1`; SCH-GEN-02, SCH-WLD-01), `palette/1` (8–16 màu có vai trò, BR-05.2). `schemaVersion` là số nguyên.
 
+Schema build (T-0004, `BUILD_KINDS`, không có `kindByPath`): `step/1` (IF-CLI-02), `report/1` (SCH-RTM-05, cho phép trường mở rộng theo `kind`), `cache-index/1` (SCH-RTM-09, kind `cacheIndex`).
+
 Build: `tsc` rồi `scripts/gen-validators.mjs` sinh Ajv standalone `dist/validators.{js,cjs}` (MOD-RTM-04) cho runtime và hook H-03.
 
 Mẫu hợp lệ: `games/_template/data/{budgets,game,world,palette}.json`.
 
 ## Chưa có (phiếu sau)
-- Schema `entities/*`, `dialogue`, `recipe`, `provenance`, `manifest`, `report`, `status`.
+- Schema `entities/*`, `dialogue`, `recipe`, `provenance`, `manifest`, `status`.
 - `impact.ts` (MOD-GEN-08), `migrate` (MOD-RTM-03).
 - Kiểu TS sinh từ schema (`json-schema-to-typescript`).
 

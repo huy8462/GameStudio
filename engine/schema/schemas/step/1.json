@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gamestudio.local/schema/step/1.json",
+  "title": "step.json: khai báo bước build (IF-CLI-02, DTO-CLI-03, DDD-04 §3.3 StepDef)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "version", "deps", "inputs", "runner", "entry", "perZone", "outputs"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": { "$ref": "#/$defs/stepId" },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d+){0,2}$",
+      "description": "Tăng khi đổi thuật toán (rule engine-build)"
+    },
+    "description": { "type": "string" },
+    "deps": { "type": "array", "items": { "$ref": "#/$defs/stepId" }, "uniqueItems": true },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dataPointers", "files", "params"],
+      "properties": {
+        "dataPointers": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^/[^/]+\\.json(/.*)?$",
+            "description": "JSON Pointer vào dữ liệu game, đoạn đầu là tên tệp trong data/ (mã hoá '/' thành ~1); '*' = mọi phần tử"
+          }
+        },
+        "files": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "description": "Glob tương đối thư mục game" }
+        },
+        "params": { "type": "object" }
+      }
+    },
+    "runner": { "enum": ["node", "python", "blender"] },
+    "entry": { "type": "string", "minLength": 1, "description": "Tương đối thư mục chứa step.json" },
+    "perZone": { "type": "boolean" },
+    "outputs": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "tools": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "timeoutS": { "type": "number", "exclusiveMinimum": 0 }
+  },
+  "$defs": {
+    "stepId": { "type": "string", "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$" }
+  }
+}
