@@ -146,7 +146,7 @@ Cần đọc lại AC-02-01, 02 để biết G-E1 có đòi dữ liệu thật k
 1. **T-0012 `intake` + `HandoffLlmClient`** (DDD-01, MOD-INT-*, EP-INT-01 `engine new-game`; đích G-E1 AC-01-01…07, phần lớn nhất của cổng). Độc lập với chuỗi build; tạo được `brief/v<n>/hash.txt` mà guard của `engine build` (T-0005) đang chờ. Nên tách 2 phiếu: (a) phân tích, câu hỏi, sinh dữ liệu + `FakeLlmClient` + golden test TC-INT-01; (b) `engine new-game` với `HandoffLlmClient` (ADR-035: Claude Code làm LLM), `confirm`, `reverseBrief`.
 2. **T-0013 `engine status` + `build --stale`** (`@gamestudio/status` `planStale`/`computeStatus`, ALG-CLI-04, 05, TST-CLI-04, 05; đích AC-CR01-…). Dựa trực tiếp trên `cache/index.json` và đồ thị bước vừa xong, nên làm nhanh khi còn nhớ ngữ cảnh. Cần thêm `zonesOf` theo toạ độ để chỉ build lại zone bị chạm.
 3. **T-0014 QA khung** (`@gamestudio/qa`, ALG-QA-01, 02, `engine qa --level=nhe`; đích AC-04-06). Làm cuối, vì cần bản build chạy được trên runtime (packager/runtime E2). Ở E1 chỉ làm khung báo cáo, ngân sách, Playwright smoke trên prototype.
-- **Phiếu nhỏ**: `.prettierignore` thêm `graphify-out/` (thư mục lạ ở gốc repo làm `pnpm format:check` toàn repo báo lỗi; hỏi Huy nguồn gốc trước); cân nhắc tách `world-steps.test.ts` (~130 s) sang lệnh test nặng riêng.
+- Đã xong: `.prettierignore` thêm `graphify-out/` (đồ thị Graphify, 25160bb; giữ nguyên, không commit). Còn: cân nhắc tách `world-steps.test.ts` (~130 s) sang lệnh test nặng riêng.
 
 **Việc hoãn từ E0 (m2) đưa vào E1:**
 - Tạo `games/_template/data/budgets.json` + `budgets.schema.json` và ghi baseline A56: `targetFps 30`, `maxRenderDpr 1.5`, `a56Baseline` theo `docs/gates/G-E0/a56-baseline.md`.

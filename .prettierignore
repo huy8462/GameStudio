@@ -16,6 +16,8 @@ pnpm-lock.yaml
 uv.lock
 **/node_modules/
 **/dist/
+# Đồ thị mã do Graphify sinh (25160bb; bỏ qua git qua .git/info/exclude), không định dạng.
+graphify-out/
 # Đầu ra build của game; engine/build là mã nguồn bước build (T-0010).
 games/*/build/
 **/cache/
