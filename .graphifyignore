@@ -14,8 +14,10 @@ node_modules/
 .pytest_cache/
 __pycache__/
 dist/
-build/
-!engine/build/
+# engine/build là MÃ NGUỒN nhưng graphify luôn bỏ thư mục tên "build" (cứng
+# trong detect.py, không ghi đè được). Đồ thị riêng: `graphify update engine/build`,
+# tra bằng `--graph engine/build/graphify-out/graph.json`.
+games/**/build/
 **/cache/
 coverage/
 test-results/
