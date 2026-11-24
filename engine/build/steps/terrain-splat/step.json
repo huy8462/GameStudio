@@ -1,0 +1,103 @@
+{
+  "id": "terrain.splat",
+  "version": "1",
+  "description": "EP-WLD-05, MOD-WLD-08, PSC-WLD-08: splat map, surface.png, layers.json (T-0011). Tạm bỏ dep 'materials' (chưa có bước): thêm lại khi có.",
+  "deps": ["terrain.erode"],
+  "inputs": {
+    "dataPointers": ["/world.json/splat", "/world.json/zones"],
+    "files": [],
+    "params": {
+      "maxLayers": 4,
+      "splatPx": 0.5,
+      "surfacePx": 1,
+      "layers": [
+        {
+          "id": "co",
+          "materialRef": "asset:dat-co@1",
+          "tiling": 4
+        },
+        {
+          "id": "dat",
+          "materialRef": "asset:dat-tran@1",
+          "tiling": 4
+        },
+        {
+          "id": "da",
+          "materialRef": "asset:da-nui@1",
+          "tiling": 6
+        },
+        {
+          "id": "cat",
+          "materialRef": "asset:cat-bai@1",
+          "tiling": 4
+        }
+      ],
+      "rules": [
+        {
+          "layer": "co",
+          "slope": [0, 22],
+          "height": [0.5, 1000],
+          "weight": 1.0,
+          "noise": {
+            "scale": 40,
+            "amp": 0.4,
+            "seedKey": "co"
+          }
+        },
+        {
+          "layer": "dat",
+          "slope": [14, 34],
+          "height": [-1000, 1000],
+          "weight": 0.8,
+          "noise": {
+            "scale": 25,
+            "amp": 0.5,
+            "seedKey": "dat"
+          }
+        },
+        {
+          "layer": "dat",
+          "slope": [0, 90],
+          "height": [-1000, 1000],
+          "mask": "farm",
+          "weight": 1.5
+        },
+        {
+          "layer": "dat",
+          "slope": [0, 90],
+          "height": [-1000, 1000],
+          "weight": 0.35,
+          "noise": {
+            "scale": 30,
+            "amp": 1.0,
+            "seedKey": "dat-vet"
+          }
+        },
+        {
+          "layer": "da",
+          "slope": [30, 90],
+          "height": [-1000, 1000],
+          "weight": 1.2,
+          "noise": {
+            "scale": 15,
+            "amp": 0.3,
+            "seedKey": "da"
+          }
+        },
+        {
+          "layer": "cat",
+          "slope": [0, 18],
+          "height": [-1000, 3],
+          "mask": "shore",
+          "weight": 1.6
+        }
+      ]
+    }
+  },
+  "runner": "python",
+  "entry": "main.py",
+  "perZone": true,
+  "outputs": ["splat-0.png", "splat-1.png", "surface.png", "layers.json", "preview/splat.png"],
+  "tools": ["python", "numpy"],
+  "timeoutS": 1800
+}

@@ -1,5 +1,5 @@
-"""Ghi PNG 8 bit (xám, RGB) chỉ bằng thư viện chuẩn: zlib mức 9, không chunk thời gian → byte tất định
-với cùng bản zlib (mask DTO-WLD-02, preview/top.png)."""
+"""Ghi PNG 8 bit (xám, RGB, RGBA) chỉ bằng thư viện chuẩn: zlib mức 9, không chunk thời gian → byte tất định
+với cùng bản zlib (mask DTO-WLD-02, preview/top.png, splat-*.png DTO-WLD-10)."""
 
 from __future__ import annotations
 
@@ -19,11 +19,11 @@ def _chunk(kind: bytes, data: bytes) -> bytes:
 
 
 def encode_png(img: U8) -> bytes:
-    """img: (h, w) xám hoặc (h, w, 3) RGB, uint8."""
-    if img.dtype != np.uint8 or img.ndim not in (2, 3) or (img.ndim == 3 and img.shape[2] != 3):
-        raise ValueError(f"cần uint8 (h, w) hoặc (h, w, 3), nhận {img.dtype} {img.shape}")
+    """img: (h, w) xám, (h, w, 3) RGB hoặc (h, w, 4) RGBA, uint8."""
+    if img.dtype != np.uint8 or img.ndim not in (2, 3) or (img.ndim == 3 and img.shape[2] not in (3, 4)):
+        raise ValueError(f"cần uint8 (h, w), (h, w, 3) hoặc (h, w, 4), nhận {img.dtype} {img.shape}")
     h, w = img.shape[0], img.shape[1]
-    color = 0 if img.ndim == 2 else 2
+    color = 0 if img.ndim == 2 else (2 if img.shape[2] == 3 else 6)
     rows = img.reshape(h, -1)
     raw = np.empty((h, rows.shape[1] + 1), dtype=np.uint8)
     raw[:, 0] = 0  # bộ lọc None mỗi hàng
@@ -53,7 +53,7 @@ def decode_png(data: bytes) -> U8:
         elif kind == b"IDAT":
             idat += body
         pos += 12 + n
-    ch = 1 if color == 0 else 3
+    ch = {0: 1, 2: 3, 6: 4}[color]
     raw = np.frombuffer(zlib.decompress(idat), dtype=np.uint8).reshape(h, w * ch + 1)
-    out: U8 = raw[:, 1:].reshape((h, w) if ch == 1 else (h, w, 3)).copy()
+    out: U8 = raw[:, 1:].reshape((h, w) if ch == 1 else (h, w, ch)).copy()
     return out

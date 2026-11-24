@@ -129,10 +129,24 @@ Thứ tự phiếu đề xuất (mỗi phiếu một phiên Claude Code, `/clear
 
 - **T-0010** (24/11/2026, `docs/tickets/T-0010.md`): bước node đầu tiên `terrain.mesh` (EP-WLD-04, PSC-WLD-07, DTO-WLD-10), gói pnpm `@gamestudio/step-terrain-mesh` (`engine/build/steps/terrain-mesh`, `entry: dist/index.js`, cần `pnpm -r build`). Chunk 64 m theo zone, LOD bước `cellM·{1,2,4,8}`, skirt 2 m, UV0 thế giới, UV2 atlas; glb lượng tử 14 bit đồng đều (KHR_mesh_quantization) + EXT_meshopt_compression qua `@gltf-transform/core`/`extensions` 4.5.1 + `meshoptimizer` 1.2.0 (không dùng `functions`); `collider/height-lod1.r32`, `lightmaps/uv2-atlas.json`. ESLint/Vitest/tsc/prettier/depcruise gốc giờ chỉ loại `games/*/build`, nên kiểm được `engine/build/steps`. Engine build 4 bước tất định. 430 test đạt. Chưa có: `bvh.bin` (E2), simplify.
 
-**Phiếu E1 kế tiếp (đề xuất):**
-- **T-0011**: `terrain.splat` (python, EP-WLD-05, PSC-WLD-08, DTO-WLD-03, 06): trọng số lớp theo dốc/độ cao/mask, `splat-0.png`, `surface.png`, `layers.json`. Phụ thuộc bước `materials` (EP-WLD-05 `deps`) chưa có: **cần Huy chọn** tạm bỏ dep `materials` (ghi lệch) hay làm bước `materials` giả trả `layers` mặc định từ `palette.json`. Đề xuất: bỏ dep tạm, `layers.json` lấy `materialRef` giữ chỗ.
-- Sau T-0011, phạm vi địa hình G-E1 đủ (fetch/heightfield/erode/mesh/splat). Còn của E1 (HANDOFF §6.1 Phạm vi E1): `intake` + `HandoffLlmClient`, QA khung (`@gamestudio/qa`), `engine status`/`build --stale` (`planStale`). Đề xuất kế: `intake` (đích G-E1 AC-01-01…07).
-- `intake` (`HandoffLlmClient`, DDD-01) vẫn làm song song được.
+- **T-0011** (24/11/2026, `docs/tickets/T-0011.md`): bước `terrain.splat` (python, EP-WLD-05, PSC-WLD-08, perZone): trọng số 4 lớp (cỏ, đất, đá, cát) theo dốc, độ cao, mask, nhiễu; top-K; `splat-0.png` (RGBA 0,5 m/px), `surface.png` (1 m/px, mã SRS-02 §6.4 + `duong`), `layers.json`, `preview/splat.png`. **Tạm bỏ dep `materials`** (Huy chọn): thêm lại khi có bước `materials`. Luật mặc định nằm trong `step.json params` (schema `world/1` chưa có `splat`, cần CR). Thêm mask `shore` cho cát. Bỏ `np.arctan`/`hypot`/`einsum` để tất định giữa CPU. 430 test + 36 pytest đạt.
+
+**Tình trạng phạm vi địa hình G-E1 (sau T-0011):** đủ chuỗi bước cho nguồn **procedural**: `world.fetch` → `world.heightfield` → `terrain.erode` → `terrain.mesh` + `terrain.splat`. Chạy bằng `engine build`, tất định (hai build sạch cùng `outputHash`), cache tăng dần đúng. Còn thiếu so với DDD-02 (để phiếu sau, không chặn khung E1):
+- nguồn `real`/`mixed` (DEM Copernicus, OSM, PSC-WLD-02, 03; đích AC-02-01, 02 nếu là bbox thật);
+- preset `ant` (Blender);
+- `features[]`, `erosion.mask`, `blendMask`;
+- `collider/bvh.bin`;
+- bước `materials` và `materialRef` thật;
+- CR thêm `splat` vào SCH-WLD-01;
+- `toolVersions` thật vào `inputHash` (CLI chưa truyền).
+
+Cần đọc lại AC-02-01, 02 để biết G-E1 có đòi dữ liệu thật không.
+
+**Phiếu E1 kế tiếp (đề xuất, theo thứ tự khuyến nghị):**
+1. **T-0012 `intake` + `HandoffLlmClient`** (DDD-01, MOD-INT-*, EP-INT-01 `engine new-game`; đích G-E1 AC-01-01…07, phần lớn nhất của cổng). Độc lập với chuỗi build; tạo được `brief/v<n>/hash.txt` mà guard của `engine build` (T-0005) đang chờ. Nên tách 2 phiếu: (a) phân tích, câu hỏi, sinh dữ liệu + `FakeLlmClient` + golden test TC-INT-01; (b) `engine new-game` với `HandoffLlmClient` (ADR-035: Claude Code làm LLM), `confirm`, `reverseBrief`.
+2. **T-0013 `engine status` + `build --stale`** (`@gamestudio/status` `planStale`/`computeStatus`, ALG-CLI-04, 05, TST-CLI-04, 05; đích AC-CR01-…). Dựa trực tiếp trên `cache/index.json` và đồ thị bước vừa xong, nên làm nhanh khi còn nhớ ngữ cảnh. Cần thêm `zonesOf` theo toạ độ để chỉ build lại zone bị chạm.
+3. **T-0014 QA khung** (`@gamestudio/qa`, ALG-QA-01, 02, `engine qa --level=nhe`; đích AC-04-06). Làm cuối, vì cần bản build chạy được trên runtime (packager/runtime E2). Ở E1 chỉ làm khung báo cáo, ngân sách, Playwright smoke trên prototype.
+- **Phiếu nhỏ**: `.prettierignore` thêm `graphify-out/` (thư mục lạ ở gốc repo làm `pnpm format:check` toàn repo báo lỗi; hỏi Huy nguồn gốc trước); cân nhắc tách `world-steps.test.ts` (~130 s) sang lệnh test nặng riêng.
 
 **Việc hoãn từ E0 (m2) đưa vào E1:**
 - Tạo `games/_template/data/budgets.json` + `budgets.schema.json` và ghi baseline A56: `targetFps 30`, `maxRenderDpr 1.5`, `a56Baseline` theo `docs/gates/G-E0/a56-baseline.md`.
