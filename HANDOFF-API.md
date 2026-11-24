@@ -121,8 +121,11 @@ Thứ tự phiếu đề xuất (mỗi phiếu một phiên Claude Code, `/clear
 
 - **T-0006** (24/11/2026, `docs/tickets/T-0006.md`, Sonnet low): tách test thời gian hook (TST-DEV-02, NFR-DEV-02) ra `pnpm test:timing` (`vitest.timing.config.ts`, tuần tự, một worker). Quy ước tên `*.timing.test.ts`, bị loại khỏi `pnpm test`. Test giờ đo P95 cho từng hook H-01…H-05. `pnpm test` 407/407 đạt, `pnpm test:timing` 5/5 đạt.
 
-**Phiếu E1 kế tiếp (đề xuất):** (đánh số tuần tự: phiếu địa hình thành **T-0007** vì T-0006 dùng cho việc tách test)
-- **T-0007**: bước python đầu tiên `world.fetch` + `world.heightfield` cho nguồn `procedural` (DDD-02 EP-WLD-01, 02; PSC-WLD-02, 03; ALG-WLD-02, 03). Đặt ở `engine/build/steps/world-*/` và `engine/build/py/heightfield/`. Sinh heightfield tất định từ `world.seed` + preset (numpy một luồng), kèm pytest và test build qua `engine build`. Nguồn OSM/DEM thật (mạng, ERR-WLD-01) để phiếu sau. Cần đọc DDD-02 theo mục để chốt định dạng đầu ra (DTO-WLD-02/07/08).
+- **T-0007** (24/11/2026, `docs/tickets/T-0007.md`): hai bước python đầu tiên `world.fetch` + `world.heightfield` cho nguồn `procedural` (EP-WLD-01, 02; PSC-WLD-04; DTO-WLD-02). Thư viện `engine/build/py/{gsio.py, heightfield/{io,noise,procedural,png}.py}`: simplex 2D numpy (hoán vị từ `Pcg32`), 5 preset, `heightScale`, `smoothing`, mask PNG, preview tô bóng. numpy 2.5.5 ghim, chạy một luồng. Tất định: hai thư mục sạch cache cùng `outputHash` (TC-WLD-02). 409 test TS + 21 pytest đạt. Lệch: mã nhiễu/procedural ở `build/py/heightfield/`; thêm dataPointer `playArea`, `source`; `gsio` ép stdout UTF-8 (`python -I` trên Windows); `real`/`mixed`/`ant` → thoát 5.
+
+**Phiếu E1 kế tiếp (đề xuất):**
+- **T-0008**: `terrain.erode` (EP-WLD-03, PSC-WLD-06, CFG-WLD-04, MOD-WLD-06): xói mòn hạt + nhiệt trên heightfield T-0007, mask, đầu ra `flow.r8`, `sediment.r8`. DDD dùng `numba` (`@njit`, một luồng). **Cần Huy chọn**: thêm `numba` (phụ thuộc lớn, có LLVM; ghim bản, cache JIT ngoài outDir) hay viết numpy/Python thuần (chậm hơn với lưới 1000×1000). Đề xuất: numba, vì vòng hạt không vector hoá được.
+- Sau đó: `terrain.mesh` (node, EP-WLD-04: chunk 64 m, LOD, skirt, collider) và `terrain.splat` (python, EP-WLD-05) để khép phạm vi địa hình của G-E1.
 - `intake` (`HandoffLlmClient`, DDD-01) vẫn làm song song được.
 
 **Việc hoãn từ E0 (m2) đưa vào E1:**

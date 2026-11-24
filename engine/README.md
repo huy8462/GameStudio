@@ -1,6 +1,8 @@
 # engine/
 
-Thư viện engine và công cụ build (TSD-00 §4.1, DDD-00 §4.1). Gói tạo dần theo pha; hiện có `cli/` (lệnh `doctor`, `validate`; bộ điều phối build `src/orchestrator/`), `shared/rng/`, `shared/expr/` (biểu thức an toàn, ADR-022), `schema/` (jcs, hash, budget, pointer, patch, schema `budgets`/`game`/`world`/`palette`, validators biên dịch sẵn), `build/py/gsrng.py`.
+Thư viện engine và công cụ build (TSD-00 §4.1, DDD-00 §4.1). Gói tạo dần theo pha; hiện có `cli/` (lệnh `doctor`, `validate`, `build`; bộ điều phối `src/orchestrator/`), `shared/rng/`, `shared/expr/` (biểu thức an toàn, ADR-022), `schema/` (jcs, hash, budget, pointer, patch, schema dữ liệu game và build, validators biên dịch sẵn), `build/py/` (`gsrng`, `gsio`, `heightfield/`), `build/steps/` (`world-fetch`, `world-heightfield`).
+
+Bước python (`build/steps/<id>/main.py`, IF-CLI-02): thêm `build/py` vào `sys.path` (vì `python -I`), import `gsio` trước (stdout UTF-8, `single_thread_env()` trước numpy), ghi tệp bằng `gsio.write_text/write_json` (`newline="\n"`), báo `gsio.progress`, trả mã 4/5/6 theo SRS-04 §7.2. Test: `uv run pytest`, `uv run mypy`.
 
 | Thư mục | Gói | Mã | Pha |
 |---|---|---|---|
