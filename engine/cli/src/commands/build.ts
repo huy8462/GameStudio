@@ -21,6 +21,8 @@ interface Opts {
   step?: string;
   force?: boolean;
   skipBake?: boolean;
+  stale?: boolean;
+  dryRun?: boolean;
   json?: boolean;
 }
 
@@ -44,6 +46,8 @@ export function registerBuild(program: Command, setExit: (code: number) => void)
     .option('--step <id>', 'chạy bước này và các bước sau nó')
     .option('--force', 'bỏ qua cache')
     .option('--skip-bake', 'bỏ bước lighting.bake')
+    .option('--stale', 'chỉ chạy bước có hash đầu vào đổi hoặc chưa build (FR-CLI-09)')
+    .option('--dry-run', 'với --stale: chỉ liệt kê bước, zone, ước lượng; không chạy')
     .option('--json', 'in báo cáo report/1 gộp một dòng ra stdout')
     .action(async (opts: Opts) => {
       if (opts.tier !== undefined && !(TIERS as readonly string[]).includes(opts.tier)) {
@@ -61,12 +65,31 @@ export function registerBuild(program: Command, setExit: (code: number) => void)
         ...(opts.step !== undefined ? { step: opts.step } : {}),
         force: opts.force === true,
         skipBake: opts.skipBake === true,
+        stale: opts.stale === true || opts.dryRun === true,
+        dryRun: opts.dryRun === true,
         clock: systemClock,
         host: hostname(),
         engineVersion: ENGINE_VERSION,
         tool: { name: '@gamestudio/cli', version: '0.0.0' },
         onProgress: (step, zone, pct, msg) => printHuman(`[${step}@${zone ?? '-'}] ${Math.round(pct)}% ${msg}`),
       });
+      if (opts.dryRun === true && r.stalePlan) {
+        const steps = r.stalePlan.items.map((i) => ({
+          step: i.step,
+          zone: i.zone,
+          reason: i.reason,
+          estS: Math.round(i.estS),
+        }));
+        if (opts.json === true) printJson({ steps, estimateS: Math.round(r.stalePlan.estimateS) });
+        else {
+          for (const s of steps) printHuman(`- ${s.step}@${s.zone ?? '-'} (${s.reason}, ~${s.estS} s)`);
+          printHuman(
+            `Cần chạy ${steps.length} nút, ước lượng ${Math.ceil(r.stalePlan.estimateS / 60)} phút. Không chạy gì (--dry-run).`,
+          );
+        }
+        setExit(r.exit);
+        return;
+      }
       if (opts.json === true) printJson(r.report);
       else {
         if (r.noSteps) printHuman('Chưa có bước build nào (engine/build/steps chưa có).');

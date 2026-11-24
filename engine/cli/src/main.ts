@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-// Điểm vào lệnh `engine` (MOD-CLI-01, IF-CLI-01). Có: doctor (E0), validate (E1 T-0002), build (E1 T-0005), new-game (E1 T-0013).
+// Điểm vào lệnh `engine` (MOD-CLI-01, IF-CLI-01). Có: doctor (E0), validate (E1 T-0002), build (E1 T-0005), new-game (E1 T-0013), status + build --stale (E1 T-0014).
 import { Command } from 'commander';
 
 import { registerBuild } from './commands/build.js';
 import { registerDoctor } from './commands/doctor.js';
 import { registerNewGame } from './commands/new-game.js';
+import { registerStatus } from './commands/status.js';
 import { registerValidate } from './commands/validate.js';
 import { EXIT } from './exit-codes.js';
 
@@ -18,6 +19,7 @@ registerDoctor(program, setExit);
 registerValidate(program, setExit);
 registerBuild(program, setExit);
 registerNewGame(program, setExit);
+registerStatus(program, setExit);
 
 try {
   await program.parseAsync(process.argv);

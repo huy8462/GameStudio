@@ -226,6 +226,9 @@ importers:
       '@gamestudio/schema':
         specifier: workspace:*
         version: link:../schema
+      '@gamestudio/status':
+        specifier: workspace:*
+        version: link:../status
       commander:
         specifier: 15.1.0
         version: 15.1.0
@@ -255,6 +258,8 @@ importers:
       '@noble/hashes':
         specifier: 2.4.0
         version: 2.4.0
+
+  engine/status: {}
 
   prototypes/baseline-a56:
     dependencies:

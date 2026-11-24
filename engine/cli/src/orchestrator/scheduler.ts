@@ -32,6 +32,8 @@ export interface RunBuildOptions {
   toolVersions?: Record<string, string>;
   concurrency?: number;
   runners?: Partial<NodeEnv['runners']>;
+  /** Chỉ chạy các nút này (khoá '<bước>@<zone|->'); dùng cho build --stale (PSC-CLI-05). */
+  onlyKeys?: ReadonlySet<string>;
   logLevel?: 'info' | 'debug';
   onProgress?: NodeEnv['onProgress'];
 }
@@ -43,16 +45,29 @@ interface PlanNode {
   deps: string[];
 }
 
-const keyOf = (step: StepId, zone: string | null): string => `${step}@${zone ?? '-'}`;
+export const keyOf = (step: StepId, zone: string | null): string => `${step}@${zone ?? '-'}`;
+export const parseKey = (key: string): { step: StepId; zone: string | null } => {
+  const at = key.lastIndexOf('@');
+  const z = key.slice(at + 1);
+  return { step: key.slice(0, at), zone: z === '-' ? null : z };
+};
+
+/** Tên upstream trong ctx/inputHash: id bước, hoặc '<bước>@<zone>' khi nút phụ thuộc nhiều zone của cùng bước. */
+export function upstreamName(depKey: string, allDepKeys: readonly string[]): string {
+  const { step } = parseKey(depKey);
+  return allDepKeys.filter((k) => parseKey(k).step === step).length > 1 ? depKey : step;
+}
 
 /** Mặc định song song ≤ min(4, lõi/2) (CFG-CLI-01). */
 export const defaultConcurrency = (): number => Math.max(1, Math.min(4, Math.floor(availableParallelism() / 2)));
 
 const fail = (exit: number, msg: string): BuildOutcome => ({ result: 'fail', exit, steps: [], error: msg });
 
-/** Nút theo thứ tự tô-pô; bước perZone nhân theo zone (o.zone hoặc mọi zone của world.json). */
+/**
+ * Nút theo thứ tự tô-pô; bước perZone nhân theo zone (o.zone hoặc mọi zone của world.json). `deps` là ĐỦ khoá phụ thuộc
+ * (kể cả bước ngoài plan): khoá không nằm trong tập nút sẽ chạy được lấy từ cache/index.json (--step, --stale).
+ */
 export function planNodes(g: StepGraph, plan: readonly StepId[], zones: readonly string[]): PlanNode[] {
-  const inPlan = new Set(plan);
   const zonesFor = (s: StepId): (string | null)[] =>
     g.steps.get(s)?.perZone && zones.length > 0 ? [...zones] : [null];
   const nodes: PlanNode[] = [];
@@ -62,7 +77,6 @@ export function planNodes(g: StepGraph, plan: readonly StepId[], zones: readonly
     for (const z of zonesFor(s)) {
       const deps: string[] = [];
       for (const d of def.deps) {
-        if (!inPlan.has(d)) continue; // ngoài plan (--step): lấy từ cache qua chỉ mục ở lần chạy upstream
         const dz = zonesFor(d);
         if (dz.length === 1 && dz[0] === null) deps.push(keyOf(d, null));
         else if (z !== null) deps.push(keyOf(d, z));
@@ -90,7 +104,9 @@ export async function runBuild(o: RunBuildOptions): Promise<BuildOutcome> {
   let plan = o.step !== undefined ? downstream(g, o.step) : [...g.order];
   if (o.skipBake) plan = plan.filter((s) => s !== 'lighting.bake');
   const zones = o.zone !== undefined ? [o.zone] : zonesOf(data);
-  const nodes = planNodes(g, plan, zones);
+  const only = o.onlyKeys;
+  const nodes = planNodes(g, plan, zones).filter((n) => !only || only.has(n.key));
+  const runKeys = new Set(nodes.map((n) => n.key));
 
   const buildDir = o.buildDir ?? join(o.gameDir, 'build');
   let runSeq = 0;
@@ -123,25 +139,23 @@ export async function runBuild(o: RunBuildOptions): Promise<BuildOutcome> {
   const limit = Math.max(1, o.concurrency ?? defaultConcurrency());
   const tier = o.tier ?? null;
 
-  // Bước phụ thuộc ngoài plan (--step): lấy lần chạy thành công gần nhất từ chỉ mục cache (SCH-RTM-09).
+  // Phụ thuộc ngoài tập nút chạy (--step, --stale): lần chạy thành công gần nhất từ chỉ mục cache (SCH-RTM-09).
   const index = readCacheIndex(buildDir);
-  const fromIndex = (dep: StepId, zone: string | null): StepCtx['upstream'][string] | undefined => {
-    const perZone = g.steps.get(dep)?.perZone ?? false;
-    const e = index.find(
-      (x) => x.step === dep && (x.zone ?? null) === (perZone ? zone : null) && (x.tier ?? null) === tier,
-    );
-    return e ? { outDir: env.cache.outDir(dep, e.inputHash), outputHash: e.outputHash } : undefined;
+  const fromIndex = (depKey: string): StepCtx['upstream'][string] | undefined => {
+    const { step, zone } = parseKey(depKey);
+    const e = index.find((x) => x.step === step && (x.zone ?? null) === zone && (x.tier ?? null) === tier);
+    return e ? { outDir: env.cache.outDir(step, e.inputHash), outputHash: e.outputHash } : undefined;
   };
-  const inPlan = new Set(plan);
+  const internal = (n: PlanNode): string[] => n.deps.filter((k) => runKeys.has(k));
 
   const launch = (n: PlanNode): void => {
     const def = g.steps.get(n.step);
     if (!def) return;
     const upstream: StepCtx['upstream'] = {};
-    for (const d of def.deps.filter((x) => !inPlan.has(x))) {
-      const u = fromIndex(d, n.zone);
+    for (const k of n.deps.filter((x) => !runKeys.has(x))) {
+      const u = fromIndex(k);
       if (!u) {
-        const error = `bước phụ thuộc '${d}' chưa build (chạy build không có --step trước)`;
+        const error = `bước phụ thuộc '${k}' chưa build (chạy build đủ trước)`;
         done.set(n.key, {
           step: n.step,
           zone: n.zone,
@@ -154,14 +168,11 @@ export async function runBuild(o: RunBuildOptions): Promise<BuildOutcome> {
         });
         return;
       }
-      upstream[d] = u;
+      upstream[upstreamName(k, n.deps)] = u;
     }
-    for (const k of n.deps) {
+    for (const k of internal(n)) {
       const r = done.get(k);
-      if (r?.outDir && r.outputHash) {
-        const multi = n.deps.filter((x) => x.startsWith(`${r.step}@`)).length > 1;
-        upstream[multi ? k : r.step] = { outDir: r.outDir, outputHash: r.outputHash };
-      }
+      if (r?.outDir && r.outputHash) upstream[upstreamName(k, n.deps)] = { outDir: r.outDir, outputHash: r.outputHash };
     }
     const p = runNodeStep(env, def, n.zone, tier, upstream)
       .catch((e: unknown): StepOutcome => {
@@ -191,7 +202,7 @@ export async function runBuild(o: RunBuildOptions): Promise<BuildOutcome> {
     // Bỏ qua nút có phụ thuộc lỗi/bị bỏ; giữ thứ tự tô-pô ổn định.
     for (let i = 0; i < pending.length;) {
       const n = pending[i] as PlanNode;
-      const bad = n.deps.find((k) => {
+      const bad = internal(n).find((k) => {
         const s = done.get(k)?.status;
         return s === 'error' || s === 'skipped';
       });
@@ -211,7 +222,7 @@ export async function runBuild(o: RunBuildOptions): Promise<BuildOutcome> {
     }
     for (let i = 0; i < pending.length && running.size < limit;) {
       const n = pending[i] as PlanNode;
-      if (n.deps.every((k) => done.has(k))) {
+      if (internal(n).every((k) => done.has(k))) {
         pending.splice(i, 1);
         launch(n);
         changed = true;

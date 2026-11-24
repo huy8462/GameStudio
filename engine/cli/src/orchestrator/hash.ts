@@ -9,13 +9,26 @@ import type { StepDef, StepId, Tier } from './types.js';
 
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
 
-/** Giải JSON Pointer có '*' (mọi phần tử mảng hoặc khoá object). Trả cặp (con trỏ cụ thể, giá trị) đã sắp. */
-export function resolvePointer(data: unknown, ptr: string): [string, unknown][] {
+const SELECT_RE = /^\[([A-Za-z_][A-Za-z0-9_]*)=(.*)\]$/;
+
+/**
+ * Giải JSON Pointer có '*' (mọi phần tử mảng hoặc khoá object) và bộ chọn '[khoá=giá trị]' (phần tử mảng có
+ * obj[khoá] === giá trị; '{zone}' thay bằng zone của nút, T-0014). Trả cặp (con trỏ cụ thể, giá trị) đã sắp.
+ * Bộ chọn cho phép bước perZone chỉ băm lát dữ liệu của zone mình (vd '/world.json/zones/[id={zone}]').
+ */
+export function resolvePointer(data: unknown, ptr: string, zone: string | null = null): [string, unknown][] {
   let cur: [string[], unknown][] = [[[], data]];
   for (const tok of parsePointer(ptr)) {
     const next: [string[], unknown][] = [];
+    const sel = SELECT_RE.exec(tok);
     for (const [path, v] of cur) {
-      if (tok === '*') {
+      if (sel) {
+        const want = sel[2] === '{zone}' ? zone : sel[2];
+        if (want === null || !Array.isArray(v)) continue;
+        v.forEach((x, i) => {
+          if (isObj(x) && x[sel[1] ?? ''] === want) next.push([[...path, String(i)], x]);
+        });
+      } else if (tok === '*') {
         if (Array.isArray(v)) v.forEach((x, i) => next.push([[...path, String(i)], x]));
         else if (isObj(v)) for (const k of Object.keys(v).sort()) next.push([[...path, k], v[k]]);
       } else if (Array.isArray(v) && /^(0|[1-9]\d*)$/.test(tok) && Number(tok) < v.length) {
@@ -30,9 +43,13 @@ export function resolvePointer(data: unknown, ptr: string): [string, unknown][] 
 }
 
 /** Trích lát dữ liệu cho ctx.inputs.data: {con trỏ cụ thể: giá trị}. */
-export function extractData(data: unknown, pointers: readonly string[]): Record<string, unknown> {
+export function extractData(
+  data: unknown,
+  pointers: readonly string[],
+  zone: string | null = null,
+): Record<string, unknown> {
   const out: Record<string, unknown> = {};
-  for (const ptr of [...pointers].sort()) for (const [p, v] of resolvePointer(data, ptr)) out[p] = v;
+  for (const ptr of [...pointers].sort()) for (const [p, v] of resolvePointer(data, ptr, zone)) out[p] = v;
   return out;
 }
 
@@ -63,13 +80,21 @@ export interface HashInput {
 
 export function inputHash(step: StepDef, h: HashInput): string {
   const dataSlices: Record<string, string> = {};
-  for (const [p, v] of Object.entries(extractData(h.data, step.inputs.dataPointers))) {
+  for (const [p, v] of Object.entries(extractData(h.data, step.inputs.dataPointers, h.zone))) {
     dataSlices[p] = sha256Hex(canonicalize(v));
   }
   const files: Record<string, string> = {};
   for (const f of matchFiles(h.gameDir, step.inputs.files)) files[f] = fileHash(join(h.gameDir, f));
   const upstream: Record<string, string> = {};
-  for (const s of [...step.deps].sort()) upstream[s] = h.upstream[s]?.outputHash ?? 'missing';
+  // Upstream khoá theo id bước, hoặc '<bước>@<zone>' khi phụ thuộc nhiều zone (scheduler.upstreamName). Trước T-0014
+  // chỉ tra theo id bước nên bước toàn cục sau bước perZone luôn băm 'missing' và không chạy lại khi zone đổi.
+  for (const s of [...step.deps].sort()) {
+    const keys = Object.keys(h.upstream)
+      .filter((k) => k === s || k.startsWith(`${s}@`))
+      .sort();
+    if (keys.length === 0) upstream[s] = 'missing';
+    for (const k of keys) upstream[k] = h.upstream[k]?.outputHash ?? 'missing';
+  }
   const toolVersions = [...(step.tools ?? [])].sort().map((t) => `${t}@${h.toolVersions[t] ?? 'unknown'}`);
   const body = {
     step: step.id,

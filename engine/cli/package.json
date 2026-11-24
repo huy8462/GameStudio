@@ -19,6 +19,7 @@
     "@gamestudio/intake": "workspace:*",
     "@gamestudio/rng": "workspace:*",
     "@gamestudio/schema": "workspace:*",
+    "@gamestudio/status": "workspace:*",
     "commander": "15.1.0"
   },
   "engines": {

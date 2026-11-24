@@ -1,0 +1,18 @@
+{
+  "world.fetch": 3,
+  "world.heightfield": 2,
+  "terrain.erode": 3,
+  "terrain.mesh": 1,
+  "terrain.splat": 1,
+  "materials": 2,
+  "assets": 5,
+  "water": 1,
+  "vegetation": 3,
+  "placement": 2,
+  "navmesh": 2,
+  "lighting.bake": 90,
+  "audio": 1,
+  "dialogue.check": 0.2,
+  "packager": 3,
+  "qa": 5
+}

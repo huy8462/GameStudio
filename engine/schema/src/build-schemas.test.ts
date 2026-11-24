@@ -55,8 +55,8 @@ const INDEX = [
 ];
 
 describe('schema build', () => {
-  it('BUILD_KINDS = step, report, cacheIndex', () => {
-    expect(BUILD_KINDS).toEqual(['step', 'report', 'cacheIndex']);
+  it('BUILD_KINDS = step, report, cacheIndex, status', () => {
+    expect(BUILD_KINDS).toEqual(['step', 'report', 'cacheIndex', 'status']);
   });
 
   it('mẫu hợp lệ', () => {

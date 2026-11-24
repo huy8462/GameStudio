@@ -89,7 +89,7 @@ export async function runNodeStep(
     tier,
     seed,
     inputs: {
-      data: extractData(env.data, step.inputs.dataPointers),
+      data: extractData(env.data, step.inputs.dataPointers, zone),
       files: matchFiles(env.gameDir, step.inputs.files),
       params: step.inputs.params,
     },

@@ -1,10 +1,10 @@
 {
   "id": "terrain.mesh",
-  "version": "1",
+  "version": "2",
   "description": "EP-WLD-04, MOD-WLD-07, PSC-WLD-07: chunk 64 m, LOD0–3, skirt, UV0/UV2, collider LOD1, glb Meshopt (T-0010). Cần build gói trước (pnpm -r build).",
   "deps": ["terrain.erode"],
   "inputs": {
-    "dataPointers": ["/world.json/zones"],
+    "dataPointers": ["/world.json/zones/[id={zone}]"],
     "files": [],
     "params": { "chunkM": 64, "lodSteps": [1, 2, 4, 8], "skirtM": 2, "uvTiling": 4, "quantBits": 14 }
   },

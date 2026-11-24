@@ -44,8 +44,13 @@ MASKS = ("road", "water", "farm", "forest")
 PREVIEW = {"co": (95, 122, 58), "dat": (107, 91, 69), "da": (138, 134, 121), "cat": (216, 199, 154)}
 
 
-def zone_bbox(zones: Any, zone_id: str | None) -> tuple[float, float, float, float] | None:
-    for z in zones if isinstance(zones, list) else []:
+def zone_bbox(data: dict[str, Any], zone_id: str | None) -> tuple[float, float, float, float] | None:
+    """Zone của nút: dataPointer '/world.json/zones/[id={zone}]' cho khoá '/world.json/zones/<i>' (T-0014)."""
+    found: list[Any] = []
+    for k, v in data.items():
+        if k.startswith("/world.json/zones"):
+            found.extend(v if isinstance(v, list) else [v])
+    for z in found:
         if isinstance(z, dict) and z.get("id") == zone_id:
             xs = [float(p[0]) for p in z["polygon"]]
             zs = [float(p[1]) for p in z["polygon"]]
@@ -59,7 +64,7 @@ def main() -> int:  # noqa: PLR0915 (luồng một bước)
     ctx = gsio.load_ctx(ap.parse_args().ctx)
     up = ctx["upstream"].get("terrain.erode")
     data, p = ctx["inputs"]["data"], ctx["inputs"]["params"]
-    bbox = zone_bbox(data.get("/world.json/zones"), ctx["zone"])
+    bbox = zone_bbox(data, ctx["zone"])
     if up is None or bbox is None:
         gsio.log_error(f"terrain.splat: thiếu upstream terrain.erode hoặc zone '{ctx['zone']}'")
         return 4

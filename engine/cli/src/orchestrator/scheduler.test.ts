@@ -70,14 +70,14 @@ describe('runBuild', () => {
     ]);
   });
 
-  it('đổi zones[*].pos → zone.mark chạy lại; đầu ra không đổi → pack.all cắt sớm từ cache', async () => {
+  it('đổi pos của z2 → chỉ zone.mark@z2 chạy lại (bộ chọn [id={zone}]); đầu ra không đổi → pack.all cắt sớm', async () => {
     const g = game();
     await build(g);
     g.write('data/world.json', { ...WORLD, zones: [WORLD.zones[0], { id: 'z2', pos: [600, 0] }] });
     expect(statusOf(await build(g))).toEqual({
       'misc.note@-': 'cached',
       'terrain.base@-': 'cached',
-      'zone.mark@z1': 'ran',
+      'zone.mark@z1': 'cached',
       'zone.mark@z2': 'ran',
       // zone.txt không chứa pos → outputHash zone.mark giữ nguyên → inputHash pack.all giữ nguyên.
       'pack.all@-': 'cached',

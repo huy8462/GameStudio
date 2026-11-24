@@ -1,10 +1,10 @@
 {
   "id": "terrain.splat",
-  "version": "1",
+  "version": "2",
   "description": "EP-WLD-05, MOD-WLD-08, PSC-WLD-08: splat map, surface.png, layers.json (T-0011). Tạm bỏ dep 'materials' (chưa có bước): thêm lại khi có.",
   "deps": ["terrain.erode"],
   "inputs": {
-    "dataPointers": ["/world.json/splat", "/world.json/zones"],
+    "dataPointers": ["/world.json/splat", "/world.json/zones/[id={zone}]"],
     "files": [],
     "params": {
       "maxLayers": 4,

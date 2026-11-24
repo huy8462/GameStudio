@@ -22,7 +22,9 @@ Lệnh `engine` (MOD-GEN-16, MOD-CLI-01, IF-CLI-01). Thư viện `commander`; `-
 
 ## `engine build` (E1, T-0004 + T-0005; ADR-023)
 
-`engine build [--game <dir>] [--steps <dir>] [--zone <id>] [--tier <tier>] [--step <id>] [--force] [--skip-bake] [--json]`.
+`engine build [--game <dir>] [--steps <dir>] [--zone <id>] [--tier <tier>] [--step <id>] [--force] [--skip-bake] [--stale [--dry-run]] [--json]`. `--stale` (T-0014, FR-CLI-09) chỉ chạy nút `planStaleFs` báo cũ; `--dry-run` chỉ liệt kê + ước lượng.
+
+`engine status [--game <dir>] [--json]` (T-0014, FR-CLI-08): báo cáo `status/1` (giai đoạn, bước cũ theo zone, việc tiếp) từ `@gamestudio/status`; chỉ đọc, ≈ 1 s cho 4 zone.
 
 - Guards (`src/build-cmd/guards.ts`): brief `brief/v<n>` lớn nhất chưa có `hash.txt` hoặc chưa có brief → 3 (ERR-INT-06); dữ liệu sai schema → 4; `engineVersion` không khớp kiểu caret với `ENGINE_VERSION` → 4 (ERR-RTM-04).
 - `src/orchestrator/runBuild` (PSC-CLI-01): DAG `step.json` (`step/1`) tô-pô ổn định, `perZone` nhân theo zone, `inputHash` (PSC-GEN-02), hit cache bỏ qua, song song ≤ min(4, lõi/2), bước lỗi huỷ nhánh phụ thuộc.
@@ -45,7 +47,7 @@ pnpm engine build --game games/<id> --json
 
 ## Cấu trúc
 
-- `src/main.ts`: điểm vào; `src/commands/{doctor,validate,build,new-game}.ts`: đăng ký lệnh; `src/validate/`, `src/build-cmd/`, `src/new-game/`, `src/orchestrator/`; `clock.ts` (điểm tiêm Clock), `engine-version.ts`.
+- `src/main.ts`: điểm vào; `src/commands/{doctor,validate,build,new-game,status}.ts`: đăng ký lệnh; `src/validate/`, `src/build-cmd/`, `src/new-game/`, `src/status/`, `src/orchestrator/`; `clock.ts` (điểm tiêm Clock), `engine-version.ts`.
 - Thư mục `build-cmd` (không phải `build`): Vitest, ESLint, tsconfig gốc loại `**/build/**`.
 - `src/doctor/`: `run-doctor.ts`, `checks.ts`, `blender-check.ts`, `env-roles.ts`, `versions.ts`, `exec.ts`, `types.ts`, `blender-probe.py`.
 - Test: `*.test.ts` (Vitest, runner giả, không gọi công cụ thật): TST-DEV-03, TST-CLI-02.

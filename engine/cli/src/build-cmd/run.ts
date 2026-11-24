@@ -5,6 +5,8 @@ import { basename, join } from 'node:path';
 import { EXIT } from '../exit-codes.js';
 import { gameIdOf, loadGameData, type GameDataFiles } from '../orchestrator/game-data.js';
 import { buildGraph } from '../orchestrator/graph.js';
+import { planStaleFs } from '../orchestrator/stale.js';
+import type { StaleItem } from '@gamestudio/status';
 import { runBuild, type RunBuildOptions } from '../orchestrator/scheduler.js';
 import type { BuildOutcome, Clock, Report1, Tier } from '../orchestrator/types.js';
 import { runGuards } from './guards.js';
@@ -26,6 +28,10 @@ export interface BuildCommandOptions {
   concurrency?: number;
   runners?: RunBuildOptions['runners'];
   onProgress?: RunBuildOptions['onProgress'];
+  /** --stale: chỉ chạy nút có hash đầu vào khác chỉ mục hoặc chưa build (FR-CLI-09, PSC-CLI-05). */
+  stale?: boolean;
+  /** --dry-run (với --stale): chỉ liệt kê, không chạy, không ghi báo cáo. */
+  dryRun?: boolean;
 }
 
 export interface BuildCommandResult {
@@ -35,6 +41,8 @@ export interface BuildCommandResult {
   outcome: BuildOutcome;
   /** Không có thư mục bước: build rỗng (chưa có bước nào ở pha này). */
   noSteps: boolean;
+  /** Kế hoạch --stale (có khi stale; dryRun thì chỉ có kế hoạch). */
+  stalePlan?: { items: StaleItem[]; estimateS: number };
 }
 
 const ID_RE = /^[a-z0-9][a-z0-9-]*$/;
@@ -80,8 +88,29 @@ export async function runBuildCommand(o: BuildCommandOptions): Promise<BuildComm
   const guard = runGuards(o.gameDir, data, o.engineVersion);
   if (guard) return finish({ result: 'fail', exit: guard.exit, steps: [] }, gameId, guard);
 
+  let onlyKeys: Set<string> | undefined;
+  let stalePlan: BuildCommandResult['stalePlan'];
+  if (o.stale) {
+    const p = planStaleFs({
+      gameDir: o.gameDir,
+      stepsDir: o.stepsDir,
+      buildDir,
+      ...(o.zone !== undefined ? { zone: o.zone } : {}),
+      ...(o.tier !== undefined ? { tier: o.tier } : {}),
+    });
+    if (!p.ok)
+      return finish({ ...empty, error: p.error.message }, gameId, { code: 'ERR-RTM-03', message: p.error.message });
+    stalePlan = { items: p.value.items, estimateS: p.value.items.reduce((t, i) => t + i.estS, 0) };
+    onlyKeys = new Set(p.value.items.map((i) => i.key));
+    if (o.dryRun) {
+      const outcome: BuildOutcome = { result: 'pass', exit: EXIT.OK, steps: [] };
+      return { ...finish(outcome, gameId, undefined, false), stalePlan };
+    }
+  }
+
   const empGraph = buildGraph([]);
   const outcome = await runBuild({
+    ...(onlyKeys ? { onlyKeys } : {}),
     gameDir: o.gameDir,
     buildDir,
     ...(noSteps && empGraph.ok ? { graph: empGraph.value } : { stepsDir: o.stepsDir }),
@@ -97,5 +126,5 @@ export async function runBuildCommand(o: BuildCommandOptions): Promise<BuildComm
     ...(o.runners ? { runners: o.runners } : {}),
     ...(o.onProgress ? { onProgress: o.onProgress } : {}),
   });
-  return finish(outcome, gameId);
+  return { ...finish(outcome, gameId), ...(stalePlan ? { stalePlan } : {}) };
 }

@@ -26,11 +26,13 @@ export class StepDataError extends Error {
 const num = (v: unknown, d: number): number => (typeof v === 'number' && Number.isFinite(v) ? v : d);
 const json = (v: unknown): string => `${JSON.stringify(v, null, 2)}\n`;
 
+/** Zone của nút: dataPointer '/world.json/zones/[id={zone}]' cho khoá '/world.json/zones/<i>' (T-0014). */
 function zonePolygon(ctx: TerrainMeshCtx): [number, number][] {
-  const zones = ctx.inputs.data['/world.json/zones'];
-  const z = Array.isArray(zones)
-    ? (zones as { id?: unknown; polygon?: unknown }[]).find((x) => x.id === ctx.zone)
-    : undefined;
+  type Z = { id?: unknown; polygon?: unknown };
+  const z = Object.entries(ctx.inputs.data)
+    .filter(([k]) => k.startsWith('/world.json/zones'))
+    .flatMap(([, v]) => (Array.isArray(v) ? (v as Z[]) : [v as Z]))
+    .find((x) => typeof x === 'object' && x !== null && x.id === ctx.zone);
   if (!z || !Array.isArray(z.polygon))
     throw new StepDataError(`terrain.mesh: không có zone '${ctx.zone ?? ''}' trong world.json`);
   return z.polygon as [number, number][];

@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gamestudio.local/schema/status/1.json",
+  "title": "status/1: báo cáo tiến độ game (SCH-GEN-07, DTO-GEN-08, SRS-04 §6.6); tính lại mỗi lần, không lưu",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "gameId",
+    "dataVersion",
+    "stage",
+    "brief",
+    "style",
+    "zones",
+    "flags",
+    "lastPublication",
+    "pendingIntake",
+    "next"
+  ],
+  "properties": {
+    "schema": { "const": "status/1" },
+    "gameId": { "$ref": "../common/1.json#/$defs/id" },
+    "dataVersion": { "type": "integer", "minimum": 0 },
+    "stage": {
+      "enum": [
+        "TaoMoi",
+        "ChoXacNhanBrief",
+        "ChoDuyetStyle",
+        "ChuaBuild",
+        "CanBuild",
+        "ChuaQA",
+        "SanSangXuatBan",
+        "DaXuatBan"
+      ]
+    },
+    "brief": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "version"],
+          "properties": {
+            "status": { "enum": ["Nhap", "ChoXacNhan", "DaXacNhan"] },
+            "version": { "type": "integer", "minimum": 0 }
+          }
+        }
+      ]
+    },
+    "style": { "enum": ["ChuaCo", "ChoDuyet", "DaDuyet"] },
+    "zones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "built", "staleSteps", "qa"],
+        "properties": {
+          "id": { "type": "string" },
+          "built": { "type": "boolean" },
+          "staleSteps": { "type": "array", "items": { "$ref": "../step/1.json#/$defs/stepId" } },
+          "estimateMinutes": { "type": "integer", "minimum": 0 },
+          "qa": { "enum": ["pass", "fail", "cu", "chua"] }
+        }
+      }
+    },
+    "flags": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deXuatChoDuyet", "assetChoDuyet", "jobLoi", "canNangCap", "thieuProvenance", "thayDoiChuaXuatBan"],
+      "properties": {
+        "deXuatChoDuyet": { "type": "integer", "minimum": 0 },
+        "assetChoDuyet": { "type": "integer", "minimum": 0 },
+        "jobLoi": { "type": "integer", "minimum": 0 },
+        "canNangCap": { "type": "boolean" },
+        "thieuProvenance": { "type": "integer", "minimum": 0 },
+        "thayDoiChuaXuatBan": { "type": "integer", "minimum": 0 },
+        "dangKhoaBoi": { "type": "string" }
+      }
+    },
+    "lastPublication": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["version", "dataVersion", "chuaDat"],
+          "properties": {
+            "version": { "type": "integer", "minimum": 1 },
+            "dataVersion": { "type": "integer", "minimum": 0 },
+            "chuaDat": { "type": "boolean" }
+          }
+        }
+      ]
+    },
+    "pendingIntake": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sessionId", "pendingQuestions"],
+          "properties": {
+            "sessionId": { "type": "string" },
+            "pendingQuestions": { "type": "integer", "minimum": 0 }
+          }
+        }
+      ]
+    },
+    "next": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "args", "label"],
+      "properties": {
+        "action": { "enum": ["answer", "confirm_brief", "approve_style", "build", "qa", "publish", "upgrade", "none"] },
+        "args": { "type": "string" },
+        "label": { "type": "string" }
+      }
+    }
+  }
+}
