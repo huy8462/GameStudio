@@ -7,12 +7,16 @@ import { validate } from '@gamestudio/schema';
 import type { Result, StepDef, StepGraph, StepId } from './types.js';
 
 /** Tìm mọi step.json dưới stepsDir (đệ quy, sắp theo đường dẫn để tất định). */
+/** Thư mục không chứa step.json của mình: phụ thuộc, đầu ra build, ẩn (T-0010: bước node là gói pnpm). */
+const SKIP_DIRS = new Set(['node_modules', 'dist', '__pycache__']);
+
 function findStepFiles(dir: string): string[] {
   const out: string[] = [];
   for (const name of readdirSync(dir).sort()) {
     const p = join(dir, name);
-    if (statSync(p).isDirectory()) out.push(...findStepFiles(p));
-    else if (name === 'step.json') out.push(p);
+    if (statSync(p).isDirectory()) {
+      if (!SKIP_DIRS.has(name) && !name.startsWith('.')) out.push(...findStepFiles(p));
+    } else if (name === 'step.json') out.push(p);
   }
   return out;
 }

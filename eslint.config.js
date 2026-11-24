@@ -8,7 +8,7 @@ export default tseslint.config(
     ignores: [
       '**/node_modules/**',
       '**/dist/**',
-      '**/build/**',
+      // Đầu ra build của game (games/<id>/build) bỏ qua; engine/build là mã nguồn bước build, phải lint (T-0010).
       '**/cache/**',
       '**/generated/**',
       '.claude/**',

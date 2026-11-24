@@ -6,5 +6,5 @@
     "types": ["node"]
   },
   "include": ["engine/**/*.ts", "web/**/*.ts", "web/**/*.tsx", "tools/**/*.ts", "*.config.ts"],
-  "exclude": ["**/node_modules", "**/dist", "**/build"]
+  "exclude": ["**/node_modules", "**/dist", "games/*/build", "prototypes/*/build"]
 }

@@ -55,7 +55,8 @@ module.exports = {
   ],
   options: {
     doNotFollow: { path: 'node_modules' },
-    exclude: { path: '(^|/)(dist|build|cache|node_modules)/' },
+    // engine/build là mã nguồn bước build (T-0010); chỉ bỏ đầu ra games/<id>/build.
+    exclude: { path: '(^|/)(dist|cache|node_modules)/|^games/[^/]+/build/' },
     tsPreCompilationDeps: true,
     tsConfig: { fileName: 'tsconfig.json' },
     enhancedResolveOptions: { exportsFields: ['exports'], conditionNames: ['import', 'require', 'node', 'default'] },

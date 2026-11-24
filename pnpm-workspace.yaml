@@ -3,6 +3,8 @@ packages:
   - 'engine/*'
   - 'engine/shared/*'
   - 'engine/build/*'
+  # Bước build viết bằng TS (bước node, IF-CLI-02): mỗi bước một gói có package.json (T-0010).
+  - 'engine/build/steps/*'
   - 'web/*'
   - 'prototypes/*'
 minimumReleaseAgeExclude:

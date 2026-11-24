@@ -5,7 +5,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     include: ['engine/**/*.timing.test.ts', 'web/**/*.timing.test.ts', 'tools/**/*.timing.test.ts'],
-    exclude: ['**/node_modules/**', '**/dist/**', '**/build/**'],
+    exclude: ['**/node_modules/**', '**/dist/**', 'games/**/build/**'],
     fileParallelism: false,
     maxWorkers: 1,
     passWithNoTests: false,

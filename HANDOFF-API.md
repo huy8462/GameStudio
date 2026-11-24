@@ -127,9 +127,11 @@ Thứ tự phiếu đề xuất (mỗi phiếu một phiên Claude Code, `/clear
 
 - **T-0009** (24/11/2026, `docs/tickets/T-0009.md`, Sonnet low): sửa `engine doctor` trên Windows (`doctor/win-spawn.ts`): tìm chương trình theo PATH + PATHEXT, `.exe` chạy trực tiếp, shim `.cmd` qua `cmd.exe` với trích dẫn CreateProcess + thoát `^`. Đối số có dấu cách hoặc nháy không còn bị cắt vụn. numpy/numba quay về kiểm bằng `python -c`. 421 test đạt, `pnpm doctor` thoát 0.
 
-**Phiếu E1 kế tiếp (đề xuất):** (đánh số tuần tự: `terrain.mesh` thành **T-0010**, `terrain.splat` thành **T-0011**)
-- **T-0010**: `terrain.mesh` (node, EP-WLD-04, PSC-WLD-07, MOD-WLD-07, DTO-WLD-10): đọc `hf/` của `terrain.erode`, chunk 64 m, LOD0–3, skirt, UV0/UV2, `collider/height-lod1.r32`, BVH; xuất `.glb`. Bước node đầu tiên trong `engine/build/steps/`, cần quyết cách ghi glTF (`@gltf-transform/core` đã có trong `versions.json` là CLI; đề xuất thư viện core ghim bản) và `meshoptimizer` cho LOD. Lưu ý: ESLint/Vitest/tsconfig gốc loại `**/build/**`, nên bước TS trong `engine/build/steps` cần cấu hình lint/test riêng (gói pnpm `engine/build/steps/*` hoặc mở ngoại lệ).
-- **T-0011**: `terrain.splat` (python, EP-WLD-05, PSC-WLD-08, DTO-WLD-03, 06): trọng số lớp theo dốc/độ cao/mask, `splat-0.png`, `surface.png`, `layers.json`. Phụ thuộc bước `materials` (EP-WLD-05 `deps`) chưa có: đề xuất tạm bỏ dep `materials` hoặc làm bước giả.
+- **T-0010** (24/11/2026, `docs/tickets/T-0010.md`): bước node đầu tiên `terrain.mesh` (EP-WLD-04, PSC-WLD-07, DTO-WLD-10), gói pnpm `@gamestudio/step-terrain-mesh` (`engine/build/steps/terrain-mesh`, `entry: dist/index.js`, cần `pnpm -r build`). Chunk 64 m theo zone, LOD bước `cellM·{1,2,4,8}`, skirt 2 m, UV0 thế giới, UV2 atlas; glb lượng tử 14 bit đồng đều (KHR_mesh_quantization) + EXT_meshopt_compression qua `@gltf-transform/core`/`extensions` 4.5.1 + `meshoptimizer` 1.2.0 (không dùng `functions`); `collider/height-lod1.r32`, `lightmaps/uv2-atlas.json`. ESLint/Vitest/tsc/prettier/depcruise gốc giờ chỉ loại `games/*/build`, nên kiểm được `engine/build/steps`. Engine build 4 bước tất định. 430 test đạt. Chưa có: `bvh.bin` (E2), simplify.
+
+**Phiếu E1 kế tiếp (đề xuất):**
+- **T-0011**: `terrain.splat` (python, EP-WLD-05, PSC-WLD-08, DTO-WLD-03, 06): trọng số lớp theo dốc/độ cao/mask, `splat-0.png`, `surface.png`, `layers.json`. Phụ thuộc bước `materials` (EP-WLD-05 `deps`) chưa có: **cần Huy chọn** tạm bỏ dep `materials` (ghi lệch) hay làm bước `materials` giả trả `layers` mặc định từ `palette.json`. Đề xuất: bỏ dep tạm, `layers.json` lấy `materialRef` giữ chỗ.
+- Sau T-0011, phạm vi địa hình G-E1 đủ (fetch/heightfield/erode/mesh/splat). Còn của E1 (HANDOFF §6.1 Phạm vi E1): `intake` + `HandoffLlmClient`, QA khung (`@gamestudio/qa`), `engine status`/`build --stale` (`planStale`). Đề xuất kế: `intake` (đích G-E1 AC-01-01…07).
 - `intake` (`HandoffLlmClient`, DDD-01) vẫn làm song song được.
 
 **Việc hoãn từ E0 (m2) đưa vào E1:**

@@ -1,0 +1,26 @@
+{
+  "name": "@gamestudio/step-terrain-mesh",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bước build terrain.mesh (EP-WLD-04, MOD-WLD-07, PSC-WLD-07): chunk, LOD, skirt, collider, glb.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "step.json"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@gltf-transform/core": "4.5.1",
+    "@gltf-transform/extensions": "4.5.1",
+    "meshoptimizer": "1.2.0"
+  }
+}

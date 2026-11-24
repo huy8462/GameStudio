@@ -1,0 +1,25 @@
+{
+  "id": "terrain.mesh",
+  "version": "1",
+  "description": "EP-WLD-04, MOD-WLD-07, PSC-WLD-07: chunk 64 m, LOD0–3, skirt, UV0/UV2, collider LOD1, glb Meshopt (T-0010). Cần build gói trước (pnpm -r build).",
+  "deps": ["terrain.erode"],
+  "inputs": {
+    "dataPointers": ["/world.json/zones"],
+    "files": [],
+    "params": { "chunkM": 64, "lodSteps": [1, 2, 4, 8], "skirtM": 2, "uvTiling": 4, "quantBits": 14 }
+  },
+  "runner": "node",
+  "entry": "dist/index.js",
+  "perZone": true,
+  "outputs": [
+    "chunks/<cx>_<cz>/lod0.glb",
+    "chunks/<cx>_<cz>/lod1.glb",
+    "chunks/<cx>_<cz>/lod2.glb",
+    "chunks/<cx>_<cz>/lod3.glb",
+    "collider/height-lod1.r32",
+    "collider/height-lod1.meta.json",
+    "lightmaps/uv2-atlas.json"
+  ],
+  "tools": ["node"],
+  "timeoutS": 1800
+}

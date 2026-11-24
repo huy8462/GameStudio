@@ -16,7 +16,8 @@ pnpm-lock.yaml
 uv.lock
 **/node_modules/
 **/dist/
-**/build/
+# Đầu ra build của game; engine/build là mã nguồn bước build (T-0010).
+games/*/build/
 **/cache/
 **/generated/
 .venv/

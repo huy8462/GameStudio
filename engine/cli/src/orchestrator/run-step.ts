@@ -154,7 +154,9 @@ export async function runNodeStep(
   }
 }
 
-/** Mã thoát của lỗi bước: StepError mang mã riêng; lỗi khác là 10 (SRS-04 §7.2). */
+/** Mã thoát của lỗi bước: StepError, hoặc lỗi bất kỳ có `exitCode` số trong 3–6 (bước node độc lập với CLI); còn lại 10. */
 export function errorExit(e: unknown): number {
-  return e instanceof StepError ? e.exitCode : 10;
+  if (e instanceof StepError) return e.exitCode;
+  const code = typeof e === 'object' && e !== null ? (e as { exitCode?: unknown }).exitCode : undefined;
+  return typeof code === 'number' && code >= 3 && code <= 6 ? code : 10;
 }
