@@ -1,0 +1,36 @@
+{
+  "id": "terrain.erode",
+  "version": "1",
+  "description": "EP-WLD-03, MOD-WLD-06, PSC-WLD-06: xói mòn hạt + nhiệt trên heightfield của world.heightfield (T-0008)",
+  "deps": ["world.heightfield"],
+  "inputs": {
+    "dataPointers": ["/world.json/erosion"],
+    "files": [],
+    "params": {
+      "inertia": 0.05,
+      "capacity": 4,
+      "deposition": 0.3,
+      "evaporation": 0.01,
+      "radius": 3,
+      "talusDeg": 35
+    }
+  },
+  "runner": "python",
+  "entry": "main.py",
+  "perZone": false,
+  "outputs": [
+    "hf/height.r32",
+    "hf/height.meta.json",
+    "hf/mask-road.png",
+    "hf/mask-water.png",
+    "hf/mask-farm.png",
+    "hf/mask-forest.png",
+    "hf/mask-building.png",
+    "hf/vectors.geojson",
+    "hf/preview/top.png",
+    "flow.r8",
+    "sediment.r8"
+  ],
+  "tools": ["python", "numpy", "numba"],
+  "timeoutS": 1800
+}

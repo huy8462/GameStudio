@@ -1,4 +1,4 @@
-// T-0007: bước python thật world.fetch + world.heightfield qua engine build (EP-WLD-01, 02; DTO-WLD-02; TC-WLD-02).
+// T-0007, T-0008: bước python thật world.fetch, world.heightfield, terrain.erode qua engine build (EP-WLD-01…03; DTO-WLD-02; TC-WLD-02).
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
@@ -41,7 +41,7 @@ const build = (dir: string) =>
     tool: { name: '@gamestudio/cli', version: '0.0.0' },
   });
 
-describe('world.fetch + world.heightfield qua engine build', { timeout: 120_000 }, () => {
+describe('world.fetch → world.heightfield → terrain.erode qua engine build', { timeout: 180_000 }, () => {
   it('sinh bundle DTO-WLD-02; lần 2 toàn cache; hai thư mục sạch cache cùng outputHash (TC-WLD-02)', async () => {
     const a = game();
     const r1 = await build(a);
@@ -49,6 +49,7 @@ describe('world.fetch + world.heightfield qua engine build', { timeout: 120_000 
     expect(r1.report.checks.map((c) => `${c.id}:${c.message ?? ''}`)).toEqual([
       'world.fetch@-:ran',
       'world.heightfield@-:ran',
+      'terrain.erode@-:ran',
     ]);
     const hf = r1.outcome.steps.find((s) => s.step === 'world.heightfield');
     const out = join(hf?.outDir ?? '', 'hf');
@@ -71,9 +72,37 @@ describe('world.fetch + world.heightfield qua engine build', { timeout: 120_000 
     const w = JSON.parse(readFileSync(wp, 'utf8')) as { procedural: Record<string, unknown> };
     writeFileSync(wp, JSON.stringify({ ...w, procedural: { ...w.procedural, roughness: 0.9 } }));
     const r = await build(a);
-    expect(r.report.checks.map((c) => c.message)).toEqual(['cached', 'ran']);
+    expect(r.report.checks.map((c) => c.message)).toEqual(['cached', 'ran', 'ran']);
     const ant = await build(game({ procedural: { preset: 'ant', maxHeight: 40, roughness: 0.5, features: [] } }));
     expect(ant.exit).toBe(EXIT.ENVIRONMENT);
     expect(ant.report.warnings.join(' ')).toMatch(/ant/);
+  });
+
+  it('terrain.erode: hf/ mới + flow.r8, sediment.r8; đổi world.erosion → chỉ terrain.erode chạy lại (T-0008)', async () => {
+    const a = game();
+    const r1 = await build(a);
+    const er = r1.outcome.steps.find((s) => s.step === 'terrain.erode');
+    const out = er?.outDir ?? '';
+    for (const f of [
+      'hf/height.r32',
+      'hf/height.meta.json',
+      'hf/mask-water.png',
+      'hf/vectors.geojson',
+      'hf/preview/top.png',
+    ]) {
+      expect(existsSync(join(out, f)), f).toBe(true);
+    }
+    expect(readFileSync(join(out, 'flow.r8')).length).toBe(251 * 251);
+    expect(readFileSync(join(out, 'sediment.r8')).length).toBe(251 * 251);
+    const hfUp = r1.outcome.steps.find((s) => s.step === 'world.heightfield')?.outDir ?? '';
+    expect(readFileSync(join(out, 'hf/height.r32')).equals(readFileSync(join(hfUp, 'hf/height.r32')))).toBe(false);
+    expect(readFileSync(join(out, 'hf/mask-water.png')).equals(readFileSync(join(hfUp, 'hf/mask-water.png')))).toBe(
+      true,
+    );
+
+    const wp = join(a, 'data/world.json');
+    const w = JSON.parse(readFileSync(wp, 'utf8')) as Record<string, unknown>;
+    writeFileSync(wp, JSON.stringify({ ...w, erosion: { iterations: 20, strength: 0.5 } }));
+    expect((await build(a)).report.checks.map((c) => c.message)).toEqual(['cached', 'cached', 'ran']);
   });
 });

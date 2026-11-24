@@ -7,6 +7,7 @@ description = "GameStudio: bước build Python (engine/build/py, engine/build/s
 requires-python = ">=3.12,<3.13"
 # numpy: heightfield (EP-WLD-02), chạy một luồng (rule engine-build). Ghim bản để outputHash tất định giữa máy.
 dependencies = [
+  "numba==0.68.1",
   "numpy==2.5.5",
 ]
 
