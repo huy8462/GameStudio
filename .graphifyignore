@@ -1,0 +1,61 @@
+# .graphifyignore: GameStudio
+# Graphify chỉ lập chỉ mục MÃ (code_only, AST, không gọi LLM) để Claude Code tra
+# đồ thị thay vì đọc nhiều tệp. Ảnh, dữ liệu, tài liệu dài và bản sao bị loại.
+# Dựng lại: `graphify update .` (GRAPHIFY_BACKEND=none). Tra: `graphify query "..."`.
+
+# Kết quả của chính graphify (không commit, nằm trong .git/info/exclude)
+graphify-out/
+
+# Phụ thuộc, môi trường, cache, đầu ra build/test (giống .gitignore)
+node_modules/
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+__pycache__/
+dist/
+build/
+!engine/build/
+**/cache/
+coverage/
+test-results/
+playwright-report/
+artifacts/
+data.bak-*/
+
+# Ảnh, mô hình 3D, texture, âm thanh, dữ liệu nhị phân
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+*.ktx2
+*.glb
+*.gltf
+*.bin
+*.blend
+*.blend1
+*.hdr
+*.exr
+*.tif
+*.tiff
+*.osm.pbf
+*.npy
+*.npz
+*.wav
+*.mp3
+*.ogg
+*.docx
+*.pdf
+*.log
+*.pyc
+*.lock
+pnpm-lock.yaml
+package-lock.json
+
+# Dữ liệu game và mockup tài liệu (đọc trực tiếp khi cần)
+games/**/assets/
+docs/UIUX/prototype/
+
+# Bản sao mẫu trong skill (trùng prototypes/), giữ hooks của dự án
+.claude/skills/
