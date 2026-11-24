@@ -42,6 +42,7 @@ docs/          BRD SRS TSD DDD UIUX ADR tickets gates metrics handoff.md
 | `pnpm doctor`                                                      | Build CLI + `engine doctor` (thoát 5 khi thiếu/lệch)                                                            |
 | `pnpm engine <lệnh> --json`                                        | Chạy CLI; đọc một dòng JSON, không đọc log                                                                      |
 | `pnpm lint` / `pnpm test` / `pnpm depcruise` / `pnpm format:check` | Kiểm trước khi xong phiếu                                                                                       |
+| `pnpm test:timing`                                                 | Test đo thời gian (hook P95, NFR-DEV-02), chạy tuần tự, tách khỏi `pnpm test`                                   |
 | `pnpm exec tsc -p tsconfig.json`                                   | Kiểm kiểu toàn repo                                                                                             |
 | `uv run ruff check`                                                | Lint Python                                                                                                     |
 | Truy vết tài liệu                                                  | `$env:PYTHONIOENCODING='utf-8'` rồi `python docs/{SRS,TSD,DDD,UIUX}/tools/*-trace.py …` (xem HANDOFF-API.md §2) |

@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { ROOT, TMP, bash, file, read, run, write } from './hooks-harness.js';
+import { ROOT, TMP, file, read, run, write } from './hooks-harness.js';
 
 interface HookOut {
   hookSpecificOutput: { hookEventName: string; additionalContext: string };
@@ -53,8 +53,5 @@ describe('Lỗi nội bộ và thời gian (TST-DEV-02)', () => {
     }
   });
   it('tệp không tồn tại → exit 0', () => expect(run('h01-large-md', read(join(TMP, 'khong-co.md'))).code).toBe(0));
-  it('P95 mỗi hook < 1 s (NFR-DEV-02)', () => {
-    const times = Array.from({ length: 20 }, () => run('h04-secrets', bash('pnpm test')).ms).sort((a, b) => a - b);
-    expect(times[18]).toBeLessThan(1000);
-  });
+  // P95 < 1 s (NFR-DEV-02): hooks.timing.test.ts, chạy bằng `pnpm test:timing` (T-0006).
 });

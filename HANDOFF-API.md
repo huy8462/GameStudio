@@ -119,9 +119,10 @@ Thứ tự phiếu đề xuất (mỗi phiếu một phiên Claude Code, `/clear
 
 - **T-0005** (24/11/2026, `docs/tickets/T-0005.md`): lệnh `engine build [--game] [--steps] [--zone] [--tier] [--step] [--force] [--skip-bake] [--json]`. Runner python (`uv run python -I`, `PROGRESS`, timeout diệt cả cây tiến trình). Guards: brief (`brief/v<n>/hash.txt`, thoát 3), schema (4), `engineVersion` caret (4). Báo cáo gộp `build/reports/build-<zone|all>.json`. Quy ước: bước python ghi tệp với `newline="\n"`. 407/408 test đạt; test thời gian hook "P95 < 1 s" trượt khi chạy cả bộ, chạy riêng thì đạt (xem phiếu).
 
-**Phiếu E1 kế tiếp (đề xuất):**
-- **T-0006**: bước python đầu tiên `world.fetch` + `world.heightfield` cho nguồn `procedural` (DDD-02 EP-WLD-01, 02; PSC-WLD-02, 03; ALG-WLD-02, 03). Đặt ở `engine/build/steps/world-*/` và `engine/build/py/heightfield/`. Sinh heightfield tất định từ `world.seed` + preset (numpy một luồng), kèm pytest và test build qua `engine build`. Nguồn OSM/DEM thật (mạng, ERR-WLD-01) để phiếu sau. Cần đọc DDD-02 theo mục để chốt định dạng đầu ra (DTO-WLD-02/07/08).
-- **Phiếu nhỏ (Sonnet, low)**: tách test thời gian `hooks-warn.test.ts` "P95 < 1 s" (NFR-DEV-02) ra chạy riêng (project Vitest riêng hoặc `pnpm test:timing`), để `pnpm test` không trượt khi máy bận. Thuộc `tools/scripts/**`, `vitest.config.ts`.
+- **T-0006** (24/11/2026, `docs/tickets/T-0006.md`, Sonnet low): tách test thời gian hook (TST-DEV-02, NFR-DEV-02) ra `pnpm test:timing` (`vitest.timing.config.ts`, tuần tự, một worker). Quy ước tên `*.timing.test.ts`, bị loại khỏi `pnpm test`. Test giờ đo P95 cho từng hook H-01…H-05. `pnpm test` 407/407 đạt, `pnpm test:timing` 5/5 đạt.
+
+**Phiếu E1 kế tiếp (đề xuất):** (đánh số tuần tự: phiếu địa hình thành **T-0007** vì T-0006 dùng cho việc tách test)
+- **T-0007**: bước python đầu tiên `world.fetch` + `world.heightfield` cho nguồn `procedural` (DDD-02 EP-WLD-01, 02; PSC-WLD-02, 03; ALG-WLD-02, 03). Đặt ở `engine/build/steps/world-*/` và `engine/build/py/heightfield/`. Sinh heightfield tất định từ `world.seed` + preset (numpy một luồng), kèm pytest và test build qua `engine build`. Nguồn OSM/DEM thật (mạng, ERR-WLD-01) để phiếu sau. Cần đọc DDD-02 theo mục để chốt định dạng đầu ra (DTO-WLD-02/07/08).
 - `intake` (`HandoffLlmClient`, DDD-01) vẫn làm song song được.
 
 **Việc hoãn từ E0 (m2) đưa vào E1:**

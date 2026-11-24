@@ -13,6 +13,7 @@
     "doctor": "pnpm --filter @gamestudio/cli build && node engine/cli/dist/main.js doctor",
     "typecheck": "pnpm -r --if-present run typecheck",
     "test": "vitest run",
+    "test:timing": "vitest run --config vitest.timing.config.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
