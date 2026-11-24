@@ -1,0 +1,35 @@
+{
+  "id": "world.heightfield",
+  "version": "1",
+  "description": "EP-WLD-02, MOD-WLD-04, PSC-WLD-04: heightfield bundle (DTO-WLD-02) từ địa hình thủ tục (T-0007)",
+  "deps": ["world.fetch"],
+  "inputs": {
+    "dataPointers": [
+      "/world.json/source",
+      "/world.json/playArea",
+      "/world.json/procedural",
+      "/world.json/blendMask",
+      "/world.json/seed",
+      "/world.json/heightScale",
+      "/world.json/smoothing"
+    ],
+    "files": [],
+    "params": { "cellM": 2 }
+  },
+  "runner": "python",
+  "entry": "main.py",
+  "perZone": false,
+  "outputs": [
+    "hf/height.r32",
+    "hf/height.meta.json",
+    "hf/mask-road.png",
+    "hf/mask-water.png",
+    "hf/mask-farm.png",
+    "hf/mask-forest.png",
+    "hf/mask-building.png",
+    "hf/vectors.geojson",
+    "hf/preview/top.png"
+  ],
+  "tools": ["python", "numpy"],
+  "timeoutS": 1800
+}

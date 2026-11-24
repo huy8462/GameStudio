@@ -1,0 +1,13 @@
+{
+  "id": "world.fetch",
+  "version": "1",
+  "description": "EP-WLD-01, MOD-WLD-03: nạp DEM/OSM cho nguồn real/mixed; procedural không tải gì (T-0007: chỉ nhánh procedural)",
+  "deps": [],
+  "inputs": { "dataPointers": ["/world.json/source", "/world.json/bbox"], "files": [], "params": {} },
+  "runner": "python",
+  "entry": "main.py",
+  "perZone": false,
+  "outputs": ["fetch.json", "fetch.provenance.json"],
+  "tools": ["python"],
+  "timeoutS": 600
+}
