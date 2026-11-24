@@ -28,6 +28,7 @@ Engine không gọi API Claude (ADR-035). Khi cần mô hình, `engine new-game`
 - Không bịa tính năng: chiến đấu, săn bắt chỉ bật khi mô tả nói rõ. Hội thoại NPC luôn `static`.
 - `clarify`: đúng các trường được giao, câu ≤ 25 từ, 2–4 lựa chọn; `value` đúng kiểu trường (vd `camera`: `"third_person"`).
 - `brief`: giữ nguyên giá trị đã chốt trong `messages`; chỉ viết lời (title, genre, artStyle.summary, coreLoop 3–5 bước, player, tên NPC). Mã sẽ ép lại camera, tính năng, quy mô, giả định.
+- `reverse_brief` (game nhập chưa có brief, `engine import` / `engine brief draft --game <id>`, PSC-INT-13): `messages` là bản tóm tắt dữ liệu, mỗi dòng `<con trỏ> = <giá trị>`. Chỉ điền trường có căn cứ; mỗi trường `{value, sources}` với `sources` là con trỏ **có trong bản tóm tắt** (sai thì trường thành `thieu` và người dùng được hỏi). Không có căn cứ thì bỏ trường, không đoán.
 - Bám đúng thể loại và phong cách người dùng mô tả; không đổi sang thứ "hay hơn".
 
 ## Không làm

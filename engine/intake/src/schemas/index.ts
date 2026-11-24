@@ -4,8 +4,14 @@ import { createAjv, toError, type ValidationError } from '@gamestudio/schema';
 import analysisSchema from './analysis.schema.json' with { type: 'json' };
 import briefSchema from './brief.schema.json' with { type: 'json' };
 import clarifySchema from './clarify.schema.json' with { type: 'json' };
+import reverseBriefSchema from './reverse_brief.schema.json' with { type: 'json' };
 
-export const SCHEMAS = { analysis: analysisSchema, clarify: clarifySchema, brief: briefSchema } as const;
+export const SCHEMAS = {
+  analysis: analysisSchema,
+  clarify: clarifySchema,
+  brief: briefSchema,
+  reverseBrief: reverseBriefSchema,
+} as const;
 
 type Validate = ((data: unknown) => boolean) & { errors?: Parameters<typeof toError>[0][] | null };
 

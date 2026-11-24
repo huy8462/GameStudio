@@ -33,6 +33,14 @@ Giữ nguyên giá trị đã chốt; chỉ viết lời cho title, genre, artSt
 Phần chính ngắn gọn (≤ 400 từ). "assumptions" giữ nguyên danh sách được giao.
 ${BAM_MO_TA}`,
   },
+  reverse_brief: {
+    version: 'reverse_brief@1',
+    text: `Bạn đọc bản tóm tắt dữ liệu của một game web 3D có sẵn (mỗi dòng "<con trỏ> = <giá trị>") và suy các trường
+văn bản của brief: genre, artStyle (một câu), coreLoop (3–5 bước), player, setting.place, setting.era, setting.season.
+Mỗi trường: {value, sources: [con trỏ]}; "sources" là các con trỏ CÓ TRONG bản tóm tắt làm căn cứ.
+Không có căn cứ thì BỎ trường đó (không đoán). Không bịa tính năng (QT-GEN-03, QĐ-11).
+Trả JSON đúng outputSchema, không thêm chữ ngoài JSON.`,
+  },
   repair: {
     version: 'repair@1',
     text: `Bạn sửa một tệp JSON cho khớp schema. Chỉ sửa các chỗ trong danh sách lỗi, giữ nguyên phần còn lại.

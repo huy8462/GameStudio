@@ -38,7 +38,7 @@ export function checkBrief(gameDir: string): GuardFail | undefined {
   return {
     exit: EXIT.NEEDS_CONFIRM,
     code: 'ERR-INT-06',
-    message: `Không build được: ${why}. Xác nhận brief trước (engine new-game --confirm hoặc Web Studio).`,
+    message: `Không build được: ${why}. Xác nhận brief trước (engine new-game --confirm, engine brief confirm --game <id> hoặc Web Studio).`,
   };
 }
 

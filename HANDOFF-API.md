@@ -149,6 +149,7 @@ Cần đọc lại AC-02-01, 02 để biết G-E1 có đòi dữ liệu thật k
 - **T-0014** (25/11/2026, `docs/tickets/T-0014.md`): `engine status [--json]` (FR-CLI-08, báo cáo `status/1`, ≈ 1,2 s cho 4 zone) và `engine build --stale [--zone] [--dry-run]` (FR-CLI-09). Gói thuần `@gamestudio/status` (`planStale` với `hashOf` tiêm vào = đúng công thức băm của build, `computeStatus` STM-GEN-01, `summarizeVi`). Thêm bộ chọn `[id={zone}]` trong `dataPointers` để bước theo zone chỉ băm lát zone mình (`terrain.mesh`/`splat` lên v2). Sửa lỗi T-0004: bước toàn cục sau bước theo zone không băm đầu ra zone. Thử thật trên `suong-som-doi-che`: đổi z2 → `status` chỉ báo z2 → `--dry-run` 2 nút → `--stale` chỉ chạy mesh/splat z2. `/resume-game` dùng `engine status`. 464 test đạt.
 
 - **T-0015** (25/11/2026, `docs/tickets/T-0015.md`): phiên tạo game dở (AC-CR01-01). `answer` một phần giữ đúng câu còn lại, không gọi mô hình. `reopenSession` (không gọi mô hình, `SESSION_CLOSED`), `expireSessions` (ngày 27 nhắc, > 30 ngày `Huy`; nhận danh sách phiên từ nơi gọi). `engine new-game --resume` in đúng câu còn lại, không tạo req mới. 469 test đạt.
+- **T-0016** (25/11/2026, `docs/tickets/T-0016.md`): nhập game có sẵn (AC-CR01-02). `engine import <thư mục|zip> [--into]` → `import/1` (schema mới trong `@gamestudio/schema`); đọc an toàn (chặn `../`, symlink/junction, đuôi lạ, > 2 GB), `chan` thì không ghi gì; không chạy mã game nhập. `reverseBrief` (intake): trường suy tất định + mô hình `reverse_brief` qua handoff; thiếu `world.json` → ERR-INT-09 không gọi mô hình. `engine brief draft|confirm --game <id>`. Thử thật trên bản sao `suong-som-doi-che`: import → 2 vòng hỏi → brief nháp → build thoát 3 → confirm → build z1 qua. 478 test đạt.
 
 **Tình trạng đích G-E1** (SRS-00 §4.3: AC-01-01…07, AC-02-01, 02, AC-04-06, AC-CR01-01, 02, 06, 12):
 
@@ -161,14 +162,13 @@ Cần đọc lại AC-02-01, 02 để biết G-E1 có đòi dữ liệu thật k
 | AC-02-02 | Đạt (procedural "đồi", hai build cùng hash, T-0007…T-0011) |
 | AC-04-06 | Đạt (`engine validate` và guard: lỗi có đường dẫn trường, T-0002, T-0005) |
 | AC-CR01-01 | Đạt (T-0015: intake + `engine new-game --resume`) |
-| AC-CR01-02 | **Thiếu**: nhập thư mục game không brief → brief nháp `ChoXacNhan` (`engine import` + `reverseBrief`, MOD-INT-23) |
+| AC-CR01-02 | Đạt (T-0016: `engine import` + `reverseBrief`; build thoát 3 tới khi `engine brief confirm`) |
 | AC-CR01-06 | **Thiếu**: xuất bản lần hai `publish/2/` (`engine publish`, packager E2) |
 | AC-CR01-12 | Đạt phần CLI (`engine status` + `/resume-game` ≤ 15 dòng, T-0014); cần thử bằng phiên Claude Code thật |
 
 **Phiếu E1 kế tiếp (đề xuất, theo thứ tự khuyến nghị):**
-1. **T-0016 `engine import` + `reverseBrief`** (MOD-INT-23, ALG-CLI-07; AC-CR01-02): nhập thư mục game có sẵn, suy brief nháp qua handoff, build bị chặn tới khi xác nhận.
-2. **T-0017 nguồn thật `world.fetch`** (PSC-WLD-02, 03; AC-02-01): DEM Copernicus + OSM (cần quyết: mạng, `rasterio`/`osmium` hay thay thế thuần Python, cache dữ liệu tải).
-3. **AC-01-05, AC-CR01-06** cần `impact`, phiên bản dữ liệu, `lighting.bake`, packager/publish (phần lớn ở E2): đề xuất Huy xét **hoãn sang E2** khi chốt cổng G-E1.
+1. **T-0017 nguồn thật `world.fetch`** (PSC-WLD-02, 03; AC-02-01): DEM Copernicus + OSM (cần quyết: mạng, `rasterio`/`osmium` hay thay thế thuần Python, cache dữ liệu tải).
+2. **AC-01-05, AC-CR01-06** cần `impact`, phiên bản dữ liệu, `lighting.bake`, packager/publish (phần lớn ở E2): đề xuất Huy xét **hoãn sang E2** khi chốt cổng G-E1.
 - Khung QA (`@gamestudio/qa`) để sau packager/runtime E2; nguồn `qaReports` của `status` đang rỗng.
 - Phiếu nhỏ: tách test nặng (`world-steps.test.ts`, `new-game.test.ts` chạy `uv`/numba thật, ~130 s) sang lệnh `pnpm test:heavy`; `LongPathsEnabled` hoặc `\\?\` trong `gsio` cho bước python nếu game nằm sâu. Sau T-0013, cũng nên viết thêm skill `engine-*` (structure-check cần 10–15, hiện 1).
 

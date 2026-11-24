@@ -125,10 +125,19 @@ export interface IntakeSessionState {
   lastActivityAt?: string;
   /** Đã nhắc phiên sắp huỷ (ngày 27, QT-INT-10). */
   remindedAt?: string;
+  /** DTO-INT-14: 'suy_nguoc' = brief suy từ dữ liệu game có sẵn (PSC-INT-13); thiếu = 'moi'. */
+  kind?: 'moi' | 'suy_nguoc';
+  /** Phiên suy_nguoc: game đích và nguồn từng trường (DTO-INT-16). */
+  reverse?: { gameId: string; fieldSources: Partial<Record<FieldKey, FieldSource>>; sourcePaths: SourcePaths };
   version: number;
   createdAt: string;
   updatedAt: string;
 }
+
+/** DTO-INT-16: nguồn trường của brief suy ngược. */
+export type FieldSource = 'suy_tu_du_lieu' | 'thieu';
+/** Con trỏ dạng '<tệp trong data/>#<JSON Pointer>', vd 'game.json#/title'. */
+export type SourcePaths = Partial<Record<FieldKey, string[]>>;
 
 /** IntakeStore (DDD-01 §3.3, phần cần ở phiếu này). */
 export interface IntakeStore {

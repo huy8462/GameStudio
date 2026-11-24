@@ -6,6 +6,7 @@ export type IntakeErrorCode =
   | 'ERR-INT-04'
   | 'ERR-INT-05'
   | 'ERR-INT-08'
+  | 'ERR-INT-09'
   | 'HANDOFF_PENDING'
   | 'HANDOFF_INVALID'
   | 'SESSION_NOT_FOUND'

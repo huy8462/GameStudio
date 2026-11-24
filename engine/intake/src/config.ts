@@ -9,8 +9,17 @@ export const MAX_ROUNDS = 2;
 export const BRIEF_MAX_WORDS = 400;
 export const REPAIR_ATTEMPTS = 3;
 
-/** CFG-INT-02. */
-export const MAX_OUTPUT_TOKENS = { analyze: 4000, clarify: 1500, brief: 8000, repair: 8000 } as const;
+/** CFG-INT-02, CFG-INT-07. */
+export const MAX_OUTPUT_TOKENS = {
+  analyze: 4000,
+  clarify: 1500,
+  brief: 8000,
+  repair: 8000,
+  reverse_brief: 4000,
+} as const;
+
+/** CFG-INT-07: tóm tắt dữ liệu gửi reverse_brief ≤ 6 KB. */
+export const REVERSE_SUMMARY_MAX_BYTES = 6 * 1024;
 
 /** PSC-INT-02 FIELD_ORDER. */
 export const FIELD_ORDER: readonly FieldKey[] = [

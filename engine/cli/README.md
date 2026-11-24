@@ -36,6 +36,8 @@ Lệnh `engine` (MOD-GEN-16, MOD-CLI-01, IF-CLI-01). Thư viện `commander`; `-
 
 `engine new-game [--from <tệp>] [--image <tệp>]… [--seed] [--resume <sid>] [--answers <tệp>] [--use-defaults] [--confirm] [--games <dir>] [--json]`. Mô hình là phiên Claude Code qua tệp `req-<n>.json`/`res-<n>.json` (skill `engine-intake`), không gọi API. Phiên ở `games/.intake/pending/<sid>/`; mỗi lần chạy phát lại `analyze` + các lượt trả lời đã lưu. Thoát 3: chờ handoff / trả lời / xác nhận (bản xem trước ở `preview/`); `--confirm` ghi `games/<id>/{data,brief/v1}` nguyên tử, thoát 0; 4: dữ liệu, `res` sai, game đã có.
 
+`engine import <thư mục|gói.zip> [--into <id>] [--json]` (T-0016, FR-CLI-11): đọc an toàn (chặn `../`, tuyệt đối, symlink/junction, zip64, mã hoá, > 2 GB, > 20.000 tệp, đuôi lạ), kiểm → `import/1`; `chan` → thoát 4, không ghi gì. Không chạy mã của game nhập. Thiếu brief → brief nháp qua handoff (`reverse_brief`, phiên `.intake/suy-nguoc/`); `engine brief draft|confirm --game <id> [--answers] [--use-defaults]` làm tiếp và xác nhận.
+
 ## Chạy
 
 ```
@@ -47,8 +49,7 @@ pnpm engine build --game games/<id> --json
 
 ## Cấu trúc
 
-- `src/main.ts`: điểm vào; `src/commands/{doctor,validate,build,new-game,status}.ts`: đăng ký lệnh; `src/validate/`, `src/build-cmd/`, `src/new-game/`, `src/status/`, `src/orchestrator/`; `clock.ts` (điểm tiêm Clock), `engine-version.ts`.
-- Thư mục `build-cmd` (không phải `build`): Vitest, ESLint, tsconfig gốc loại `**/build/**`.
+- `src/main.ts`: điểm vào; `src/commands/{doctor,validate,build,new-game,status,import,brief}.ts`: đăng ký lệnh; `src/validate/`, `src/build-cmd/` (không đặt tên `build`: Vitest/ESLint loại `**/build/**`), `src/new-game/`, `src/status/`, `src/import/`, `src/brief/`, `src/orchestrator/`; `clock.ts`, `engine-version.ts`.
 - `src/doctor/`: `run-doctor.ts`, `checks.ts`, `blender-check.ts`, `env-roles.ts`, `versions.ts`, `exec.ts`, `types.ts`, `blender-probe.py`.
 - Test: `*.test.ts` (Vitest, runner giả, không gọi công cụ thật): TST-DEV-03, TST-CLI-02.
 

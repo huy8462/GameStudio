@@ -15,6 +15,7 @@ Tiếp nhận mô tả game (MOD-GEN-13; DDD-01; T-0012): mô tả → phân tí
 | `analyze(input, deps)` | Kiểm đầu vào (ERR-INT-01/02) → mô hình `analyze` → luật hậu kiểm → luật bằng chứng → câu hỏi vòng 1 hoặc sinh luôn |
 | `answer(sessionId, answers, deps, {useDefaults})` | Gộp trả lời; ≤ 2 vòng, ≤ 5 câu/vòng; hết vòng → mặc định `gia_dinh` (trừ mâu thuẫn) → sinh |
 | `generate(sessionId, deps)` | Chạy lại bước sinh (sau handoff) |
+| `reverseBrief(data, {gameId}, deps)` | Brief nháp từ dữ liệu game có sẵn (PSC-INT-13, T-0016): thiếu `game.json`/`world.json` → ERR-INT-09 không gọi mô hình; trường suy tất định + mô hình `reverse_brief` (văn bản kèm nguồn, tóm tắt ≤ 6 KB); thiếu nguồn → `thieu` → hỏi; phiên `suy_nguoc`, brief luôn `ChoXacNhan` |
 | `confirm(sessionId, deps)` | `ChoXacNhan → DaXacNhan`; ERR-INT-08 khi còn mâu thuẫn; `hash` PSC-INT-09 + `brief/v1/hash.txt` |
 
 Kết quả `GeneratedBundle.files` (khoá tương đối `games/<id>/`): `data/{game,world,budgets,palette}.json`, `data/entities/{npc,animals}/*.json`, `brief/v1/{brief.json, game-brief.md, game-brief-phu-luc.md?}`. Ghi ra đĩa là việc của lệnh `engine new-game` (T-0013); `FileIntakeStore` (`./node`) lưu `session.json` nguyên tử.
@@ -28,8 +29,8 @@ Kết quả `GeneratedBundle.files` (khoá tương đối `games/<id>/`): `data/
 
 ## Test
 
-`src/intake.test.ts` (AC-01-01, 02, 03, 06, 07; TC-INT-09, 13), `src/llm/handoff.test.ts` (TC-INT-12).
+`src/intake.test.ts` (AC-01-01, 02, 03, 06, 07; TC-INT-09, 13), `src/llm/handoff.test.ts` (TC-INT-12), `src/reopen.test.ts` (TC-INT-16), `src/reverse/reverse.test.ts` (TC-INT-17).
 
 ## Chưa có
 
-Style bible; đề xuất thay đổi/áp/impact; mở lại/hết hạn phiên; suy brief; ước lượng quy mô.
+Style bible; đề xuất thay đổi/áp/impact; ước lượng quy mô.

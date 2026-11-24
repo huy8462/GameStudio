@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gamestudio.local/schema/import/1.json",
+  "title": "import/1: báo cáo kiểm nhập game (SCH-RTM-10, DTO-CLI-06, FR-CLI-11)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "result",
+    "gameId",
+    "engineVersion",
+    "schemaVersion",
+    "hasBrief",
+    "counts",
+    "assets",
+    "problems"
+  ],
+  "properties": {
+    "schema": { "const": "import/1" },
+    "result": { "enum": ["ok", "canNangCap", "chan"] },
+    "gameId": { "type": ["string", "null"] },
+    "engineVersion": { "type": ["string", "null"] },
+    "schemaVersion": { "type": ["integer", "null"] },
+    "hasBrief": { "type": "boolean" },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["zones", "npcs", "animals", "assets"],
+      "properties": {
+        "zones": { "type": "integer", "minimum": 0 },
+        "npcs": { "type": "integer", "minimum": 0 },
+        "animals": { "type": "integer", "minimum": 0 },
+        "assets": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "assets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["missingProvenance", "pendingReview"],
+      "properties": {
+        "missingProvenance": { "type": "array", "items": { "type": "string" } },
+        "pendingReview": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "problems": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "path", "message"],
+        "properties": {
+          "code": { "type": "string", "minLength": 1 },
+          "path": { "type": "string" },
+          "message": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "migrateFrom": { "type": "integer", "minimum": 0 },
+    "brief": {
+      "description": "Bổ sung T-0016 (ngoài SCH-RTM-10): kết quả suy brief nháp khi game nhập chưa có brief (PSC-INT-13)",
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": { "type": "string" },
+        "sessionId": { "type": "string" },
+        "preview": { "type": "string" },
+        "questions": { "type": "array" },
+        "fieldSources": { "type": "object" },
+        "handoff": { "type": "object" },
+        "error": { "type": "object" }
+      }
+    }
+  }
+}

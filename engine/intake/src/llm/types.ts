@@ -3,7 +3,7 @@
 // Không có trường khoá/token nào ở đây.
 import type { Result } from '../result.js';
 
-export type LlmTask = 'analyze' | 'clarify' | 'brief' | 'repair';
+export type LlmTask = 'analyze' | 'clarify' | 'brief' | 'repair' | 'reverse_brief';
 
 export type ContentPart =
   { type: 'text'; text: string } | { type: 'image'; name: string; mime: string; bytes: Uint8Array };

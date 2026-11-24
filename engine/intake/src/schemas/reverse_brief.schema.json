@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gamestudio.local/schema/intake/reverse_brief/1.json",
+  "title": "Đầu ra mô hình reverse_brief (MOD-INT-23, PSC-INT-13)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fields"],
+  "properties": {
+    "fields": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "genre": { "$ref": "#/$defs/text" },
+        "artStyle": { "$ref": "#/$defs/text" },
+        "player": { "$ref": "#/$defs/text" },
+        "setting.place": { "$ref": "#/$defs/text" },
+        "setting.era": { "$ref": "#/$defs/text" },
+        "setting.season": { "$ref": "#/$defs/text" },
+        "coreLoop": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["value", "sources"],
+          "properties": {
+            "value": { "type": "array", "minItems": 3, "maxItems": 5, "items": { "type": "string", "minLength": 1 } },
+            "sources": { "$ref": "#/$defs/sources" }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sources": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "text": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "sources"],
+      "properties": {
+        "value": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "sources": { "$ref": "#/$defs/sources" }
+      }
+    }
+  }
+}

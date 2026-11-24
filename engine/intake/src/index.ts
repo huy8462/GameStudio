@@ -12,6 +12,10 @@ export {
   reopenSession,
   type Step,
 } from './session.js';
+export { REQUIRED_DATA, reverseBrief, toReverseResult, type ReverseBriefResult } from './reverse/reverse-brief.js';
+export { deriveFields } from './reverse/derive.js';
+export { coveredBy, summarizeData, type DataSummary } from './reverse/summary.js';
+export { buildReverseBrief, UNKNOWN } from './reverse/bundle.js';
 export { applyPostRules } from './analyze/post-rules.js';
 export { enforceEvidence } from './analyze/evidence.js';
 export { validateInput } from './analyze/validate-input.js';
@@ -33,6 +37,7 @@ export type {
   Clock,
   Deps,
   FieldKey,
+  FieldSource,
   FieldState,
   FieldStatus,
   GameDataFiles,
@@ -46,4 +51,5 @@ export type {
   IntakeStatus,
   IntakeStore,
   Result,
+  SourcePaths,
 } from './types.js';

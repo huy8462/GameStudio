@@ -8,6 +8,7 @@ import { applyAnswers, fillDefaults, hasConflict } from './clarify/answer.js';
 import { selectQuestions } from './clarify/select.js';
 import { FIELD_ORDER, isRequired, MAX_ROUNDS } from './config.js';
 import { generateBundle } from './generate/generate.js';
+import { reverseBundle } from './reverse/bundle.js';
 import { callModel } from './llm/call.js';
 import type { ContentPart } from './llm/types.js';
 import { SCHEMAS } from './schemas/index.js';
@@ -30,7 +31,7 @@ export interface Step {
 
 const iso = (deps: Deps): string => new Date(deps.clock.now()).toISOString();
 
-async function persist(s: IntakeSessionState, deps: Deps): Promise<IntakeSessionState> {
+export async function persist(s: IntakeSessionState, deps: Deps): Promise<IntakeSessionState> {
   const next = { ...s, version: s.version + 1, updatedAt: iso(deps) };
   await deps.store.save(next);
   return next;
@@ -48,7 +49,7 @@ function demoteModelAssumptions(a: IntakeAnalysis): IntakeAnalysis {
 }
 
 /** Sau mỗi lượt: hỏi tiếp, hoặc điền mặc định rồi sinh (STM-INT-01). */
-async function advance(s: IntakeSessionState, deps: Deps): Promise<Result<Step>> {
+export async function advance(s: IntakeSessionState, deps: Deps): Promise<Result<Step>> {
   const round = s.analysis.round + 1;
   const qs =
     round <= MAX_ROUNDS
@@ -78,7 +79,8 @@ async function advance(s: IntakeSessionState, deps: Deps): Promise<Result<Step>>
       ...filled.assumptions.filter((x) => !s.assumptions.some((y) => y.field === x.field)),
     ],
   };
-  const bundle = await generateBundle(ready, deps);
+  // Phiên suy_nguoc (PSC-INT-13): brief dựng từ trường đã chốt, không gọi mô hình 'brief', không sinh dữ liệu.
+  const bundle = ready.kind === 'suy_nguoc' ? reverseBundle(ready) : await generateBundle(ready, deps);
   if (!bundle.ok) {
     if (bundle.error.code !== 'HANDOFF_PENDING') await persist({ ...ready, status: 'Loi' }, deps);
     return bundle;
