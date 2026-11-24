@@ -217,6 +217,9 @@ importers:
 
   engine/cli:
     dependencies:
+      '@gamestudio/intake':
+        specifier: workspace:*
+        version: link:../intake
       '@gamestudio/rng':
         specifier: workspace:*
         version: link:../shared/rng

@@ -3,8 +3,9 @@ description: Tạo game mới từ mô tả - sinh brief một trang và dữ li
 argument-hint: <mô tả game>
 ---
 
-Tạo game từ mô tả: $ARGUMENTS (QĐ-03, QĐ-11; SRS-01, TSD-01, DDD-01 EP-INT-01).
+Tạo game từ mô tả: $ARGUMENTS (QĐ-03, QĐ-11; SRS-01, TSD-01, DDD-01 EP-INT-01; T-0013).
 
-Trạng thái: **chưa có ở E0**. `@gamestudio/intake` và `engine new-game` làm ở E1. Nếu `node engine/cli/dist/main.js new-game --help` báo lệnh không tồn tại, dừng và báo "cần phiếu E1".
-
-Khi đã có: chạy `engine new-game --json` với `HandoffLlmClient`; trình brief một trang; **không** đổi thể loại hay phong cách người dùng mô tả; không build khi brief chưa `DaXacNhan`.
+1. Ghi mô tả nguyên văn vào tệp tạm (UTF-8), chạy `pnpm engine new-game --from <tệp> --json`.
+2. Làm theo skill `engine-intake`: trả lời từng `req-<n>.json` bằng `res-<n>.json`, chạy lại `--resume <sessionId>`; đưa câu hỏi làm rõ cho người dùng nguyên văn.
+3. Trình brief một trang (`preview`); **không** đổi thể loại hay phong cách người dùng mô tả. Chỉ `--confirm` khi người dùng xác nhận.
+4. Sau xác nhận: `pnpm engine build --game games/<id>` (không build khi brief chưa `DaXacNhan`, guard thoát 3).

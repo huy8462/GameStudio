@@ -143,3 +143,26 @@ describe('cache-index', () => {
     expect(readCacheIndex(b)).toEqual([]);
   });
 });
+
+describe('cache: tên thư mục mục cache (MAX_PATH Windows, T-0013)', () => {
+  it('dùng 24 ký tự hex đầu của inputHash; get() vẫn so đủ inputHash', async () => {
+    const { StepCache, ENTRY_HEX } = await import('./cache.js');
+    const c = new StepCache(tmp());
+    const h = `sha256:${'ab'.repeat(32)}`;
+    expect(ENTRY_HEX).toBe(24);
+    expect(c.entryDir('world.heightfield', h).endsWith(join('world.heightfield', 'ab'.repeat(12)))).toBe(true);
+    const { outDir } = c.prepareTmp('s', h, 'r1');
+    writeFileSync(join(outDir, 'x.txt'), 'x');
+    c.commit('s', h, outDir, {
+      inputHash: h,
+      outputHash: h,
+      createdAt: 't',
+      durationS: 0,
+      host: 'h',
+      stepVersion: '1',
+    });
+    expect(c.get('s', h)?.inputHash).toBe(h);
+    const sameprefix = `sha256:${'ab'.repeat(12)}${'cd'.repeat(20)}`;
+    expect(c.get('s', sameprefix)).toBeUndefined(); // trùng tiền tố → miss, không dùng nhầm
+  });
+});

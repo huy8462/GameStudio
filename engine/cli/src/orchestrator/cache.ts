@@ -6,11 +6,18 @@ import type { CacheMeta, StepId } from './types.js';
 
 const hex = (hash: string): string => hash.replace(/^sha256:/, '');
 
+/**
+ * Tên thư mục mục cache = 24 ký tự hex đầu của inputHash (96 bit), không phải đủ 64: đường dẫn đầy đủ phải dưới
+ * MAX_PATH 260 của Windows, vì Python (bước build) không đọc được đường dẫn dài hơn khi LongPathsEnabled tắt (T-0013
+ * thử thật bắt được). meta.json vẫn giữ đủ inputHash và get() so đủ, nên trùng tiền tố chỉ thành cache miss.
+ */
+export const ENTRY_HEX = 24;
+
 export class StepCache {
   constructor(readonly cacheDir: string) {}
 
   entryDir(step: StepId, inputHash: string): string {
-    return join(this.cacheDir, step, hex(inputHash));
+    return join(this.cacheDir, step, hex(inputHash).slice(0, ENTRY_HEX));
   }
 
   outDir(step: StepId, inputHash: string): string {

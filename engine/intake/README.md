@@ -17,7 +17,7 @@ Tiếp nhận mô tả game (MOD-GEN-13; DDD-01; T-0012): mô tả → phân tí
 | `generate(sessionId, deps)` | Chạy lại bước sinh (sau handoff) |
 | `confirm(sessionId, deps)` | `ChoXacNhan → DaXacNhan`; ERR-INT-08 khi còn mâu thuẫn; `hash` PSC-INT-09 + `brief/v1/hash.txt` |
 
-Kết quả `GeneratedBundle.files` (khoá tương đối `games/<id>/`): `data/{game,world,budgets,palette}.json`, `data/entities/{npc,animals}/*.json`, `brief/v1/{brief.json, game-brief.md, game-brief-phu-luc.md?}`. Ghi ra đĩa là việc của lệnh `engine new-game` (phiếu sau).
+Kết quả `GeneratedBundle.files` (khoá tương đối `games/<id>/`): `data/{game,world,budgets,palette}.json`, `data/entities/{npc,animals}/*.json`, `brief/v1/{brief.json, game-brief.md, game-brief-phu-luc.md?}`. Ghi ra đĩa là việc của lệnh `engine new-game` (T-0013); `FileIntakeStore` (`./node`) lưu `session.json` nguyên tử.
 
 ## Quy tắc chính
 
@@ -32,4 +32,4 @@ Kết quả `GeneratedBundle.files` (khoá tương đối `games/<id>/`): `data/
 
 ## Chưa có
 
-`engine new-game`, `FileIntakeStore`, skill `engine-intake`; style bible; đề xuất thay đổi/áp/impact; mở lại/hết hạn phiên; suy brief; ước lượng quy mô.
+Style bible; đề xuất thay đổi/áp/impact; mở lại/hết hạn phiên; suy brief; ước lượng quy mô.

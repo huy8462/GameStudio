@@ -26,9 +26,13 @@ Lệnh `engine` (MOD-GEN-16, MOD-CLI-01, IF-CLI-01). Thư viện `commander`; `-
 
 - Guards (`src/build-cmd/guards.ts`): brief `brief/v<n>` lớn nhất chưa có `hash.txt` hoặc chưa có brief → 3 (ERR-INT-06); dữ liệu sai schema → 4; `engineVersion` không khớp kiểu caret với `ENGINE_VERSION` → 4 (ERR-RTM-04).
 - `src/orchestrator/runBuild` (PSC-CLI-01): DAG `step.json` (`step/1`) tô-pô ổn định, `perZone` nhân theo zone, `inputHash` (PSC-GEN-02), hit cache bỏ qua, song song ≤ min(4, lõi/2), bước lỗi huỷ nhánh phụ thuộc.
-- Cache `<game>/build/cache/<bước>/<hex>/{out/, meta.json}`, chỉ mục `cache/index.json` (SCH-RTM-09); báo cáo gộp `build/reports/build-<zone|all>.json` (`report/1`).
+- Cache `<game>/build/cache/<bước>/<24 hex đầu inputHash>/{out/, meta.json}` (ngắn để dưới MAX_PATH Windows), chỉ mục `cache/index.json` (SCH-RTM-09); báo cáo gộp `build/reports/build-<zone|all>.json` (`report/1`).
 - Runner node: `export function run(ctx)` trong tiến trình. Runner python: `uv run python -I <entry> --ctx ctx.json`, stdout `PROGRESS <0-100> <msg>`, `timeoutS` diệt cả cây tiến trình; ghi tệp với `newline="\n"`. Blender: phiếu sau.
 - Thoát 0/1/2 theo kết quả; bước lỗi giữ mã 3–6 của bước, còn lại 10. Bước mẫu: `src/orchestrator/fixtures/`.
+
+## `engine new-game` (E1, T-0013; DDD-01 EP-INT-01, ADR-035)
+
+`engine new-game [--from <tệp>] [--image <tệp>]… [--seed] [--resume <sid>] [--answers <tệp>] [--use-defaults] [--confirm] [--games <dir>] [--json]`. Mô hình là phiên Claude Code qua tệp `req-<n>.json`/`res-<n>.json` (skill `engine-intake`), không gọi API. Phiên ở `games/.intake/pending/<sid>/`; mỗi lần chạy phát lại `analyze` + các lượt trả lời đã lưu. Thoát 3: chờ handoff / trả lời / xác nhận (bản xem trước ở `preview/`); `--confirm` ghi `games/<id>/{data,brief/v1}` nguyên tử, thoát 0; 4: dữ liệu, `res` sai, game đã có.
 
 ## Chạy
 
@@ -41,7 +45,7 @@ pnpm engine build --game games/<id> --json
 
 ## Cấu trúc
 
-- `src/main.ts`: điểm vào; `src/commands/{doctor,validate,build}.ts`: đăng ký lệnh; `src/validate/`, `src/build-cmd/`, `src/orchestrator/`; `clock.ts` (điểm tiêm Clock), `engine-version.ts`.
+- `src/main.ts`: điểm vào; `src/commands/{doctor,validate,build,new-game}.ts`: đăng ký lệnh; `src/validate/`, `src/build-cmd/`, `src/new-game/`, `src/orchestrator/`; `clock.ts` (điểm tiêm Clock), `engine-version.ts`.
 - Thư mục `build-cmd` (không phải `build`): Vitest, ESLint, tsconfig gốc loại `**/build/**`.
 - `src/doctor/`: `run-doctor.ts`, `checks.ts`, `blender-check.ts`, `env-roles.ts`, `versions.ts`, `exec.ts`, `types.ts`, `blender-probe.py`.
 - Test: `*.test.ts` (Vitest, runner giả, không gọi công cụ thật): TST-DEV-03, TST-CLI-02.
