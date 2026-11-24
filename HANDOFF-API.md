@@ -125,10 +125,11 @@ Thứ tự phiếu đề xuất (mỗi phiếu một phiên Claude Code, `/clear
 
 - **T-0008** (24/11/2026, `docs/tickets/T-0008.md`; Huy chọn numba): bước `terrain.erode` (EP-WLD-03, PSC-WLD-06, CFG-WLD-04). Xói mòn hạt + nhiệt bằng numba 0.68.1 (llvmlite 0.50.0, chạy với numpy 2.5.5), `parallel=False, fastmath=False`; vị trí hạt từ `Pcg32(ctx.seed)`. Đầu ra `hf/` đầy đủ + `flow.r8`, `sediment.r8`. 251×251 mất 0,14 s (JIT nguội 4,3 s), 1001×1001 mất 3,8 s. `versions.json` + doctor có numpy, numba. 410 test TS + 28 pytest đạt. Lệch: tham số CFG ở `step.json params`; PCG chạy ở Python thay vì trong nhân; `erosion.mask` chưa hỗ trợ; doctor kiểm bằng `uv pip show` (lỗi nối đối số qua `cmd.exe` trong `doctor/exec.ts`, để phiếu nhỏ sau).
 
-**Phiếu E1 kế tiếp (đề xuất):**
-- **T-0009**: `terrain.mesh` (node, EP-WLD-04, PSC-WLD-07, MOD-WLD-07, DTO-WLD-10): đọc `hf/` của `terrain.erode`, chunk 64 m, LOD0–3, skirt, UV0/UV2, `collider/height-lod1.r32`, BVH; xuất `.glb`. Bước node đầu tiên trong `engine/build/steps/`, cần quyết cách ghi glTF (`@gltf-transform/core` đã có trong `versions.json` là CLI; đề xuất thư viện core ghim bản) và `meshoptimizer` cho LOD. Lưu ý: ESLint/Vitest/tsconfig gốc loại `**/build/**`, nên bước TS trong `engine/build/steps` cần cấu hình lint/test riêng (gói pnpm `engine/build/steps/*` hoặc mở ngoại lệ).
-- **T-0010**: `terrain.splat` (python, EP-WLD-05, PSC-WLD-08, DTO-WLD-03, 06): trọng số lớp theo dốc/độ cao/mask, `splat-0.png`, `surface.png`, `layers.json`. Phụ thuộc bước `materials` (EP-WLD-05 `deps`) chưa có: đề xuất tạm bỏ dep `materials` hoặc làm bước giả.
-- **Phiếu nhỏ (Sonnet, low)**: sửa `engine/cli/src/doctor/exec.ts` trích dẫn đối số đúng khi qua `cmd.exe`.
+- **T-0009** (24/11/2026, `docs/tickets/T-0009.md`, Sonnet low): sửa `engine doctor` trên Windows (`doctor/win-spawn.ts`): tìm chương trình theo PATH + PATHEXT, `.exe` chạy trực tiếp, shim `.cmd` qua `cmd.exe` với trích dẫn CreateProcess + thoát `^`. Đối số có dấu cách hoặc nháy không còn bị cắt vụn. numpy/numba quay về kiểm bằng `python -c`. 421 test đạt, `pnpm doctor` thoát 0.
+
+**Phiếu E1 kế tiếp (đề xuất):** (đánh số tuần tự: `terrain.mesh` thành **T-0010**, `terrain.splat` thành **T-0011**)
+- **T-0010**: `terrain.mesh` (node, EP-WLD-04, PSC-WLD-07, MOD-WLD-07, DTO-WLD-10): đọc `hf/` của `terrain.erode`, chunk 64 m, LOD0–3, skirt, UV0/UV2, `collider/height-lod1.r32`, BVH; xuất `.glb`. Bước node đầu tiên trong `engine/build/steps/`, cần quyết cách ghi glTF (`@gltf-transform/core` đã có trong `versions.json` là CLI; đề xuất thư viện core ghim bản) và `meshoptimizer` cho LOD. Lưu ý: ESLint/Vitest/tsconfig gốc loại `**/build/**`, nên bước TS trong `engine/build/steps` cần cấu hình lint/test riêng (gói pnpm `engine/build/steps/*` hoặc mở ngoại lệ).
+- **T-0011**: `terrain.splat` (python, EP-WLD-05, PSC-WLD-08, DTO-WLD-03, 06): trọng số lớp theo dốc/độ cao/mask, `splat-0.png`, `surface.png`, `layers.json`. Phụ thuộc bước `materials` (EP-WLD-05 `deps`) chưa có: đề xuất tạm bỏ dep `materials` hoặc làm bước giả.
 - `intake` (`HandoffLlmClient`, DDD-01) vẫn làm song song được.
 
 **Việc hoãn từ E0 (m2) đưa vào E1:**

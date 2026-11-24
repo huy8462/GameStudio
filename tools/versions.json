@@ -14,15 +14,15 @@
   "numpy": {
     "version": "2.5.5",
     "match": "exact",
-    "check": ["uv", "pip", "show", "numpy"],
-    "parse": "Version: (\\d+\\.\\d+\\.\\d+)",
+    "check": ["uv", "run", "--no-sync", "python", "-c", "import numpy; print(\"numpy\", numpy.__version__)"],
+    "parse": "numpy (\\d+\\.\\d+\\.\\d+)",
     "timeoutS": 30
   },
   "numba": {
     "version": "0.68.1",
     "match": "exact",
-    "check": ["uv", "pip", "show", "numba"],
-    "parse": "Version: (\\d+\\.\\d+\\.\\d+)",
+    "check": ["uv", "run", "--no-sync", "python", "-c", "import numba; print(\"numba\", numba.__version__)"],
+    "parse": "numba (\\d+\\.\\d+\\.\\d+)",
     "timeoutS": 60
   },
   "blender": {
