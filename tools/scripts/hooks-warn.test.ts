@@ -1,9 +1,10 @@
 // TST-DEV-01 (H-03, H-05 cảnh báo), TST-DEV-02 (thời gian), lỗi nội bộ không chặn nhầm.
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { TMP, bash, file, read, run, write } from './hooks-harness.js';
+import { ROOT, TMP, bash, file, read, run, write } from './hooks-harness.js';
 
 interface HookOut {
   hookSpecificOutput: { hookEventName: string; additionalContext: string };
@@ -24,6 +25,20 @@ describe('H-03, H-05 cảnh báo (PostToolUse)', () => {
     file('README.md', '# x');
     expect(run('h03-schema', write('README.md')).stdout).toBe('');
   });
+  it('có validators.cjs (E1): dữ liệu sai schema → cảnh báo có instancePath; đúng → im lặng', () => {
+    const real = readFileSync(join(ROOT, 'engine/schema/dist/validators.cjs'), 'utf8');
+    file('engine/schema/dist/validators.cjs', real);
+    const game = JSON.parse(readFileSync(join(ROOT, 'games/_template/data/game.json'), 'utf8')) as Record<string, unknown>;
+    file('games/g2/data/game.json', JSON.stringify({ ...game, camera: { mode: 'top_down' } }));
+    const r = run('h03-schema', write('games/g2/data/game.json'));
+    expect(r.code).toBe(0);
+    const ctx = (JSON.parse(r.stdout) as HookOut).hookSpecificOutput.additionalContext;
+    expect(ctx).toContain('sai schema game');
+    expect(ctx).toContain('/camera/mode');
+    file('games/g2/data/game.json', JSON.stringify(game));
+    expect(run('h03-schema', write('games/g2/data/game.json')).stdout).toBe('');
+  });
+
   it('sửa budgets.json, .glsl → nhắc /perf-snapshot; tệp khác → im lặng', () => {
     expect(run('h05-perf', write('games/g1/data/budgets.json')).stdout).toContain('/perf-snapshot');
     expect(run('h05-perf', write('engine/runtime/src/render/water.glsl')).stdout).toContain('/perf-snapshot');

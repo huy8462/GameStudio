@@ -9,6 +9,10 @@
       "types": "./dist/src/index.d.ts",
       "default": "./dist/src/index.js"
     },
+    "./validators": {
+      "import": "./dist/validators.js",
+      "require": "./dist/validators.cjs"
+    },
     "./schemas/*": "./schemas/*"
   },
   "files": [
@@ -16,7 +20,7 @@
     "schemas"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && node scripts/gen-validators.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

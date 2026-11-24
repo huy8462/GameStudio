@@ -205,6 +205,9 @@ importers:
 
   engine/cli:
     dependencies:
+      '@gamestudio/schema':
+        specifier: workspace:*
+        version: link:../schema
       commander:
         specifier: 15.1.0
         version: 15.1.0

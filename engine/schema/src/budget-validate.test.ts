@@ -61,9 +61,11 @@ describe('schema budgets/1', () => {
   it('kindByPath và validateFiles theo bảng DDD-00 §3.3', () => {
     expect(kindByPath('data/budgets.json')).toBe('budgets');
     expect(kindByPath('data\\budgets.json')).toBe('budgets');
-    expect(kindByPath('data/game.json')).toBeUndefined();
-    const out = validateFiles({ 'data/budgets.json': tpl(), 'data/game.json': {} });
-    expect(Object.keys(out)).toEqual(['data/budgets.json']);
+    expect(kindByPath('data/game.json')).toBe('game');
+    expect(kindByPath('data/entities/player.json')).toBeUndefined();
+    const out = validateFiles({ 'data/budgets.json': tpl(), 'data/game.json': {}, 'README.md': '' });
+    expect(Object.keys(out)).toEqual(['data/budgets.json', 'data/game.json']);
     expect(out['data/budgets.json']).toEqual([]);
+    expect(out['data/game.json']?.length).toBeGreaterThan(0);
   });
 });

@@ -11,14 +11,23 @@ Dữ liệu game: schema, chuẩn tắc hoá, băm, đánh giá ngân sách (MOD
 | `evaluate(metrics, limits, fpsTarget?)`, `worst` | MOD-GEN-09, ALG-GEN-03 | ≤ 0,9 pass, ≤ 1,0 warn, > 1,0 fail; fps ≥ mục tiêu pass, ≥ 0,9× warn |
 | `validate(kind, data)`, `validateFiles`, `kindByPath` | MOD-GEN-07 | Ajv 2020-12; lỗi `{instancePath, keyword, message}` |
 
-Schema: `schemas/<tên>/<major>.json`, `$id` = `https://gamestudio.local/schema/<tên>/<major>.json`. Hiện có `budgets/1` (SCH-GEN-03, SCH-RTM-03): 4 tier đủ chỉ số SRS-04 §6.3 + `maxRenderDpr`, `behaviorLod`, `combat`, và `a56Baseline` (thông tin, không phải giới hạn).
+## Thêm ở T-0002
 
-Mẫu: `games/_template/data/budgets.json` (baseline A56 từ G-E0).
+| API | Mã | Việc |
+|---|---|---|
+| `parsePointer`, `formatPointer`, `pointerGet/Has/Set/Add/Remove` | RFC 6901 | Con trỏ JSON, bất biến |
+| `applyPatch`, `invertPatch`, `touchedFilesOf` | MOD-GEN-06 | JSON Patch RFC 6902, bất biến, báo tệp bị chạm |
+| `SCHEMA_DOCS`, `ROOT_IDS` | MOD-GEN-07 | Danh mục schema cho Ajv |
+
+Schema: `schemas/<tên>/<major>.json`, `$id` = `https://gamestudio.local/schema/<tên>/<major>.json`. Hiện có `common/1`, `budgets/1` (SCH-GEN-03, SCH-RTM-03), `game/1` (SCH-GEN-01, SCH-CBT-01 phần `features`), `world/1` (+ `defs-1`, `parts-1`; SCH-GEN-02, SCH-WLD-01), `palette/1` (8–16 màu có vai trò, BR-05.2). `schemaVersion` là số nguyên.
+
+Build: `tsc` rồi `scripts/gen-validators.mjs` sinh Ajv standalone `dist/validators.{js,cjs}` (MOD-RTM-04) cho runtime và hook H-03.
+
+Mẫu hợp lệ: `games/_template/data/{budgets,game,world,palette}.json`.
 
 ## Chưa có (phiếu sau)
-- Schema `game`, `world`, `palette`, `entities/*`, `dialogue`, `recipe`, `provenance`, `manifest`, `report`, `status`.
-- `patch.ts` (MOD-GEN-06), `impact.ts` (MOD-GEN-08), `migrate` (MOD-RTM-03).
-- Ajv standalone biên dịch sẵn `dist/validators.{js,cjs}` cho runtime và hook H-03 (MOD-RTM-04).
+- Schema `entities/*`, `dialogue`, `recipe`, `provenance`, `manifest`, `report`, `status`.
+- `impact.ts` (MOD-GEN-08), `migrate` (MOD-RTM-03).
 - Kiểu TS sinh từ schema (`json-schema-to-typescript`).
 
 ## Lệch DDD

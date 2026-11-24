@@ -1,0 +1,57 @@
+{
+  "$schema": "../../../engine/schema/schemas/world/1.json",
+  "schemaVersion": 1,
+  "seed": 1,
+  "source": "procedural",
+  "procedural": { "preset": "doi", "maxHeight": 40, "roughness": 0.5, "features": [] },
+  "heightScale": 1,
+  "smoothing": 0,
+  "erosion": { "iterations": 40, "strength": 0.3 },
+  "playArea": [
+    [-250, -250],
+    [250, -250],
+    [250, 250],
+    [-250, 250]
+  ],
+  "zones": [
+    {
+      "id": "z1",
+      "seed": 1,
+      "polygon": [
+        [-250, -250],
+        [250, -250],
+        [250, 250],
+        [-250, 250]
+      ],
+      "neighbors": []
+    }
+  ],
+  "water": [],
+  "vegetation": [],
+  "placementRules": [],
+  "placedObjects": [],
+  "regions": [
+    {
+      "id": "spawn",
+      "kind": "spawn",
+      "polygon": [
+        [-5, -5],
+        [5, -5],
+        [5, 5],
+        [-5, 5]
+      ]
+    }
+  ],
+  "timeOfDay": [
+    { "id": "sang", "hour": 7, "baked": true, "sun": { "elevation": 15, "azimuth": 100 } },
+    { "id": "trua", "hour": 12, "baked": true, "sun": { "elevation": 70, "azimuth": 180 } },
+    { "id": "hoang-hon", "hour": 18, "baked": true, "sun": { "elevation": 5, "azimuth": 260 } },
+    { "id": "dem", "hour": 22, "baked": false, "sun": { "elevation": -20, "azimuth": 200 } }
+  ],
+  "dayNightCycle": { "enabled": false },
+  "atmosphere": {},
+  "postFx": { "toneMapping": "aces", "bloom": false },
+  "weather": { "wind": 0.2 },
+  "spawns": [],
+  "ambience": []
+}

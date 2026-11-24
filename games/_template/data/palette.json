@@ -1,0 +1,17 @@
+{
+  "$schema": "../../../engine/schema/schemas/palette/1.json",
+  "schemaVersion": 1,
+  "status": "ChoDuyet",
+  "colors": [
+    { "id": "nen-dat", "hex": "#6b5b45", "role": "nen", "name": "Đất" },
+    { "id": "nen-co", "hex": "#5f7a3a", "role": "nen", "name": "Cỏ" },
+    { "id": "nen-da", "hex": "#8a8679", "role": "nen", "name": "Đá" },
+    { "id": "nen-nuoc", "hex": "#3d6b78", "role": "nen", "name": "Nước" },
+    { "id": "nhan-chinh", "hex": "#c8553d", "role": "nhan", "name": "Nhấn chính" },
+    { "id": "nhan-phu", "hex": "#e0a458", "role": "nhan", "name": "Nhấn phụ" },
+    { "id": "ui-nen", "hex": "#1e2124", "role": "ui", "name": "Nền UI" },
+    { "id": "ui-chu", "hex": "#f2efe6", "role": "ui", "name": "Chữ UI" },
+    { "id": "anh-sang-ngay", "hex": "#fff1d6", "role": "anh_sang", "name": "Nắng" },
+    { "id": "anh-sang-dem", "hex": "#7d8fb3", "role": "anh_sang", "name": "Trăng" }
+  ]
+}

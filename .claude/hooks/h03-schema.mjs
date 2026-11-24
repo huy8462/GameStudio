@@ -1,5 +1,6 @@
 // H-03 (cảnh báo): ghi games/**/data/**/*.json → kiểm schema (ALG-DEV-05, PSC-DEV-05, FR-DEV-18).
-// Validator Ajv biên dịch sẵn (engine/schema/dist/validators.cjs) có từ E1. Trước đó chỉ kiểm JSON hợp lệ.
+// Validator Ajv biên dịch sẵn engine/schema/dist/validators.cjs (MOD-RTM-04, sinh khi build @gamestudio/schema).
+// Chưa build gói (dist chưa có) → chỉ kiểm JSON hợp lệ. Kind chưa có schema → im lặng.
 import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gamestudio.local/schema/common/1.json",
+  "title": "Kiểu dùng chung cho schema dữ liệu game (DTO-GEN-03, TSD-00 §5.2)",
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "seed": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+    "tier": { "enum": ["thap", "vua", "cao", "toi_da"] },
+    "assetRef": {
+      "type": "string",
+      "pattern": "^asset:[a-z0-9][a-z0-9-]*@\\d+$",
+      "description": "asset:<id>@<version> (FR-AST-37)"
+    },
+    "audioRef": { "type": "string", "pattern": "^audio:[a-z0-9][a-z0-9-]*@\\d+$" },
+    "color": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+    "point2": {
+      "type": "array",
+      "prefixItems": [{ "type": "number" }, { "type": "number" }],
+      "items": false,
+      "minItems": 2
+    },
+    "range": { "$ref": "#/$defs/point2", "description": "[min, max]" },
+    "vec3": {
+      "type": "array",
+      "prefixItems": [{ "type": "number" }, { "type": "number" }, { "type": "number" }],
+      "items": false,
+      "minItems": 3
+    },
+    "polygon": {
+      "description": "Đa giác [x, z] mét, ≥ 3 đỉnh. 'Không tự cắt' kiểm ở build (shapely) và web (polygon-clipping), không kiểm bằng JSON Schema (TSD-02 SCH-WLD-01).",
+      "type": "array",
+      "minItems": 3,
+      "items": { "$ref": "#/$defs/point2" }
+    }
+  }
+}

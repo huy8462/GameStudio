@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gamestudio.local/schema/world/defs-1.json",
+  "title": "Kiểu con của world.json (SCH-WLD-01, DTO-WLD-01, DTO-WLD-09)",
+  "$defs": {
+    "seed": { "$ref": "../common/1.json#/$defs/seed" },
+    "polygon": { "$ref": "../common/1.json#/$defs/polygon" },
+    "zone": {
+      "type": "object",
+      "required": ["id", "polygon"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "../common/1.json#/$defs/id" },
+        "polygon": { "$ref": "../common/1.json#/$defs/polygon" },
+        "seed": { "$ref": "../common/1.json#/$defs/seed" },
+        "neighbors": { "type": "array", "items": { "$ref": "../common/1.json#/$defs/id" }, "uniqueItems": true },
+        "budgetOverride": {
+          "type": "object",
+          "description": "Gộp nông theo khoá vào budgets.tiers.<tier> (SCH-RTM-03)"
+        },
+        "tiers": { "type": "array", "items": { "$ref": "../common/1.json#/$defs/tier" }, "uniqueItems": true }
+      }
+    },
+    "water": {
+      "type": "object",
+      "required": ["id", "level", "kind"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "../common/1.json#/$defs/id" },
+        "polygon": { "$ref": "../common/1.json#/$defs/polygon" },
+        "maskRef": { "type": "string" },
+        "level": { "type": "number" },
+        "depth": { "type": "number", "minimum": 0 },
+        "flow": { "type": "number", "minimum": 0 },
+        "kind": { "enum": ["ao", "ho", "song", "suoi", "bien", "ruong_nuoc"] }
+      },
+      "oneOf": [{ "required": ["polygon"] }, { "required": ["maskRef"] }]
+    },
+    "vegLayer": { "$ref": "parts-1.json#/$defs/vegLayer" },
+    "placementRule": { "$ref": "parts-1.json#/$defs/placementRule" },
+    "placedObject": {
+      "type": "object",
+      "required": ["id", "assetId", "position"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "../common/1.json#/$defs/id" },
+        "assetId": { "$ref": "../common/1.json#/$defs/assetRef" },
+        "position": { "$ref": "../common/1.json#/$defs/vec3" },
+        "rotation": { "$ref": "../common/1.json#/$defs/vec3", "description": "Euler độ (yaw, pitch, roll)" },
+        "scale": { "oneOf": [{ "type": "number", "exclusiveMinimum": 0 }, { "$ref": "../common/1.json#/$defs/vec3" }] }
+      }
+    },
+    "region": {
+      "type": "object",
+      "required": ["id", "kind", "polygon"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "../common/1.json#/$defs/id" },
+        "kind": { "enum": ["spawn", "no_place", "custom"] },
+        "polygon": { "$ref": "../common/1.json#/$defs/polygon" }
+      }
+    },
+    "timeOfDay": { "$ref": "parts-1.json#/$defs/timeOfDay" },
+    "procedural": {
+      "type": "object",
+      "required": ["preset", "maxHeight", "roughness"],
+      "additionalProperties": false,
+      "properties": {
+        "preset": { "enum": ["dong_bang", "doi", "nui", "ven_bien", "thung_lung", "ant"] },
+        "maxHeight": { "type": "number", "exclusiveMinimum": 0 },
+        "roughness": { "type": "number", "minimum": 0, "maximum": 1 },
+        "features": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "erosion": {
+      "type": "object",
+      "required": ["iterations", "strength"],
+      "additionalProperties": false,
+      "properties": {
+        "iterations": { "type": "integer", "minimum": 0 },
+        "strength": { "type": "number", "minimum": 0, "maximum": 1 },
+        "mask": { "type": "string" }
+      }
+    }
+  }
+}

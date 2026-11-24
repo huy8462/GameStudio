@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gamestudio.local/schema/game/1.json",
+  "title": "game.json (SCH-GEN-01, SCH-INT-05, SRS-01 §6.2, SRS-06 §2.1, SRS-07 §2.1)",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "id",
+    "title",
+    "engineVersion",
+    "seed",
+    "language",
+    "camera",
+    "orientation",
+    "features",
+    "briefVersion"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,62}$",
+      "description": "Slug, duy nhất trong thư viện (DTO-GEN-03)"
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "engineVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$" },
+    "seed": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+    "language": { "enum": ["vi", "en"] },
+    "camera": {
+      "type": "object",
+      "required": ["mode"],
+      "additionalProperties": false,
+      "properties": { "mode": { "enum": ["first_person", "third_person"], "default": "third_person" } }
+    },
+    "orientation": { "enum": ["landscape", "portrait"], "default": "landscape" },
+    "features": { "$ref": "#/$defs/features" },
+    "briefVersion": { "type": "integer", "minimum": 1 },
+    "styleBibleVersion": { "type": ["integer", "null"], "minimum": 1 },
+    "state": {
+      "description": "Biến game dùng trong biểu thức (ALG-DLG-01, ADR-022): tên biến → giá trị khởi tạo. Đổi state là thay đổi chỉ runtime (SRS-04 §6.2).",
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-z][a-zA-Z0-9_]{0,63}$" },
+      "additionalProperties": { "type": ["number", "boolean", "string"] }
+    }
+  },
+  "$defs": {
+    "idList": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+      "uniqueItems": true
+    },
+    "features": {
+      "type": "object",
+      "required": ["combat", "hunting", "violence", "dialogueMode"],
+      "additionalProperties": false,
+      "properties": {
+        "combat": {
+          "description": "QĐ-13, mặc định tắt. targets kiểm chéo với entities/ sau Ajv (SCH-CBT-01, ERR-CBT-01).",
+          "type": "object",
+          "required": ["enabled"],
+          "additionalProperties": false,
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "style": { "enum": ["melee", "ranged", "mixed"], "default": "melee" },
+            "targets": { "$ref": "#/$defs/idList" },
+            "formula": { "type": "string", "minLength": 1, "maxLength": 200, "default": "max(1, atk + weapon - def)" },
+            "dropOnDeath": { "type": "boolean" },
+            "showDamageNumbers": { "type": "boolean" }
+          }
+        },
+        "hunting": {
+          "type": "object",
+          "required": ["enabled"],
+          "additionalProperties": false,
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "species": { "$ref": "#/$defs/idList" }
+          }
+        },
+        "violence": {
+          "type": "object",
+          "required": ["level"],
+          "additionalProperties": false,
+          "properties": { "level": { "enum": ["minimal", "standard"], "default": "minimal" } }
+        },
+        "dialogueMode": {
+          "description": "SRS-07. ADR-035: chỉ dùng 'static' (thu hẹp enum ở change request W1).",
+          "enum": ["static", "ai", "hybrid"],
+          "default": "static"
+        }
+      }
+    }
+  }
+}

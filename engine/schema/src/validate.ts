@@ -1,11 +1,10 @@
 // Kiểm dữ liệu game theo JSON Schema 2020-12 (MOD-GEN-07, ADR-021, SCH-RTM-01).
-// Phiếu T-0001 chỉ có schema `budgets`; các kind khác thêm dần. Bản Ajv standalone biên dịch sẵn cho runtime
-// và hook H-03 (`dist/validators.*`, MOD-RTM-04) làm ở phiếu sau; ở đây biên dịch lúc chạy (CLI, test).
-import { Ajv2020, type ErrorObject, type ValidateFunction } from 'ajv/dist/2020.js';
+// Biên dịch lúc chạy (CLI, test). Bản biên dịch sẵn cho runtime và hook H-03: scripts/gen-validators.mjs (MOD-RTM-04).
+import { Ajv2020, type ErrorObject, type Options, type ValidateFunction } from 'ajv/dist/2020.js';
 
-import budgetsV1 from '../schemas/budgets/1.json' with { type: 'json' };
+import { kindByPath, ROOT_IDS, SCHEMA_DOCS, type SchemaKind } from './registry.js';
 
-export type SchemaKind = 'budgets';
+export { kindByPath, SCHEMA_KINDS, type SchemaKind } from './registry.js';
 
 export interface ValidationError {
   instancePath: string;
@@ -13,10 +12,23 @@ export interface ValidationError {
   message: string;
 }
 
-const SCHEMAS: Record<SchemaKind, object> = { budgets: budgetsV1 };
-
-/** Bảng `kindByPath` (DDD-00 §3.3), đường dẫn tương đối `games/<id>/`, dùng '/'. */
-const KIND_BY_PATH: readonly [RegExp, SchemaKind][] = [[/^data\/budgets\.json$/, 'budgets']];
+/** Ajv dùng chung cấu hình cho bản chạy và bản biên dịch sẵn. */
+export function createAjv(extra: Options = {}): Ajv2020 {
+  const ajv = new Ajv2020({
+    allErrors: true,
+    strict: true,
+    // Schema cố ý dùng kiểu hợp, vd styleBibleVersion: integer|null, state: number|boolean|string.
+    allowUnionTypes: true,
+    // world.json dùng if/then để bắt buộc origin/bbox theo source; trường đã khai báo ở properties gốc.
+    // strictRequired của Ajv không nhìn thấy khai báo đó qua if/then nên báo nhầm.
+    strictRequired: false,
+    // Định dạng dùng trong schema; khai báo tay để không kéo thêm ajv-formats.
+    formats: { date: /^\d{4}-\d{2}-\d{2}$/ },
+    ...extra,
+  });
+  for (const doc of SCHEMA_DOCS) ajv.addSchema(doc);
+  return ajv;
+}
 
 let ajv: Ajv2020 | undefined;
 const compiled = new Map<SchemaKind, ValidateFunction>();
@@ -24,34 +36,28 @@ const compiled = new Map<SchemaKind, ValidateFunction>();
 function validator(kind: SchemaKind): ValidateFunction {
   let fn = compiled.get(kind);
   if (fn === undefined) {
-    ajv ??= new Ajv2020({
-      allErrors: true,
-      strict: true,
-      // Định dạng dùng trong schema; khai báo tay để không kéo thêm ajv-formats.
-      formats: { date: /^\d{4}-\d{2}-\d{2}$/ },
-    });
-    fn = ajv.compile(SCHEMAS[kind]);
+    ajv ??= createAjv();
+    fn = ajv.getSchema(ROOT_IDS[kind]);
+    if (fn === undefined) throw new Error(`Không có schema cho kind '${kind}'`);
     compiled.set(kind, fn);
   }
   return fn;
 }
 
-function toError(e: ErrorObject): ValidationError {
+export function toError(e: ErrorObject): ValidationError {
+  const p = e.params as { additionalProperty?: unknown; allowedValues?: unknown };
   const extra =
     e.keyword === 'additionalProperties'
-      ? ` (${String((e.params as { additionalProperty?: unknown }).additionalProperty)})`
-      : '';
+      ? ` (${String(p.additionalProperty)})`
+      : e.keyword === 'enum'
+        ? ` (${JSON.stringify(p.allowedValues)})`
+        : '';
   return { instancePath: e.instancePath || '/', keyword: e.keyword, message: `${e.message ?? 'không hợp lệ'}${extra}` };
 }
 
 export function validate(kind: SchemaKind, data: unknown): ValidationError[] {
   const fn = validator(kind);
   return fn(data) ? [] : (fn.errors ?? []).map(toError);
-}
-
-export function kindByPath(relPath: string): SchemaKind | undefined {
-  const p = relPath.replace(/\\/g, '/');
-  return KIND_BY_PATH.find(([re]) => re.test(p))?.[1];
 }
 
 /** Kiểm nhiều tệp (khoá: đường dẫn tương đối `games/<id>/`); tệp không có kind được bỏ qua. */

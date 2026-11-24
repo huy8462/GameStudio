@@ -11,16 +11,26 @@ Lệnh `engine` (MOD-GEN-16, MOD-CLI-01, IF-CLI-01). Thư viện `commander`; `-
 - Biến môi trường theo vai trò (`src/doctor/env-roles.ts`): chỉ báo `co`/`khong`, không in, không băm, không đo độ dài giá trị (FR-DEV-22).
 - Thoát 0 khi đạt; 5 khi một mục bắt buộc `missing`/`mismatch` (ERR-DEV-04, ERR-DEV-05). Mục `optional` chỉ cảnh báo.
 
+## `engine validate` (E1, T-0002)
+
+`engine validate [--all | --staged | <tệp...>] [--schema <path>] [--json]`: kiểm dữ liệu game theo JSON Schema của `@gamestudio/schema` (EP-CLI-01, TC-GEN-01, FR-RTM-01).
+
+- `--all`: mọi `games/*/data/**/*.json`; `--staged`: tệp dữ liệu đã `git add` (pre-commit); `<tệp...>`: tệp chỉ định, loại suy schema theo tên (`kindByPath`).
+- `--schema <path>`: kiểm các tệp theo một tệp JSON Schema cho trước (handoff intake).
+- `--json`: một dòng `validate/1` `{ok, checked, skipped, files[{path, kind, errors[{instancePath, keyword, message}]}]}`.
+- Thoát 0 khi mọi tệp hợp lệ; 4 khi có tệp sai schema.
+
 ## Chạy
 
 ```
 pnpm --filter @gamestudio/cli build
 node engine/cli/dist/main.js doctor
+pnpm engine validate --all --json
 ```
 
 ## Cấu trúc
 
-- `src/main.ts`: điểm vào; `src/commands/doctor.ts`: đăng ký lệnh.
+- `src/main.ts`: điểm vào; `src/commands/{doctor,validate}.ts`: đăng ký lệnh; `src/validate/`: `run-validate.ts` + test.
 - `src/doctor/`: `run-doctor.ts`, `checks.ts`, `blender-check.ts`, `env-roles.ts`, `versions.ts`, `exec.ts`, `types.ts`, `blender-probe.py`.
 - Test: `*.test.ts` (Vitest, runner giả, không gọi công cụ thật): TST-DEV-03, TST-CLI-02.
 

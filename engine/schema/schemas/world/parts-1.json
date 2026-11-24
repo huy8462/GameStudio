@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gamestudio.local/schema/world/parts-1.json",
+  "title": "Thực vật, luật bố trí, mốc thời điểm của world.json (DTO-WLD-09, DTO-WLD-01 TimeOfDayStop, SRS-02 §6.3)",
+  "$defs": {
+    "vegLayer": {
+      "type": "object",
+      "required": ["id", "mask", "species", "densityPerHa", "minSpacing", "maxSlope", "seed"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "../common/1.json#/$defs/id" },
+        "mask": {
+          "oneOf": [
+            { "enum": ["forest", "farm"] },
+            { "type": "array", "items": { "$ref": "../common/1.json#/$defs/polygon" } }
+          ]
+        },
+        "species": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["ref", "weight"],
+            "additionalProperties": false,
+            "properties": {
+              "ref": { "$ref": "../common/1.json#/$defs/assetRef" },
+              "weight": { "type": "number", "exclusiveMinimum": 0 }
+            }
+          }
+        },
+        "densityPerHa": { "type": "number", "minimum": 0 },
+        "minSpacing": { "type": "number", "minimum": 0 },
+        "maxSlope": { "type": "number", "minimum": 0, "maximum": 90 },
+        "scale": { "$ref": "../common/1.json#/$defs/range" },
+        "seed": { "$ref": "../common/1.json#/$defs/seed" },
+        "impostorDistance": { "type": "number", "minimum": 0 },
+        "grass": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "densityPerM2": { "type": "number", "minimum": 0 },
+            "heightM": { "type": "number", "minimum": 0 },
+            "colorJitter": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    },
+    "placementRule": {
+      "type": "object",
+      "required": ["id", "ref", "region", "minSpacing", "maxSlope", "seed"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "../common/1.json#/$defs/id" },
+        "ref": { "$ref": "../common/1.json#/$defs/assetRef" },
+        "region": {
+          "oneOf": [{ "$ref": "../common/1.json#/$defs/polygon" }, { "$ref": "../common/1.json#/$defs/id" }]
+        },
+        "count": { "$ref": "../common/1.json#/$defs/range" },
+        "densityPerHa": { "type": "number", "minimum": 0 },
+        "minSpacing": { "type": "number", "minimum": 0 },
+        "maxSlope": { "type": "number", "minimum": 0, "maximum": 90 },
+        "alignToNormal": { "type": "boolean" },
+        "onWater": { "type": "boolean" },
+        "avoidRoadM": { "type": "number", "minimum": 0 },
+        "avoidWaterM": { "type": "number", "minimum": 0 },
+        "seed": { "$ref": "../common/1.json#/$defs/seed" }
+      }
+    },
+    "timeOfDay": {
+      "type": "object",
+      "required": ["id", "hour", "baked", "sun"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "../common/1.json#/$defs/id" },
+        "hour": { "type": "number", "minimum": 0, "exclusiveMaximum": 24 },
+        "baked": { "type": "boolean" },
+        "sun": {
+          "type": "object",
+          "required": ["elevation", "azimuth"],
+          "additionalProperties": false,
+          "properties": {
+            "elevation": { "type": "number", "minimum": -90, "maximum": 90 },
+            "azimuth": { "type": "number", "minimum": 0, "exclusiveMaximum": 360 },
+            "color": { "$ref": "../common/1.json#/$defs/color" },
+            "intensity": { "type": "number", "minimum": 0 }
+          }
+        },
+        "sky": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "hdri": { "$ref": "../common/1.json#/$defs/assetRef" },
+            "color": { "$ref": "../common/1.json#/$defs/color" }
+          }
+        },
+        "fogColor": { "$ref": "../common/1.json#/$defs/color" }
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "../../../engine/schema/schemas/game/1.json",
+  "schemaVersion": 1,
+  "id": "mau-game",
+  "title": "Game mẫu",
+  "engineVersion": "0.1.0",
+  "seed": 1,
+  "language": "vi",
+  "camera": { "mode": "third_person" },
+  "orientation": "landscape",
+  "features": {
+    "combat": { "enabled": false, "style": "melee", "targets": [], "formula": "max(1, atk + weapon - def)" },
+    "hunting": { "enabled": false, "species": [] },
+    "violence": { "level": "minimal" },
+    "dialogueMode": "static"
+  },
+  "briefVersion": 1,
+  "styleBibleVersion": null,
+  "state": {}
+}

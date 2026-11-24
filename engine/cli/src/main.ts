@@ -1,16 +1,19 @@
 #!/usr/bin/env node
-// Điểm vào lệnh `engine` (MOD-CLI-01, IF-CLI-01). E0: chỉ có `doctor`; các lệnh khác thêm từ E1.
+// Điểm vào lệnh `engine` (MOD-CLI-01, IF-CLI-01). Có: doctor (E0), validate (E1 T-0002).
 import { Command } from 'commander';
 
 import { registerDoctor } from './commands/doctor.js';
+import { registerValidate } from './commands/validate.js';
 import { EXIT } from './exit-codes.js';
 
 let exitCode: number = EXIT.OK;
 const program = new Command().name('engine').description('CLI GameStudio (SRS-04 FR-CLI-01).').version('0.0.0');
-
-registerDoctor(program, (code) => {
+const setExit = (code: number): void => {
   exitCode = code;
-});
+};
+
+registerDoctor(program, setExit);
+registerValidate(program, setExit);
 
 try {
   await program.parseAsync(process.argv);

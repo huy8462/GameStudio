@@ -111,8 +111,9 @@ Thứ tự phiếu đề xuất (mỗi phiếu một phiên Claude Code, `/clear
 
 **Phiếu E1 đã xong:**
 - **T-0001** (24/11/2026, `docs/tickets/T-0001.md`): `@gamestudio/rng` (PCG32 + `deriveSeed`, TS = Python theo `vectors.json`); lõi `@gamestudio/schema` (`canonicalize` RFC 8785, `sha256Hex`/`jsonHash`/`dataHash`, `evaluate`, `validate` Ajv, schema `budgets/1`); `games/_template/data/budgets.json` có baseline A56.
+- **T-0002** (24/11/2026, `docs/tickets/T-0002.md`): schema `game/1`, `world/1`, `palette/1` (+ `common/1`) và mẫu `games/_template/data/*.json`; `pointer.ts` (RFC 6901), `patch.ts` (RFC 6902, `applyPatch`/`invertPatch`/`touchedFilesOf`, MOD-GEN-06); Ajv standalone `dist/validators.{js,cjs}` (MOD-RTM-04), hook H-03 dùng; lệnh `engine validate [--all|--staged|<tệp>] [--schema] [--json]`, thoát 0/4 (TC-GEN-01). 100 test đạt. Lệch tài liệu chờ change request: `schemaVersion` số nguyên (SRS-01 §6.2 ghi string), `world.bbox` dạng object theo DDD-02.
 
-**Phiếu E1 kế tiếp (đề xuất):** T-0002: schema `game`, `world`, `palette` + `patch.ts` (MOD-GEN-06) + Ajv standalone `dist/validators.{js,cjs}` cho hook H-03, rồi `engine validate` (TC-GEN-01).
+**Phiếu E1 kế tiếp (đề xuất):** T-0003: `@gamestudio/expr` phần điều kiện (ADR-022; MOD-GEN-11/MOD-RTM-15, ALG-RTM-04): lexer, Pratt parser, kiểm tĩnh, biên dịch closure. Chọn trước bộ chạy bước + cache (ADR-023) vì `expr` là gói lá, không phụ thuộc gói nào (DDD-00 MOD-GEN-11); bộ chạy bước cần `step.json`, `report/1`, `@gamestudio/status` (`planStale`) và chỉ mục cache SCH-RTM-09 chưa có.
 
 **Việc hoãn từ E0 (m2) đưa vào E1:**
 - Tạo `games/_template/data/budgets.json` + `budgets.schema.json` và ghi baseline A56: `targetFps 30`, `maxRenderDpr 1.5`, `a56Baseline` theo `docs/gates/G-E0/a56-baseline.md`.
