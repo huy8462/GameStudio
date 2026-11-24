@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gamestudio.local/schema/intake/clarify/1.json",
+  "title": "Đầu ra mô hình task 'clarify' (SCH-INT-03, DTO-INT-04): chỉ văn bản câu hỏi và 2–4 lựa chọn mỗi trường",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["questions"],
+  "properties": {
+    "questions": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field", "text", "choices"],
+        "properties": {
+          "field": { "type": "string" },
+          "text": { "type": "string", "minLength": 1 },
+          "choices": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "label", "value"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^[a-z0-9_-]+$" },
+                "label": { "type": "string", "minLength": 1 },
+                "value": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -227,6 +227,15 @@ importers:
         specifier: 15.1.0
         version: 15.1.0
 
+  engine/intake:
+    dependencies:
+      '@gamestudio/rng':
+        specifier: workspace:*
+        version: link:../shared/rng
+      '@gamestudio/schema':
+        specifier: workspace:*
+        version: link:../schema
+
   engine/schema:
     dependencies:
       '@noble/hashes':

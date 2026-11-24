@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gamestudio.local/schema/intake/analysis/1.json",
+  "title": "Đầu ra mô hình task 'analyze' (SCH-INT-02, DTO-INT-03; MOD-INT-15)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fields"],
+  "properties": {
+    "fields": {
+      "type": "object",
+      "propertyNames": {
+        "enum": [
+          "title",
+          "genre",
+          "camera",
+          "setting.place",
+          "setting.era",
+          "setting.season",
+          "setting.timeOfDay",
+          "setting.realPlace",
+          "artStyle",
+          "coreLoop",
+          "player",
+          "npcs",
+          "animals",
+          "features.combat",
+          "features.hunting",
+          "features.dialogueMode",
+          "scale",
+          "highRiskAssets"
+        ]
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["value", "status", "evidence"],
+        "properties": {
+          "value": {},
+          "status": { "enum": ["tu_mo_ta", "gia_dinh", "thieu", "mau_thuan"] },
+          "evidence": { "type": "array", "items": { "type": "string" } },
+          "reason": { "type": "string" }
+        }
+      }
+    }
+  }
+}

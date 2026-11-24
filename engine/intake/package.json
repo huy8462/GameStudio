@@ -1,0 +1,28 @@
+{
+  "name": "@gamestudio/intake",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tiếp nhận mô tả game: phân tích, câu hỏi làm rõ, brief + dữ liệu khởi tạo (MOD-GEN-13, DDD-01).",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "default": "./dist/node.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@gamestudio/rng": "workspace:*",
+    "@gamestudio/schema": "workspace:*"
+  }
+}
