@@ -12,6 +12,7 @@ import { baseSeedOf, gameIdOf, loadGameData, zonesOf } from './game-data.js';
 import { downstream, loadGraph } from './graph.js';
 import { errorExit, runNodeStep, type NodeEnv } from './run-step.js';
 import { notYet, runNode, type Runner } from './runners/node.js';
+import { makePythonRunner } from './runners/python.js';
 import type { BuildOutcome, Clock, StepCtx, StepGraph, StepId, StepOutcome, Tier } from './types.js';
 
 export interface RunBuildOptions {
@@ -95,7 +96,7 @@ export async function runBuild(o: RunBuildOptions): Promise<BuildOutcome> {
   let runSeq = 0;
   const runners: Record<'node' | 'python' | 'blender', Runner> = {
     node: runNode,
-    python: notYet('python'),
+    python: makePythonRunner(),
     blender: notYet('blender'),
     ...o.runners,
   };

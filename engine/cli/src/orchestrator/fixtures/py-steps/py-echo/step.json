@@ -1,0 +1,12 @@
+{
+  "id": "py.echo",
+  "version": "1",
+  "description": "Bước python mẫu (T-0005): đọc ctx.json, báo PROGRESS, ghi echo.txt và report.json một phần",
+  "deps": [],
+  "inputs": { "dataPointers": ["/game.json/title"], "files": [], "params": { "mode": "ok" } },
+  "runner": "python",
+  "entry": "main.py",
+  "perZone": false,
+  "outputs": ["echo.txt"],
+  "timeoutS": 30
+}

@@ -20,13 +20,15 @@ Lệnh `engine` (MOD-GEN-16, MOD-CLI-01, IF-CLI-01). Thư viện `commander`; `-
 - `--json`: một dòng `validate/1` `{ok, checked, skipped, files[{path, kind, errors[{instancePath, keyword, message}]}]}`.
 - Thoát 0 khi mọi tệp hợp lệ; 4 khi có tệp sai schema.
 
-## Bộ điều phối build (E1, T-0004; ADR-023)
+## `engine build` (E1, T-0004 + T-0005; ADR-023)
 
-`src/orchestrator/`: `runBuild(o)` (PSC-CLI-01) đọc `step.json` (schema `step/1`), lập DAG tô-pô ổn định, nhân bước `perZone` theo zone, băm `inputHash` (PSC-GEN-02), hit cache bỏ qua, song song ≤ min(4, lõi/2), bước lỗi huỷ nhánh phụ thuộc. Chưa có lệnh `engine build` (phiếu sau).
+`engine build [--game <dir>] [--steps <dir>] [--zone <id>] [--tier <tier>] [--step <id>] [--force] [--skip-bake] [--json]`.
 
-- Cache: `<buildDir>/cache/<bước>/<hex>/{out/, meta.json}`; chỉ mục `cache/index.json` (SCH-RTM-09) ghi nguyên tử có khoá.
-- Bước node: `export function run(ctx)` ghi vào `ctx.outDir`, trả `{result?, metrics?, checks?, warnings?, summary?…}`; bộ điều phối ghi `report.json` (`report/1`). Runner python/blender: phiếu sau.
-- Bước mẫu và test: `src/orchestrator/fixtures/steps/`, `*.test.ts`.
+- Guards (`src/build-cmd/guards.ts`): brief `brief/v<n>` lớn nhất chưa có `hash.txt` hoặc chưa có brief → 3 (ERR-INT-06); dữ liệu sai schema → 4; `engineVersion` không khớp kiểu caret với `ENGINE_VERSION` → 4 (ERR-RTM-04).
+- `src/orchestrator/runBuild` (PSC-CLI-01): DAG `step.json` (`step/1`) tô-pô ổn định, `perZone` nhân theo zone, `inputHash` (PSC-GEN-02), hit cache bỏ qua, song song ≤ min(4, lõi/2), bước lỗi huỷ nhánh phụ thuộc.
+- Cache `<game>/build/cache/<bước>/<hex>/{out/, meta.json}`, chỉ mục `cache/index.json` (SCH-RTM-09); báo cáo gộp `build/reports/build-<zone|all>.json` (`report/1`).
+- Runner node: `export function run(ctx)` trong tiến trình. Runner python: `uv run python -I <entry> --ctx ctx.json`, stdout `PROGRESS <0-100> <msg>`, `timeoutS` diệt cả cây tiến trình; ghi tệp với `newline="\n"`. Blender: phiếu sau.
+- Thoát 0/1/2 theo kết quả; bước lỗi giữ mã 3–6 của bước, còn lại 10. Bước mẫu: `src/orchestrator/fixtures/`.
 
 ## Chạy
 
@@ -34,11 +36,13 @@ Lệnh `engine` (MOD-GEN-16, MOD-CLI-01, IF-CLI-01). Thư viện `commander`; `-
 pnpm --filter @gamestudio/cli build
 node engine/cli/dist/main.js doctor
 pnpm engine validate --all --json
+pnpm engine build --game games/<id> --json
 ```
 
 ## Cấu trúc
 
-- `src/main.ts`: điểm vào; `src/commands/{doctor,validate}.ts`: đăng ký lệnh; `src/validate/`: `run-validate.ts` + test.
+- `src/main.ts`: điểm vào; `src/commands/{doctor,validate,build}.ts`: đăng ký lệnh; `src/validate/`, `src/build-cmd/`, `src/orchestrator/`; `clock.ts` (điểm tiêm Clock), `engine-version.ts`.
+- Thư mục `build-cmd` (không phải `build`): Vitest, ESLint, tsconfig gốc loại `**/build/**`.
 - `src/doctor/`: `run-doctor.ts`, `checks.ts`, `blender-check.ts`, `env-roles.ts`, `versions.ts`, `exec.ts`, `types.ts`, `blender-probe.py`.
 - Test: `*.test.ts` (Vitest, runner giả, không gọi công cụ thật): TST-DEV-03, TST-CLI-02.
 

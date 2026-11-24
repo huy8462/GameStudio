@@ -117,7 +117,12 @@ Thứ tự phiếu đề xuất (mỗi phiếu một phiên Claude Code, `/clear
 
 - **T-0004** (24/11/2026, `docs/tickets/T-0004.md`): bộ chạy bước + cache (ADR-023; MOD-CLI-02, 03; IF-CLI-02, 03; PSC-CLI-01, PSC-GEN-02): schema `step/1`, `report/1`, `cache-index/1`; `engine/cli/src/orchestrator/` (graph tô-pô ổn định, inputHash/outputHash, cache theo nội dung + `meta.json`, `cache/index.json` ghi nguyên tử, scheduler song song có giới hạn, runner node trong tiến trình); 4 bước mẫu. Build lần 2 toàn cache, cắt sớm khi đầu ra không đổi. 390 test đạt. Lệch/làm rõ: xem mục "Quyết định nhỏ" trong phiếu (bố cục cache `out/`+`meta.json`, `params` vào `inputHash`, seed bước, runner node trong tiến trình).
 
-**Phiếu E1 kế tiếp (đề xuất):** T-0005: CLI build cơ bản: runner python (`uv run python -I entry --ctx ctx.json`, đọc dòng `PROGRESS`, timeout, mã thoát) theo IF-CLI-02 + lệnh `engine build [--zone] [--tier] [--step] [--force] [--skip-bake] [--json]` (IF-CLI-01) gọi `runBuild`, guards trước build (brief `DaXacNhan` → thoát 3, `engineVersion`), báo cáo gộp ra `build/reports/` (FR-CLI-03). Mở đường cho T-0006 `world.fetch`/`heightfield` (bước python đầu tiên). `intake` (`HandoffLlmClient`, DDD-01) vẫn làm song song được.
+- **T-0005** (24/11/2026, `docs/tickets/T-0005.md`): lệnh `engine build [--game] [--steps] [--zone] [--tier] [--step] [--force] [--skip-bake] [--json]`. Runner python (`uv run python -I`, `PROGRESS`, timeout diệt cả cây tiến trình). Guards: brief (`brief/v<n>/hash.txt`, thoát 3), schema (4), `engineVersion` caret (4). Báo cáo gộp `build/reports/build-<zone|all>.json`. Quy ước: bước python ghi tệp với `newline="\n"`. 407/408 test đạt; test thời gian hook "P95 < 1 s" trượt khi chạy cả bộ, chạy riêng thì đạt (xem phiếu).
+
+**Phiếu E1 kế tiếp (đề xuất):**
+- **T-0006**: bước python đầu tiên `world.fetch` + `world.heightfield` cho nguồn `procedural` (DDD-02 EP-WLD-01, 02; PSC-WLD-02, 03; ALG-WLD-02, 03). Đặt ở `engine/build/steps/world-*/` và `engine/build/py/heightfield/`. Sinh heightfield tất định từ `world.seed` + preset (numpy một luồng), kèm pytest và test build qua `engine build`. Nguồn OSM/DEM thật (mạng, ERR-WLD-01) để phiếu sau. Cần đọc DDD-02 theo mục để chốt định dạng đầu ra (DTO-WLD-02/07/08).
+- **Phiếu nhỏ (Sonnet, low)**: tách test thời gian `hooks-warn.test.ts` "P95 < 1 s" (NFR-DEV-02) ra chạy riêng (project Vitest riêng hoặc `pnpm test:timing`), để `pnpm test` không trượt khi máy bận. Thuộc `tools/scripts/**`, `vitest.config.ts`.
+- `intake` (`HandoffLlmClient`, DDD-01) vẫn làm song song được.
 
 **Việc hoãn từ E0 (m2) đưa vào E1:**
 - Tạo `games/_template/data/budgets.json` + `budgets.schema.json` và ghi baseline A56: `targetFps 30`, `maxRenderDpr 1.5`, `a56Baseline` theo `docs/gates/G-E0/a56-baseline.md`.

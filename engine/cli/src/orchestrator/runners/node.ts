@@ -26,9 +26,16 @@ function withTimeout<T>(p: Promise<T>, timeoutS: number | undefined, id: string)
   return Promise.race([p, t]).finally(() => clearTimeout(timer));
 }
 
-export const runNode: Runner = async (step, ctx) => {
+/** Ghi ctx.json (DTO-CLI-01) vào tmpDir, bỏ hàm progress; trả đường dẫn. */
+export function writeCtxJson(ctx: StepCtx): string {
   const { progress: _progress, ...serializable } = ctx;
-  writeFileSync(join(ctx.tmpDir, 'ctx.json'), `${JSON.stringify(serializable, null, 2)}\n`);
+  const p = join(ctx.tmpDir, 'ctx.json');
+  writeFileSync(p, `${JSON.stringify(serializable, null, 2)}\n`);
+  return p;
+}
+
+export const runNode: Runner = async (step, ctx) => {
+  writeCtxJson(ctx);
   const mod = (await import(pathToFileURL(join(step.dir, step.entry)).href)) as {
     run?: (c: StepCtx) => Promise<StepReturn | undefined> | StepReturn | undefined;
   };

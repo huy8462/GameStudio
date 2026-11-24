@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// Điểm vào lệnh `engine` (MOD-CLI-01, IF-CLI-01). Có: doctor (E0), validate (E1 T-0002).
+// Điểm vào lệnh `engine` (MOD-CLI-01, IF-CLI-01). Có: doctor (E0), validate (E1 T-0002), build (E1 T-0005).
 import { Command } from 'commander';
 
+import { registerBuild } from './commands/build.js';
 import { registerDoctor } from './commands/doctor.js';
 import { registerValidate } from './commands/validate.js';
 import { EXIT } from './exit-codes.js';
@@ -14,6 +15,7 @@ const setExit = (code: number): void => {
 
 registerDoctor(program, setExit);
 registerValidate(program, setExit);
+registerBuild(program, setExit);
 
 try {
   await program.parseAsync(process.argv);
