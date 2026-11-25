@@ -3,13 +3,13 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | TSD-04 |
-| Phiên bản | 1.2 (đã duyệt) |
+| Phiên bản | 1.3 |
 | Ngày | 22/11/2026 |
 | Tài liệu cha | TSD-00 `TSD-00-TONG-QUAN.md` |
 | SRS nguồn | SRS-04 v0.1 (FR-RTM-01…23, FR-QA-01…10, FR-CLI-01…07, NFR-RTM-01…03, NFR-QA-01…02, NFR-CLI-01) |
-| Gói | `@gamestudio/schema`, `@gamestudio/rng`, `@gamestudio/expr`, `@gamestudio/engine` (core, render, camera-player phần chung, interaction, ui-audio, api), `engine/build/packager`, `@gamestudio/qa`, `@gamestudio/cli` |
+| Gói | `@gamestudio/schema`, `@gamestudio/rng`, `@gamestudio/expr`, Unity player `engine/unity` (Core, Render, CameraPlayer phần chung, Interaction, UI, Audio; CR-02), `engine/build/packager`, `@gamestudio/qa`, `@gamestudio/cli` |
 | Pha | E0 (baseline), E1, E2, E3, E6 |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026; bản 1.2 gồm CR-01 duyệt 23/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026; bản 1.2 gồm CR-01 duyệt 23/11/2026); **v1.3 runtime Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại |
 
 ---
 
@@ -18,46 +18,52 @@ TSD này là "hợp đồng kỹ thuật" dùng chung: schema và dữ liệu, v
 
 ---
 
-## 2. Runtime `@gamestudio/engine`
+## 2. Runtime: Unity player `engine/unity` (CR-02, ADR-036)
 
-### 2.1 Cấu trúc gói
+> Từ v1.3 (CR-02) runtime là **một Unity player chung** (Unity 6 LTS, URP, nền Web) cho mỗi `engineVersion`, viết bằng C#, thay gói TS `@gamestudio/engine` trên Three.js. Mã IF-RTM-01…05 giữ nguyên số, nội dung đổi theo Unity. Số liệu ngân sách tải đo lại ở POC-U1 (OI-GEN-05).
 
-| Thư mục | Trách nhiệm |
+### 2.1 Cấu trúc project
+
+| Thư mục (`engine/unity/Assets/GameStudio/`) | Trách nhiệm |
 |---|---|
-| `runtime/src/core/` | `Engine` (khởi động, vòng lặp, đồng hồ, chế độ test), `SystemRegistry`, `EventBus` (sự kiện kiểu, không cấp phát: hàng đợi vòng), `Pools` |
-| `runtime/src/loader/` | `ManifestLoader`, `ZoneStreamer`, `AssetCache`, worker giải mã (`loader.worker.ts`: KTX2 transcoder, Meshopt decoder, Draco) |
-| `runtime/src/render/` | Tạo `WebGLRenderer`, tier, vật liệu dùng chung, instancing, LOD, lightmap, hậu kỳ |
-| `runtime/src/tier/` | Dò thiết bị, đo 3 s, hạ tier |
-| `runtime/src/input/` | Cảm ứng (joystick, vuốt), bàn phím/chuột, pointer lock |
-| `runtime/src/camera-player/` | Camera ngôi một/ba, bộ điều khiển viên nang (chi tiết TSD-05) |
-| `runtime/src/interaction/` | Điểm tương tác, biến game, nhiệm vụ, cây thoại (TSD-07) |
-| `runtime/src/ui/` | HUD, menu, cài đặt, credit, lớp phủ dev; DOM + CSS (không vẽ UI trong WebGL) |
-| `runtime/src/audio/` | WebAudio: bus tổng/nhạc/hiệu ứng/giọng, âm 3D (`PannerNode` HRTF tắt ở tier Thấp) |
-| `runtime/src/save/` | IndexedDB (`idb-keyval` hoặc wrapper tự viết) |
-| `runtime/src/perf/` | Đo fps, P5/P1, `renderer.info`, timer query, gửi API-WEB-60 |
-| `runtime/src/api/` | API công khai cho `games/*/scripts` (re-export có chọn lọc) |
-| `runtime/src/{characters,npc-ai,fx}/` | TSD-05, TSD-02 |
-| `runtime/src/combat/`, `runtime/src/dialogue-ai/` | Chunk tuỳ chọn (TSD-06, TSD-07) |
+| `Core/` | `Engine` (khởi động, vòng lặp, đồng hồ, chế độ test), `SystemRegistry`, `EventBus` (sự kiện kiểu, không cấp phát: hàng đợi vòng), `Pools`; một `MonoBehaviour` điều phối gọi các hệ thống theo thứ tự cố định |
+| `Loader/` | `ManifestLoader`, `ZoneStreamer`, `AssetCache`; nạp glb bằng glTFast (Meshopt decompress, `KHR_mesh_quantization`), KTX2 bằng KTX for Unity; chia lát bất đồng bộ để không chặn khung |
+| `Render/` | URP asset theo tier, vật liệu dùng chung, GPU instancing / SRP Batcher, LOD (`LODGroup` cho vật đơn, theo chunk cho địa hình), shader lightmap RGBM UV2, hậu kỳ URP |
+| `Tier/` | Dò thiết bị qua `.jslib` + `SystemInfo`, đo 3 s, hạ tier |
+| `Input/` | Input System: cảm ứng (joystick, vuốt), bàn phím/chuột, pointer lock |
+| `CameraPlayer/` | Camera ngôi một/ba, `CharacterController` (chi tiết TSD-05) |
+| `Interaction/` | Điểm tương tác, biến game, nhiệm vụ, cây thoại (TSD-07) |
+| `UI/` | HUD, menu, cài đặt, credit, lớp phủ dev bằng UI Toolkit |
+| `Audio/` | Bus tổng/nhạc/hiệu ứng/giọng bằng `AudioMixer`; âm 3D (tắt spatial ở tier Thấp); nạp clip lúc chạy qua `UnityWebRequestMultimedia` |
+| `Save/` | Lưu cục bộ qua IndexedDB của nền Web (`.jslib`) |
+| `Perf/` | fps, P5/P1, `ProfilerRecorder` (draw call, batch, tri), `FrameTimingManager`; gửi API-WEB-60 |
+| `Bridge/` | Cầu nối JS ↔ C#: `.jslib` xuất sự kiện ra trang, hàm nhận `SendMessage` cho khung xem trước (TSD-08 IF-WEB-05) |
+| `Editor/` | Chế độ editor trong player (gizmo, chọn, vẽ vùng), chỉ bật khi `mode='preview'` |
+| `Shared/Rng`, `Shared/Expr` | Bản C# của `@gamestudio/rng` và `@gamestudio/expr`, kiểm chéo bằng bộ vector chung với TS/Python |
+| `Characters/`, `NpcAi/`, `Fx/` | TSD-05, TSD-02 |
+| `Combat/`, `Dialogue/` | Module tuỳ chọn, bật bằng dữ liệu (TSD-06, TSD-07) |
+| `engine/unity/Tests/` | Unity Test Framework (EditMode, PlayMode), chạy batchmode trên máy dev |
 
 ### 2.2 Interface
 
 | Mã | Interface | Mô tả |
 |---|---|---|
-| IF-RTM-01 | `bootstrap({canvas, manifestUrl, engineBase, mode: 'play'\|'preview'\|'test', seed?, onProgress})` | Điểm vào duy nhất. Trang `index.html` của bản xuất bản tải `/engine/<semver>/engine.js` theo `manifest.engineVersion`; khung xem trước Web Studio gọi cùng hàm với `mode='preview'` và `RuntimeDataSource` từ API (áp nóng) |
-| IF-RTM-02 | `interface System { readonly id: string; readonly order: number; init(ctx: EngineContext): void \| Promise<void>; update(dt: number, t: number): void; onZoneLoaded?(z): void; onZoneUnloaded?(z): void; onRuntimeData?(diff: RuntimeDataDiff): void; dispose(): void }` | Thứ tự cố định: input 10, camera-player 20, npc-ai 30, characters 40, combat 50, interaction 60, fx 70, render 80, ui-audio 90 (SRS-04 mục 2.1). Hệ thống tuỳ chọn đăng ký bằng `import()` khi cờ bật |
-| IF-RTM-03 | `EngineContext {scene, renderer, tier, budgets, rng: RngRoot, clock, bus, data: RuntimeData, zones: ZoneStreamer, physics: StaticWorld, nav?: NavService, audio, ui, save, logger}` | Truyền cho mọi hệ thống |
-| IF-RTM-04 | `RuntimeDataSource` | `static` (đọc `runtimeData` trong manifest) hoặc `live` (preview: WebSocket/SSE từ `web/api` gửi `RuntimeDataDiff` = JSON Patch) |
-| IF-RTM-05 | API công khai `@gamestudio/engine/api` | `onEvent`, `setFlag`, `getFlag`, `addCounter`, `quest`, `spawn`, `playSound`, `showInfo`, `rng(id)`, `registerSystem(System)`; không lộ `three` nội bộ trừ kiểu `Vector3` chỉ đọc |
+| IF-RTM-01 | Trang nạp `createUnityInstance(canvas, {dataUrl, frameworkUrl, codeUrl, …})` rồi `SendMessage('GameStudio', 'Boot', json{manifestUrl, mode: 'play'\|'preview'\|'test', seed?})` | Điểm vào duy nhất. Trang `index.html` của bản xuất bản tải player ở `/engine/<semver>/` theo `manifest.engineVersion`; khung xem trước Web Studio dùng cùng player với `mode='preview'`; tiến độ tải báo qua callback `onProgress` của loader và sự kiện `.jslib` |
+| IF-RTM-02 | `interface ISystem { string Id; int Order; void Init(EngineContext ctx); void Tick(float dt, float t); void OnZoneLoaded(Zone z); void OnZoneUnloaded(Zone z); void OnRuntimeData(RuntimeDataDiff d); void Dispose(); }` | Thứ tự cố định như bản cũ (input 10, camera-player …); `Engine` gọi `Tick` trong `Update` của bộ điều phối |
+| IF-RTM-03 | `EngineContext {Tier, Budgets, Rng, Clock, Bus, Data, Zones, Physics (Unity Physics), Nav (AI Navigation, khi có), Audio, Ui, Save, Log}` | Truyền cho mọi hệ thống |
+| IF-RTM-04 | `RuntimeDataSource` | `static` (đọc `runtimeData` trong manifest) hoặc `live` (preview: SPA nhận SSE từ `web/api` rồi đẩy `RuntimeDataDiff` = JSON Patch vào player qua `SendMessage`) |
+| IF-RTM-05 | Bề mặt mở rộng cho dữ liệu game | Không còn API cho script TS riêng game (FR-RTM-04, CR-02). Hành vi riêng khai báo bằng sự kiện, `expr`, đồ thị hành vi; danh mục hành động (`fire_event`, `set_flag`, `add_counter`, `quest`, `spawn`, `play_sound`, `show_info`, …) là hợp đồng giữa dữ liệu và player |
 
 ### 2.3 Vòng lặp và thời gian
-- `requestAnimationFrame`; `dt` kẹp [0, 0,1 s]. Chế độ test (`?test=1&seed=n`): bước cố định 1/30 s, bỏ qua thời gian thực, RNG gốc = seed (FR-RTM-06).
-- Không cấp phát trong `update` (FR-RTM-23): vector tạm theo hệ thống (`const _v = new Vector3()` ở module), pool cho đạn/hạt/sự kiện, mảng kiểu cho thực thể động, không dùng closure/array literal trong vòng nóng; lint tuỳ chỉnh cảnh báo `new` trong thân `update` ở `engine/runtime/**`.
+- `Update` của bộ điều phối; `dt` kẹp [0, 0,1 s]. Chế độ test (`?test=1&seed=n`): bước cố định 1/30 s, bỏ qua thời gian thực, RNG gốc = seed (FR-RTM-06).
+- Không cấp phát trong `Tick` (FR-RTM-23): struct và mảng cấp phát trước, pool cho đạn/hạt/sự kiện, `NativeArray`/mảng struct cho thực thể động, không LINQ/lambda/boxing trong vòng nóng; kiểm bằng `GC.Alloc` của `ProfilerRecorder` trong test PlayMode.
+- Nền Web của Unity chạy một luồng mặc định; giải mã asset chia lát theo khung (TSD-00 §7.2).
 
 ### 2.4 Render
-- `WebGLRenderer({antialias: false, powerPreference: 'high-performance'})`; khử răng cưa bằng FXAA ở tier ≥ Vừa (hậu kỳ), MSAA tắt.
-- `outputColorSpace = SRGB`, tone mapping ACES/AgX theo `world.postFx`.
-- Vật liệu chuẩn `MeshStandardMaterial` + `lightMap`/`aoMap` từ UV2; tier Thấp dùng `MeshLambertMaterial` biến thể (bỏ PBR specular) **(TSD đề xuất)**.
-- Hình tĩnh: gộp theo vật liệu khi đóng gói (packager), vật lặp: `InstancedMesh`/`BatchedMesh`; frustum culling theo chunk; LOD bằng `THREE.LOD` cho vật đơn, theo chunk cho địa hình.
+- URP, khử răng cưa FXAA ở tier ≥ Vừa (hậu kỳ URP), MSAA tắt; không dùng WebGPU ở bản đầu.
+- Không gian màu Linear, tone mapping ACES/Neutral theo `world.postFx`.
+- Vật liệu chuẩn URP Lit + shader riêng đọc lightmap RGBM và AO từ UV2 (ADR-026); tier Thấp dùng biến thể Simple Lit **(TSD đề xuất)**.
+- Hình tĩnh: gộp theo vật liệu khi đóng gói (packager) + SRP Batcher; vật lặp: GPU instancing (`Graphics.RenderMeshInstanced`); culling theo chunk; LOD bằng `LODGroup` cho vật đơn, theo chunk cho địa hình.
 - Bóng: tier Thấp không bóng động; Vừa 1 cascade 1024 cho nhân vật gần; Cao 2 cascade 2048 **(TSD đề xuất, OIT-RTM-01)**; bóng tĩnh nằm trong lightmap.
 
 ---
@@ -66,10 +72,10 @@ TSD này là "hợp đồng kỹ thuật" dùng chung: schema và dữ liệu, v
 
 | Mã | Thuật toán | Mô tả |
 |---|---|---|
-| ALG-RTM-01 | Chọn tier khởi động | (1) Kiểm WebGL2 (không có → ERR-RTM-01); (2) đọc `WEBGL_debug_renderer_info` (nếu có), `navigator.deviceMemory`, `hardwareConcurrency`, kích thước màn; (3) tra `tier-table.json` (khớp chuỗi GPU → tier đề xuất; mặc định: deviceMemory ≥ 8 và màn ≥ 1080p → `vua`, ≥ 12 → `cao`, còn lại `thap`); (4) nhớ lựa chọn người chơi trong `localStorage` thắng; (5) sau khi vào game đo 3 s: fps trung bình < 0,85 × mục tiêu → hạ một bậc trước khi người chơi kịp thấy (FR-RTM-07). Kiểm định dạng nén: `KTX2Loader.detectSupport` → chọn `astc`/`etc2`/`bc7`; không có → texture fallback (FR-RTM-11) |
+| ALG-RTM-01 | Chọn tier khởi động | (1) Trang nạp kiểm WebGL2 trước khi tải player (không có → ERR-RTM-01); (2) player đọc qua `.jslib` `WEBGL_debug_renderer_info` (nếu có), `navigator.deviceMemory`, `hardwareConcurrency`, kích thước màn; (3) tra `tier-table.json` (khớp chuỗi GPU → tier đề xuất; mặc định: deviceMemory ≥ 8 và màn ≥ 1080p → `vua`, ≥ 12 → `cao`, còn lại `thap`); (4) nhớ lựa chọn người chơi trong `localStorage` thắng; (5) sau khi vào game đo 3 s: fps trung bình < 0,85 × mục tiêu → hạ một bậc trước khi người chơi kịp thấy (FR-RTM-07). Kiểm định dạng nén: `KTX2Loader.detectSupport` → chọn `astc`/`etc2`/`bc7`; không có → texture fallback (FR-RTM-11) |
 | ALG-RTM-02 | Stream zone | Mỗi zone có `bytes{tier}` và hai phần: `core` (địa hình LOD2–3, collider, vật trong bán kính 60 m quanh điểm xuất phát, texture mip thấp) và `full`. Thứ tự nạp: manifest → `core` zone xuất phát → cho điều khiển → `full` zone xuất phát → zone kề khi khoảng cách tới ranh giới ≤ `prefetchDistance` (100 m) → giải phóng zone cách > `unloadDistance` (2 zone) (FR-RTM-09, 10). Tải bằng `fetch` + `ReadableStream` để báo tiến độ theo byte; tối đa 4 yêu cầu song song; giải mã trên Web Worker; tải lên GPU theo lát ≤ 4 ms/khung. Lỗi: thử lại lùi 2/4/8 s (ERR-RTM-02). Vượt bộ nhớ: giải phóng zone xa sớm, rồi hạ tier (ERR-RTM-05) |
 | ALG-RTM-03 | Hạ tier động | Cửa sổ trượt 5 s các khung; nếu fps trung bình < mục tiêu × (1 − 0,15) liên tục 5 s → hạ một tier, báo HUD, khoá không tự nâng trong phiên (FR-RTM-08). Hạ tier áp ngay: bán kính cỏ, cascade bóng, hậu kỳ, DPR; texture tier thấp nạp lại nền theo zone |
-| ALG-RTM-04 | Biểu thức an toàn (`@gamestudio/expr`) | Ngữ pháp: số, chuỗi `'…'`, boolean, định danh có chấm (`quest.trau.state`, `counter.lua`, `flag.x`, `hour`), toán tử `! && \|\| == != < <= > >= + - * / %`, ngoặc, gọi hàm trong danh sách trắng do nơi dùng cấp (`dist`, `event`, `flag`, `rand`, `max`, `min`, `round`). Pratt parser → AST → biên dịch thành closure một lần khi nạp; đánh giá không cấp phát. Kiểm tĩnh: định danh và hàm phải thuộc ngữ cảnh khai báo, nếu không → lỗi có vị trí ký tự (dùng cho ERR-CHR-04, ERR-CBT-02, `dialogue.check`). Không `eval`, không truy cập thuộc tính động |
+| ALG-RTM-04 | Biểu thức an toàn (`@gamestudio/expr` TS cho build/Web Studio, bản C# `Shared/Expr` trong player, cùng bộ vector kiểm; CR-02) | Ngữ pháp: số, chuỗi `'…'`, boolean, định danh có chấm (`quest.trau.state`, `counter.lua`, `flag.x`, `hour`), toán tử `! && \|\| == != < <= > >= + - * / %`, ngoặc, gọi hàm trong danh sách trắng do nơi dùng cấp (`dist`, `event`, `flag`, `rand`, `max`, `min`, `round`). Pratt parser → AST → biên dịch thành closure một lần khi nạp; đánh giá không cấp phát. Kiểm tĩnh: định danh và hàm phải thuộc ngữ cảnh khai báo, nếu không → lỗi có vị trí ký tự (dùng cho ERR-CHR-04, ERR-CBT-02, `dialogue.check`). Không `eval`, không truy cập thuộc tính động |
 | ALG-RTM-05 | Biến game và sự kiện | `GameState` lưu `flags: Map<id, bool>`, `counters: Int32Array` theo chỉ số, `quests: Uint8Array` (0 `chua_nhan`, 1 `dang_lam`, 2 `xong`); chỉ số gán lúc nạp từ `game.json.state`. Sự kiện `fire_event` đi qua `EventBus` (hàng đợi vòng 256), xử lý ở đầu khung sau |
 | ALG-RTM-06 | Điểm tương tác | Lưới không gian (ô 8 m) chứa điểm tương tác của zone đã nạp; mỗi khung tra ô quanh người chơi, chọn điểm gần nhất thoả `radius` và điều kiện → hiện nút hành động ngữ cảnh; hành động `show_info/start_dialogue/pick_item/change_zone/fire_event` (FR-RTM-19) |
 | ALG-RTM-07 | Lưu cục bộ | IndexedDB DB `gs-save`, khoá `<gameId>@<publishVersion>`; lưu khi tạm dừng, đổi zone, mỗi 60 s; nội dung `{pos, zone, state, gameHour}`; phiên bản xuất bản khác → bỏ qua bản lưu cũ (FR-RTM-21) |
@@ -80,7 +86,7 @@ TSD này là "hợp đồng kỹ thuật" dùng chung: schema và dữ liệu, v
 - Chế độ dev `?dev=1` chỉ khi `publish.json.dev=true` hoặc khung xem trước có quyền: flycam, orbit, lớp phủ SCR-RTM-06, chọn tier, tua giờ (FR-RTM-17).
 
 ### 3.2 UI trong game
-DOM overlay (`<div id="gs-ui">`) dùng CSS thuần + vài web component nhỏ, không framework; cỡ chữ thân 16 px CSS, tương phản ≥ 4,5:1, chuỗi giao diện từ `i18n/<lang>.json` theo `game.json.language` (FR-RTM-18, 22). Credit đọc `manifest.credits` (TSD-03 ALG-AST-07).
+UI Toolkit trong Unity player (CR-02; trước là DOM overlay); cỡ chữ thân 16 px CSS, tương phản ≥ 4,5:1, chuỗi giao diện từ `i18n/<lang>.json` theo `game.json.language` (FR-RTM-18, 22). Credit đọc `manifest.credits` (TSD-03 ALG-AST-07).
 
 ---
 
@@ -88,10 +94,10 @@ DOM overlay (`<div id="gs-ui">`) dùng CSS thuần + vài web component nhỏ, k
 
 | Mã | Cấu trúc | Ghi chú |
 |---|---|---|
-| SCH-RTM-01 | Bộ JSON Schema `engine/schema/*.schema.json` + `index.ts` xuất `validate(kind, data)` (Ajv standalone đã biên dịch, ~25 KB gzip cho runtime) | Lỗi trả `{instancePath, keyword, message}`; runtime bản dev hiện đường dẫn, bản xuất bản hiện thông báo chung (ERR-RTM-03) |
+| SCH-RTM-01 | Bộ JSON Schema `engine/schema/*.schema.json` + `index.ts` xuất `validate(kind, data)` (Ajv standalone đã biên dịch) dùng ở CLI, packager và Web Studio; player chỉ kiểm `schemaVersion` và trường bắt buộc khi nạp (CR-02) | Lỗi trả `{instancePath, keyword, message}`; runtime bản dev hiện đường dẫn, bản xuất bản hiện thông báo chung (ERR-RTM-03) |
 | SCH-RTM-02 | `migrate/` | Mỗi schema `<tên>/<n>-to-<n+1>.ts` thuần hàm; `engine migrate` sao lưu `data/` vào `data.bak-<ts>/` trước khi ghi |
 | SCH-RTM-03 | `budgets.json` | Như SRS-04 mục 6.3; `$defs.tierBudget`; zone ghi đè ở `world.zones[].budgetOverride` (gộp nông theo khoá) |
-| SCH-RTM-04 | `manifest.json` | SRS-04 mục 6.5, bổ sung: `zones[].parts{core,full}` mỗi tier, `zones[].lightmaps{timeOfDayId: file}`, `chunks{combat?, dialogueAi?, recast?}`, `fallbacks{texture: 'png'\|'jpg'}`, `surfaceMap` |
+| SCH-RTM-04 | `manifest.json` | SRS-04 mục 6.5, bổ sung: `zones[].parts{core,full}` mỗi tier, `zones[].lightmaps{timeOfDayId: file}`, `modules{combat?}` (cờ bật module trong player; CR-02 bỏ chunk JS và recast), `fallbacks{texture: 'png'\|'jpg'}`, `surfaceMap` |
 | SCH-RTM-05 | Báo cáo `report/1` | Đúng SRS-04 mục 6.4; thêm `tool: {name, version}`, `host` (máy chạy), `stepVersion` |
 | SCH-RTM-06 | `publish.json` | `{gameId, publishVersion, publishedAt, engineVersion, schemaVersion, dataHash, tiers[], qa: {result, reportRef}, notMet: bool, dev: bool}`; v1.2 (CR-01, FR-CLI-12) thêm `previousVersion?`, `dataVersion`, `changes[{kind: them\|sua\|xoa, file, objectId, fields[]}]` (≤ 200 mục, phần dư gộp đếm) (FR-CLI-06, FR-WEB-37) |
 | SCH-RTM-07 | `qa/views.json`, `qa/routes.json`, `qa/bot/*.json` | `view {id, zone, pos[3], dir[3] \| lookAt[3], fov, timeOfDay, tier?}`; `route {id, zone, points[], speed, durationS}`; `bot {id, seed, steps[{goal: goto\|interact\|wait\|random_walk, …}], maxS}` |
@@ -136,11 +142,11 @@ DOM overlay (`<div id="gs-ui">`) dùng CSS thuần + vài web component nhỏ, k
 
 | Mã | Thuật toán | Mô tả |
 |---|---|---|
-| ALG-QA-01 | QA nhẹ | Playwright Chromium headless, `--use-gl=angle --use-angle=swiftshader` trên máy không GPU (ghi rõ trong báo cáo: số fps giả lập chỉ để so tương đối); mở bản build qua máy chủ tĩnh cục bộ với `?test=1&seed=<seed>`; smoke: không lỗi console mức error, khung đầu render (pixel không đồng màu) trong 30 s; chụp 3–5 góc đầu `views.json`; đo nhanh 20 s trên route đầu ở viewport 412 × 915 DPR 2,6; kiểm ngân sách từ báo cáo packager + `renderer.info` (FR-QA-02) |
+| ALG-QA-01 | QA nhẹ | Playwright Chromium headless, `--use-gl=angle --use-angle=swiftshader` trên máy không GPU (ghi rõ trong báo cáo: số fps giả lập chỉ để so tương đối); mở bản build qua máy chủ tĩnh cục bộ với `?test=1&seed=<seed>`; smoke: không lỗi console mức error, khung đầu render (pixel không đồng màu) trong 30 s; chụp 3–5 góc đầu `views.json`; đo nhanh 20 s trên route đầu ở viewport 412 × 915 DPR 2,6; kiểm ngân sách từ báo cáo packager + thống kê player (`ProfilerRecorder` qua `.jslib`, CR-02) (FR-QA-02) |
 | ALG-QA-02 | QA đầy đủ | Mọi góc; visual regression (ALG-QA-03); perf 3 tier giả lập; bot (ALG-QA-04) khi có `qa/bot`; `engine asset check`; hội thoại (`--dialogue`, TSD-07 ALG-DLG-06); tổng hợp báo cáo `kind: qa` (FR-QA-03) |
 | ALG-QA-03 | Visual regression | Ảnh PNG 1280 × 720 mỗi góc; so baseline: SSIM (ssim.js, cửa sổ 8×8, ảnh xám) và tỷ lệ pixel khác (pixelmatch threshold 0,1); "khác" khi SSIM < 0,98 hoặc > 0,5% pixel (OI-QA-01); sinh ảnh diff; chọn ≤ 4 góc điểm tệ nhất cho báo cáo (FR-QA-05). Baseline lưu `qa/baseline/<view>.png` + `baseline.json {view, acceptedBy, at, reason, buildHash}`; chỉ cập nhật bằng `--accept-baseline` hoặc API-WEB-34 (FR-QA-09). Thiếu baseline → `warn` (ERR-QA-02) |
 | ALG-QA-04 | Bot playtest | Điều khiển người chơi bằng API test nội bộ (`window.__gsTest`); kịch bản bước mục tiêu + đi ngẫu nhiên có seed; mỗi 0,5 s ghi vị trí; báo `stuck` (dịch < 0,5 m trong 5 s khi có lệnh đi), `out_of_bounds`, `penetration` (tâm viên nang trong collider tĩnh), lỗi console; gom log `stuck` của NPC (FR-CHR-20) (FR-QA-08) |
-| ALG-QA-05 | Canvas inspector | Bọc `WebGL2RenderingContext` trong bản test để đếm `drawElements/drawArrays(Instanced)`, chương trình, texture, buffer; đọc `renderer.info`; đọc pixel `readPixels` cho kiểm màn đen/màu trung bình (FR-QA-06) |
+| ALG-QA-05 | Canvas inspector | Bọc `WebGL2RenderingContext` trong bản test để đếm `drawElements/drawArrays(Instanced)`, chương trình, texture, buffer; đọc thống kê player qua `.jslib` (CR-02); đọc pixel `readPixels` cho kiểm màn đen/màu trung bình (FR-QA-06) |
 | ALG-QA-06 | Tóm tắt cho Claude | Báo cáo có `summary` ≤ 20 dòng: kết quả, check Fail/Warn kèm giá trị/giới hạn, góc khác nhất; ảnh chỉ liệt kê đường dẫn (FR-QA-10) |
 
 Đo A56 thật (UC-QA-03, FR-QA-07): link `…/play/<publish>?perf=1&route=<id>&pt=<token đo>`; runtime chạy route tự động, thu fps (avg, P5, P1 từ histogram 1 ms), `frameMs`, `performance.memory` (nếu có), draw call, tri; gửi API-WEB-60, không mạng → hiện JSON để sao chép.
@@ -153,7 +159,7 @@ DOM overlay (`<div id="gs-ui">`) dùng CSS thuần + vài web component nhỏ, k
 |---|---|
 | NFR-RTM-01 ≤ 10 s tới điều khiển được | `core` zone xuất phát ≤ 8 MB (TSD đề xuất); JS khởi động ≤ 1,2 MB gzip; preload `manifest` + engine bằng `<link rel=modulepreload>`; giải mã trên worker |
 | NFR-RTM-02 fps ≥ 30, P5 ≥ 25 | Ngân sách khung TSD-00 mục 7.2; ALG-RTM-03; packager Fail khi vượt draw call/tri |
-| NFR-RTM-03 trình duyệt | WebGL2 bắt buộc; kiểm thử Chrome Android ổn định + bản trước, Chrome/Edge desktop |
+| NFR-RTM-03 trình duyệt | WebGL2 bắt buộc (nền Web của Unity); kiểm thử Chrome Android ổn định + bản trước, Chrome/Edge desktop |
 | NFR-QA-01 QA nhẹ ≤ 5 phút, đầy đủ ≤ 30 phút | QA nhẹ một trình duyệt, ≤ 5 góc; đầy đủ chạy song song góc theo 2 trang; timeout cứng → ERR-QA-01 |
 | NFR-QA-02 tất định | Chế độ test bước cố định, RNG seed, tắt hạt phụ thuộc thời gian thực, `preserveDrawingBuffer` khi chụp; ngưỡng nhiễu pixel do SwiftShader |
 | NFR-CLI-01 build lại không đổi ≤ 30 s | Băm theo lát dữ liệu (không băm asset lớn mỗi lần: dùng cache `mtime+size → sha256`); cache hit chỉ kiểm `meta.json` |
@@ -167,7 +173,7 @@ DOM overlay (`<div id="gs-ui">`) dùng CSS thuần + vài web component nhỏ, k
 | TST-RTM-01 | Schema: mỗi file mẫu hợp lệ; file sai → lỗi có `instancePath` đúng (AC-04-06) |
 | TST-RTM-02 | `migrate` chuyển dữ liệu v1 mẫu → v2, giữ bản sao lưu |
 | TST-RTM-03 | `expr`: bảng 200 biểu thức (đúng, sai cú pháp, hàm cấm, định danh lạ); không dùng `eval` (grep CI) |
-| TST-RTM-04 | Lint import: `games/*/scripts` import đường dẫn nội bộ → CI lỗi (FR-RTM-04) |
+| TST-RTM-04 | Không có mã riêng game (CR-02): `games/*/` chứa tệp mã → `engine validate`/packager lỗi (FR-RTM-04) |
 | TST-RTM-05 | Tắt KTX2 (giả lập không hỗ trợ) → dùng fallback, không màn đen (AC-04-05) |
 | TST-RTM-06 | Profiler 2 phút ở số thực thể tối đa: không GC > 5 ms; heap không tăng đều (FR-RTM-23, AC-05-08) |
 | TST-RTM-07 | Ví dụ FR-RTM-14: 100/112/125 draw call → Pass/Warn/Fail; fps 31/28/26 → Pass/Warn/Fail |
@@ -192,7 +198,7 @@ DOM overlay (`<div id="gs-ui">`) dùng CSS thuần + vài web component nhỏ, k
 | Mã | Câu hỏi | Đề xuất |
 |---|---|---|
 | OIT-RTM-01 | Cấu hình bóng động theo tier | Như mục 2.4; chốt sau E2 đo A56 |
-| OIT-RTM-02 | `BatchedMesh` của Three.js thay cho gộp mesh ở packager | Thử ở E2 trên A56; giữ gộp tĩnh làm mặc định |
+| OIT-RTM-02 | (CR-02) `BatchedMesh` của Three.js không còn áp dụng; thử GPU Resident Drawer / SRP Batcher của Unity thay cho gộp mesh ở packager | Thử ở POC-U1/E2 trên A56; giữ gộp tĩnh làm mặc định |
 | OIT-QA-01 | Có máy QA có GPU để đo fps giả lập sát thực hơn | Không bắt buộc; số liệu cổng lấy từ A56 thật |
 
 ---
@@ -248,3 +254,4 @@ DOM overlay (`<div id="gs-ui">`) dùng CSS thuần + vài web component nhỏ, k
 | 1.1 | 22/11/2026 | Claude | Chốt các số "(đề xuất)" có nguồn từ SRS sau khi Huy duyệt SRS |
 | 1.2 | 23/11/2026 | Claude | CR-01 (SRS-04 v1.1): IF-CLI-04, SCH-RTM-06 mở rộng, SCH-RTM-09, 10, mục 5.3 ALG-CLI-04…08, TST-CLI-04…08, truy vết FR-CLI-08…12, NFR-CLI-02 |
 | 1.2 | 23/11/2026 | Huy | Duyệt phần bổ sung CR-01 |
+| 1.3 | 25/11/2026 | Claude | CR-02 (runtime Unity, ADR-036; Huy duyệt phân tích 25/11/2026): viết lại mục 2 cho Unity player (cấu trúc project, IF-RTM-01…05, vòng lặp, render); ALG-RTM-01, 04; UI Toolkit (3.2); SCH-RTM-01, 04; ALG-QA-01, 05; NFR-RTM-03; OIT-RTM-02 |

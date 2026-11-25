@@ -274,7 +274,7 @@
 | BR-40.3 | BRD-04 | Lệnh trả mã thoát chuẩn và báo cáo JSON để Web Studio và Claude Code dùng chung | M | SRS-04: FR-CLI-03, FR-CLI-08 |
 | BR-41.1 | BRD-09 | Ghi chú dự án gọn (ràng buộc, việc đã xong, asset đang chờ, bước tiếp) cập nhật bằng `/handoff` c… | M | SRS-09: FR-DEV-15 |
 | BR-41.2 | BRD-09 | `/clear` giữa các phiếu; phiếu sau đọc ghi chú thay vì lịch sử | M | SRS-09: FR-DEV-16 |
-| BR-42.1 | BRD-09 | MCP xem cảnh (Three.js, Blender) chỉ bật khi gỡ lỗi | S | SRS-09: FR-DEV-17 |
+| BR-42.1 | BRD-09 | MCP xem cảnh (Unity, Blender) chỉ bật khi gỡ lỗi | S | SRS-09: FR-DEV-17 |
 | BR-43.2 | BRD-09 | Khoá Gemini, ElevenLabs, Claude API để trong biến môi trường; script probe kiểm có khoá mà không … | M | SRS-09: FR-DEV-22 |
 | BR-43.3 | BRD-09 | Không commit file bí mật; có `.gitignore` và quét bí mật trước commit | M | SRS-09: FR-DEV-23 |
 | BR-44.1 | BRD-09 | LICENSE MIT gốc và thông báo bản quyền giữ trong repo | M | SRS-09: FR-DEV-13 |

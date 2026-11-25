@@ -3,13 +3,13 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | DDD-00 |
-| Phiên bản | 1.0 |
+| Phiên bản | 1.1 |
 | Ngày | 23/11/2026 |
 | Chủ sở hữu / người duyệt | Huy |
 | Người soạn | Claude |
 | Nguồn | TSD-00…09 v1.1, riêng TSD-00, 01, 04, 09 v1.2 và TSD-08 v1.3 (đã duyệt, CR-01); SRS-00…09 v1.0, riêng SRS-00 v1.2, SRS-01, 04, 09 v1.1, SRS-06 v1.1, SRS-08 v1.2 (đã duyệt); ADR-016…033 (đã chốt), BRD-00 v0.5 |
 | Quyết định áp dụng | QĐ-13 chiến đấu/săn bắt là module tuỳ chọn, mặc định tắt; QĐ-14 hội thoại NPC tĩnh, AI khi chạy tuỳ chọn và chỉ qua cổng AI phía server; QĐ-15 Web Studio riêng, chỉ người được mời (CH-23); TD-01…18 (ADR-016…033) |
-| Trạng thái | Đã duyệt (Huy, 23/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 23/11/2026); **v1.1 runtime Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại |
 
 > DDD đi một tầng dưới TSD: TSD nói **dùng gì và theo thuật toán nào**, DDD nói **viết vào tệp nào, lớp và hàm nào, chữ ký kiểu ra sao, bảng CSDL có cột và chỉ mục gì, API nhận và trả gì, luồng gọi và máy trạng thái ra sao, xử lý lỗi và cấu hình thế nào, kiểm thử những ca nào**. Mục tiêu là một phiếu Claude Code có thể mở đúng một mục DDD, viết mã và test mà không phải đoán. DDD không định nghĩa lại mã của SRS/TSD, không tự chốt số SRS còn mở. Hai số còn mở theo SRS được thiết kế thành **tham số cấu hình** với giá trị khởi tạo: LOD hành vi 30/80 m (OI-CHR-07) và ngân sách chiến đấu tier Vừa 3 kẻ tấn công / 20 đạn (OI-CBT-05).
 
@@ -292,7 +292,7 @@ Không băm tệp asset (dùng hash registry), không gọi mạng → ≤ 5 s c
 | MOD-GEN-11 | `@gamestudio/expr` | `engine/shared/expr` | `.` | `tsc` |
 | MOD-GEN-12 | `@gamestudio/schema` | `engine/schema` | `.`, `./patch`, `./validators` (ESM + CJS), `./types` | `tsc` + `scripts/gen-validators.ts` + `scripts/gen-types.ts` |
 | MOD-GEN-13 | `@gamestudio/intake` | `engine/intake` | `.` | `tsc` |
-| MOD-GEN-14 | `@gamestudio/engine` | `engine/runtime` | `.` (bootstrap), `./api`, `./editor` (chỉ gói dev), `./combat` và `./dialogue-ai` (entry chunk) | Vite library mode, nhiều entry, đầu ra `dist/engine/<semver>/` |
+| MOD-GEN-14 | Unity player (CR-02, thay `@gamestudio/engine`) | `engine/unity` | `GameStudio.Runtime` (player), `GameStudio.Editor` (chế độ preview trong player), `GameStudio.Tests` | Unity Web build (Brotli), đầu ra `dist/engine/<semver>/` (loader, `.wasm`, `.data`, `.framework.js`); build batchmode trên máy dev |
 | MOD-GEN-15 | `@gamestudio/qa` | `engine/qa` | `.` | `tsc` |
 | MOD-GEN-16 | `@gamestudio/cli` | `engine/cli` | `bin: {engine: dist/main.js}` | `tsc` |
 | MOD-GEN-17 | `@gamestudio/web-shared`, `-api`, `-ai-gateway`, `-worker`, `-app` | `web/*` | xem DDD-08 | `tsc` / Vite |
@@ -301,7 +301,7 @@ Không băm tệp asset (dùng hash registry), không gọi mạng → ≤ 5 s c
 `pnpm-workspace.yaml`: `packages: ['engine/*', 'engine/shared/*', 'engine/build/*', 'web/*']`. `pyproject.toml` gốc khai báo workspace `uv` cho `engine/build/py` và các bước Python.
 
 ### 4.2 Luật phụ thuộc (TSD-00 mục 4.2)
-Cấu hình `.dependency-cruiser.cjs`: (1) `no-circular`; (2) `engine/runtime/**` không tới `node:*`, `fs`, `path`; (3) `games/*/scripts/**` chỉ tới `@gamestudio/engine/api`; (4) `web/app/**` không tới `web/api/**`, `web/ai-gateway/**`, `web/worker/**`; (5) `web/**` không chứa bản sao logic intake: cấm import đường dẫn `engine/intake/src/**` trực tiếp, chỉ `@gamestudio/intake` (TST-INT-10).
+Cấu hình `.dependency-cruiser.cjs`: (1) `no-circular`; (2) `engine/unity/**` không chứa mã TS/JS ngoài `.jslib`; (3) `games/**` không chứa tệp mã (FR-RTM-04, CR-02); (4) `web/app/**` không tới `web/api/**`, `web/ai-gateway/**`, `web/worker/**`; (5) `web/**` không chứa bản sao logic intake: cấm import đường dẫn `engine/intake/src/**` trực tiếp, chỉ `@gamestudio/intake` (TST-INT-10).
 
 ---
 
@@ -461,7 +461,7 @@ DDD-01…09 có mục "Truy vết" ánh xạ FR/NFR và thành phần TSD sang t
 | NFR-GEN-07 | TSD-00 mục 8 | Mục 9; DDD-08 (bảo mật web) |
 | NFR-GEN-08 | TSD-08 ALG-WEB-05 | DDD-08 (hạn mức), DDD-07 (hạn mức hội thoại) |
 | NFR-GEN-09 | TSD-00 mục 9.2 | Mục 8 |
-| NFR-GEN-10 | TD-03 | DDD-04 (kiểm WebGL2) |
+| NFR-GEN-10 | TD-03 | DDD-04 (trang nạp kiểm WebGL2 trước khi tải Unity player, CR-02) |
 | NFR-GEN-11 | TSD-00 mục 4.3 | Mục 2.1 |
 | NFR-GEN-12 | TSD-09 ALG-DEV-02 | DDD-09 (token-meter) |
 | NFR-GEN-13 | TSD-00 mục 4.3 | DDD-08 (i18n), DDD-04 (UI trong game) |
@@ -487,3 +487,4 @@ DDD-01…09 có mục "Truy vết" ánh xạ FR/NFR và thành phần TSD sang t
 | 0.1 | 22/11/2026 | Claude | Bản đầu: DDD-00…09, Phụ lục A, `tools/ddd-trace.py`; soạn từ TSD-00…09 v1.1 và SRS v1.0 |
 | 0.2 | 23/11/2026 | Claude | CR-01 (Huy yêu cầu 23/11/2026: luồng làm tiếp/cập nhật game đang làm dở hoặc đã có), theo SRS-00 v1.2 và TSD-00 v1.2: mục 3.7 gói `@gamestudio/status` (MOD-GEN-20, 21, DTO-GEN-08, 09, STM-GEN-01, PSC-GEN-05, CFG-GEN-06, TC-GEN-07, 08); DDD-01, 04, 08, 09 bổ sung phần CR-01 |
 | 1.0 | 23/11/2026 | Huy | Duyệt bộ DDD; thay đổi sau đây theo change request |
+| 1.1 | 25/11/2026 | Claude | CR-02 (runtime Unity, ADR-036): MOD-GEN-14 thành Unity player `engine/unity`; luật dependency-cruiser (2), (3); dòng NFR-GEN-10 |

@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | DDD-04 |
-| Phiên bản | 1.0 |
+| Phiên bản | 1.1 |
 | Ngày | 23/11/2026 |
 | Tài liệu cha | DDD-00 `DDD-00-TONG-QUAN.md` |
 | TSD nguồn | TSD-04 v1.2 (IF-RTM-01…05, SCH-RTM-01…10, ALG-RTM-01…07, IF-CLI-01…04, ALG-CLI-01…08, ALG-QA-01…06, TST-RTM-01…08, TST-QA-01…04, TST-CLI-01…08); TSD-00 v1.2 (ALG-GEN-05, SCH-GEN-07) |
 | SRS nguồn | SRS-04 v1.1 (FR-RTM-01…23, FR-QA-01…10, FR-CLI-01…12, NFR-RTM-01…03, NFR-QA-01…02, NFR-CLI-01, 02; CR-01 làm tiếp/cập nhật game) |
-| Gói | `@gamestudio/engine` (`engine/runtime`), `@gamestudio/expr`, `@gamestudio/schema` (validate, migrate), `engine/build/packager`, `@gamestudio/qa`, `@gamestudio/cli` |
+| Gói | Unity player `engine/unity` (C#, CR-02), `@gamestudio/expr`, `@gamestudio/schema` (validate, migrate), `engine/build/packager`, `@gamestudio/qa`, `@gamestudio/cli` |
 | Pha | E0 (baseline), E1, E2, E3, E6 |
-| Trạng thái | Đã duyệt (Huy, 23/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 23/11/2026); **v1.1 runtime Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại |
 
 ---
 
@@ -23,25 +23,27 @@ DDD này là hợp đồng chi tiết dùng chung: khung runtime (hệ thống, 
 
 ### 2.1 Runtime
 
-| Mã | Tệp (`engine/runtime/src/…`) | Trách nhiệm |
+> Từ v1.1 (CR-02, ADR-036) runtime là Unity player `engine/unity` (C#). Mã MOD-RTM-01…17 giữ số; tệp đổi sang C# trong `engine/unity/Assets/GameStudio/…`. MOD-RTM-03, 04, 15 vẫn là mã TS dùng ở build, CLI và Web Studio.
+
+| Mã | Tệp (`engine/unity/Assets/GameStudio/…`) | Trách nhiệm |
 |---|---|---|
-| MOD-RTM-01 | `index.ts`, `core/engine.ts`, `core/bootstrap.ts` | `bootstrap()`, lớp `Engine` (vòng đời STM-RTM-01, vòng lặp, chế độ `play`/`preview`/`test`) |
-| MOD-RTM-02 | `core/system-registry.ts`, `core/event-bus.ts`, `core/pools.ts`, `core/clock.ts` | Đăng ký hệ thống theo `order`, `EventBus` hàng đợi vòng 256, `Pool<T>`, `GameClock` (giờ game, thời gian cố định ở test) |
-| MOD-RTM-03 | `engine/schema/migrate/<tên>/<n>-to-<n+1>.ts`, `engine/schema/src/migrate.ts`, `engine/cli/src/commands/migrate.ts` | Chuỗi migrate thuần hàm; `engine migrate [--dry-run]` sao lưu `data.bak-<ts>/` |
-| MOD-RTM-04 | `engine/schema/dist/validators.js` (sinh), `engine/schema/src/validate.ts` | Ajv standalone ~25 KB gzip cho runtime; thông báo lỗi theo chế độ (ERR-RTM-03) |
-| MOD-RTM-05 | `loader/manifest-loader.ts`, `loader/zone-streamer.ts`, `loader/asset-cache.ts`, `loader/fetch-progress.ts`, `loader/gpu-upload-queue.ts`, `loader/loader.worker.ts` | Nạp manifest, stream zone `core`/`full`, cache có đếm tham chiếu, giải mã KTX2/Meshopt/Draco trên Worker, tải lên GPU theo lát |
-| MOD-RTM-06 | `render/render-system.ts`, `render/renderer-factory.ts`, `render/materials.ts`, `render/lightmap.ts`, `render/instancing.ts`, `render/lod.ts`, `render/shadows.ts` | Tạo `WebGLRenderer`, vật liệu dùng chung theo tier, lightmap/AO UV2, instancing, LOD vật đơn, bóng theo tier |
-| MOD-RTM-07 | `tier/detect.ts`, `tier/tier-monitor.ts`, `tier/apply-tier.ts`, `tier/tier-table.json` | Chọn tier khởi động, đo 3 s, hạ tier động, áp thay đổi |
-| MOD-RTM-08 | `input/input-system.ts`, `input/touch-joystick.ts`, `input/touch-look.ts`, `input/keyboard-mouse.ts`, `input/action-buttons.ts` | Hệ thống `input` (order 10): hợp nhất cảm ứng/bàn phím thành `InputState` |
-| MOD-RTM-09 | `interaction/interaction-system.ts`, `interaction/game-state.ts`, `interaction/spatial-grid.ts`, `interaction/actions.ts`, `interaction/quests.ts` | Hệ thống `interaction` (order 60): điểm tương tác, `GameState`, nhiệm vụ, `fire_event` |
-| MOD-RTM-10 | `ui/ui-system.ts`, `ui/hud.ts`, `ui/menu.ts`, `ui/settings.ts`, `ui/credits.ts`, `ui/dev-overlay.ts`, `ui/loading-screen.ts`, `ui/i18n.ts`, `ui/styles.css` | DOM overlay `#gs-ui`, SCR-RTM-01…06 |
-| MOD-RTM-11 | `audio/audio-system.ts`, `audio/buses.ts`, `audio/spatial-pool.ts`, `audio/ambience.ts` | WebAudio, bus tổng/nhạc/hiệu ứng/giọng, nguồn 3D pool, âm nền theo vùng/mốc |
-| MOD-RTM-12 | `save/save-store.ts` | IndexedDB `gs-save` |
-| MOD-RTM-13 | `perf/perf-monitor.ts`, `perf/histogram.ts`, `perf/gpu-timer.ts`, `perf/perf-route.ts`, `perf/sender.ts` | fps, P5/P1, `renderer.info`, timer query, route đo, gửi API-WEB-60 |
-| MOD-RTM-14 | `api/index.ts` | API công khai cho `games/*/scripts` (IF-RTM-05) |
-| MOD-RTM-15 | `engine/shared/expr/src/{lexer.ts, parser.ts, ast.ts, check.ts, compile.ts, index.ts}` | Biểu thức an toàn: lexer, Pratt parser, kiểm tĩnh, biên dịch closure |
-| MOD-RTM-16 | `editor/index.ts`, `editor/bridge.ts`, `editor/gizmo.ts`, `editor/picking.ts` | Phía engine của `EditorBridge` (TSD-08 IF-WEB-05), chỉ có trong gói dev `@gamestudio/engine/editor` |
-| MOD-RTM-17 | `test/test-api.ts` | `window.__gsTest` cho bot QA, chỉ khi `mode='test'` |
+| MOD-RTM-01 | `Core/Engine.cs`, `Core/Boot.cs`, `Core/EngineRunner.cs` (`MonoBehaviour` tên `GameStudio`) | Nhận `Boot(json)` qua `SendMessage` (IF-RTM-01), lớp `Engine` (vòng đời STM-RTM-01, vòng lặp, chế độ `play`/`preview`/`test`) |
+| MOD-RTM-02 | `Core/SystemRegistry.cs`, `Core/EventBus.cs`, `Core/Pool.cs`, `Core/GameClock.cs` | Đăng ký hệ thống theo `Order`, `EventBus` hàng đợi vòng 256 (struct), `Pool<T>`, `GameClock` (giờ game, thời gian cố định ở test) |
+| MOD-RTM-03 | `engine/schema/migrate/<tên>/<n>-to-<n+1>.ts`, `engine/schema/src/migrate.ts`, `engine/cli/src/commands/migrate.ts` | Chuỗi migrate thuần hàm; `engine migrate [--dry-run]` sao lưu `data.bak-<ts>/` (không đổi) |
+| MOD-RTM-04 | `engine/schema/dist/validators.js` (sinh), `engine/schema/src/validate.ts`; phía player `Loader/ManifestCheck.cs` | Ajv standalone dùng ở CLI, packager, Web Studio; player chỉ kiểm `schemaVersion`, `engineVersion` và trường bắt buộc (ERR-RTM-03) |
+| MOD-RTM-05 | `Loader/ManifestLoader.cs`, `Loader/ZoneStreamer.cs`, `Loader/AssetCache.cs`, `Loader/FetchProgress.cs`, `Loader/GltfLoader.cs` (glTFast + Meshopt decompress), `Loader/Ktx2Loader.cs` (KTX for Unity), `Loader/UploadQueue.cs` | Nạp manifest, stream zone `core`/`full`, cache có đếm tham chiếu, giải mã chia lát theo khung (nền Web một luồng) |
+| MOD-RTM-06 | `Render/RenderSystem.cs`, `Render/UrpTierAssets/*.asset`, `Render/Materials.cs`, `Render/Lightmap.cs` + `Shaders/LitRgbmLightmap.shadergraph`, `Render/Instancing.cs`, `Render/Lod.cs`, `Render/Shadows.cs` | URP theo tier, vật liệu dùng chung, lightmap RGBM/AO UV2, GPU instancing, `LODGroup`, cascade bóng |
+| MOD-RTM-07 | `Tier/Detect.cs` + `Plugins/WebGL/gs-device.jslib`, `Tier/TierMonitor.cs`, `Tier/ApplyTier.cs`, `Tier/tier-table.json` | Chọn tier khởi động, đo 3 s, hạ tier động, áp thay đổi |
+| MOD-RTM-08 | `Input/InputSystemGs.cs`, `Input/TouchJoystick.cs`, `Input/TouchLook.cs`, `Input/KeyboardMouse.cs`, `Input/ActionButtons.cs` | Hệ thống `input` (order 10) trên Unity Input System: hợp nhất cảm ứng/bàn phím thành `InputState` |
+| MOD-RTM-09 | `Interaction/InteractionSystem.cs`, `Interaction/GameState.cs`, `Interaction/SpatialGrid.cs`, `Interaction/Actions.cs`, `Interaction/Quests.cs` | Hệ thống `interaction` (order 60): điểm tương tác, `GameState`, nhiệm vụ, danh mục hành động (IF-RTM-05) |
+| MOD-RTM-10 | `UI/UiSystem.cs`, `UI/Hud.uxml`, `UI/Menu.uxml`, `UI/Settings.uxml`, `UI/Credits.uxml`, `UI/DevOverlay.uxml`, `UI/LoadingScreen.uxml`, `UI/I18n.cs`, `UI/gs.uss` | UI Toolkit, SCR-RTM-01…06 (màn tải đầu tiên trước khi player sẵn sàng do trang nạp vẽ bằng HTML) |
+| MOD-RTM-11 | `Audio/AudioSystem.cs`, `Audio/GsMixer.mixer`, `Audio/SpatialPool.cs`, `Audio/Ambience.cs` | `AudioMixer` bus tổng/nhạc/hiệu ứng/giọng, nguồn 3D pool, âm nền theo vùng/mốc |
+| MOD-RTM-12 | `Save/SaveStore.cs` + `Plugins/WebGL/gs-save.jslib` | IndexedDB `gs-save` |
+| MOD-RTM-13 | `Perf/PerfMonitor.cs`, `Perf/Histogram.cs`, `Perf/RenderStats.cs` (`ProfilerRecorder`, `FrameTimingManager`), `Perf/PerfRoute.cs`, `Perf/Sender.cs` | fps, P5/P1, draw call/batch/tri, thời gian GPU khi có, route đo, gửi API-WEB-60 |
+| MOD-RTM-14 | `Interaction/ActionCatalog.cs` | Danh mục hành động và sự kiện mà dữ liệu game được dùng (IF-RTM-05); không còn API cho script TS riêng game (FR-RTM-04) |
+| MOD-RTM-15 | `engine/shared/expr/src/{lexer.ts, parser.ts, ast.ts, check.ts, compile.ts, index.ts}`; bản C# `Shared/Expr/{Lexer.cs, Parser.cs, Check.cs, Compile.cs}`; vector chung `engine/shared/expr/vectors/*.json` | Biểu thức an toàn: TS ở build/Web Studio, C# trong player, cùng bộ vector kiểm (bản C# của `@gamestudio/rng` ở `Shared/Rng/Pcg32.cs` dùng vector `gen_rng_vectors.py`) |
+| MOD-RTM-16 | `Editor/EditorMode.cs`, `Bridge/EditorBridgeReceiver.cs`, `Plugins/WebGL/gs-bridge.jslib`, `Editor/Gizmo.cs`, `Editor/Picking.cs` | Phía player của `EditorBridge` (TSD-08 IF-WEB-05), chỉ bật khi `mode='preview'` |
+| MOD-RTM-17 | `Test/TestApi.cs` + `Plugins/WebGL/gs-test.jslib` | `window.__gsTest` cho bot QA, chỉ khi `mode='test'` |
 
 ### 2.2 Build, QA, CLI
 
@@ -50,7 +52,7 @@ DDD này là hợp đồng chi tiết dùng chung: khung runtime (hệ thống, 
 | MOD-CLI-01 | `engine/cli/src/main.ts`, `src/commands/{new-game, build, qa, publish, doctor, migrate, validate, asset}.ts`, `src/output.ts`, `src/exit-codes.ts` | `commander`, đầu ra người đọc + `--json`, ánh xạ mã thoát |
 | MOD-CLI-02 | `engine/cli/src/orchestrator/{graph.ts, scheduler.ts, ctx.ts, runners/node.ts, runners/python.ts, runners/blender.ts, progress.ts, guards.ts}` | Đọc `step.json`, DAG, lập lịch, chạy tiến trình con, kiểm trước (brief, style bible, `engineVersion`) |
 | MOD-CLI-03 | `engine/cli/src/orchestrator/cache.ts` | Cache `build/<id>/cache/<step>/<inputHash>/` + `meta.json`, LRU, thư mục cache chia sẻ trên worker |
-| MOD-CLI-04 | `engine/build/packager/src/{index.ts, collect.ts, check-assets.ts, merge.ts, textures.ts, compress.ts, split-core.ts, optional-chunks.ts, metrics.ts, manifest.ts, credits.ts}` | Packager theo zone × tier (PSC-CLI-02) |
+| MOD-CLI-04 | `engine/build/packager/src/{index.ts, collect.ts, check-assets.ts, merge.ts, textures.ts, compress.ts, split-core.ts, modules.ts, metrics.ts, manifest.ts, credits.ts}` | Packager theo zone × tier (PSC-CLI-02) |
 | MOD-CLI-05 | `engine/cli/src/commands/publish.ts`, `engine/build/packager/src/publish.ts`, `tools/scripts/secret-scan.mjs` | Xuất bản tĩnh, quét bí mật, `publish.json`, đích `poc`/`web` |
 | MOD-CLI-06 | `engine/cli/src/commands/{status, upgrade, import, brief}.ts` | Lệnh CR-01 (IF-CLI-04): `status`, `upgrade`, `import`, `brief confirm`; `build.ts` thêm cờ `--stale`, `--dry-run` |
 | MOD-CLI-07 | `engine/cli/src/orchestrator/cache-index.ts`, `engine/cli/src/orchestrator/stale.ts`, `engine/cli/src/status/sources-fs.ts` | Chỉ mục cache `cache/index.json` (SCH-RTM-09) cập nhật nguyên tử; `planStaleFs` bọc `planStale` của `@gamestudio/status` (DDD-00 MOD-GEN-20); dựng `StatusSources` từ thư mục game |
@@ -69,66 +71,61 @@ DDD này là hợp đồng chi tiết dùng chung: khung runtime (hệ thống, 
 
 ### 3.1 Runtime
 
-```ts
-// core/bootstrap.ts  (IF-RTM-01)
-export interface BootstrapOptions {
-  canvas: HTMLCanvasElement; manifestUrl: string; engineBase: string;
-  mode: 'play' | 'preview' | 'test'; seed?: number; tier?: Tier | 'auto';
-  runtimeData?: RuntimeDataSource;            // preview: 'live'
-  onProgress?: (p: { phase: 'manifest' | 'core' | 'full'; loaded: number; total: number }) => void;
+```csharp
+// Core/Boot.cs  (IF-RTM-01) — trang nạp gọi: unityInstance.SendMessage('GameStudio', 'Boot', json)
+[Serializable] public struct BootOptions {
+  public string manifestUrl; public string mode;   // "play" | "preview" | "test"
+  public long seed; public string tier;            // "auto" | "thap" | "vua" | "cao" | "toida"
+  public bool liveRuntimeData;                      // preview: diff đến qua ApplyRuntimeData
 }
-export async function bootstrap(o: BootstrapOptions): Promise<EngineHandle>;
-export interface EngineHandle { engine: Engine; ready: Promise<void>; dispose(): void }
+// Tiến độ: gs-bridge.jslib → window.dispatchEvent(new CustomEvent('gs:progress', {detail:{phase, loaded, total}}))
 
-// core/engine.ts  (IF-RTM-02, IF-RTM-03)
-export interface System {
-  readonly id: string; readonly order: number;
-  init(ctx: EngineContext): void | Promise<void>;
-  update(dt: number, t: number): void;
-  onZoneLoaded?(z: LoadedZone): void; onZoneUnloaded?(z: LoadedZone): void;
-  onRuntimeData?(diff: RuntimeDataDiff): void; onTierChanged?(tier: Tier): void;
-  dispose(): void;
+// Core/Engine.cs  (IF-RTM-02, IF-RTM-03)
+public interface ISystem {
+  string Id { get; } int Order { get; }
+  void Init(EngineContext ctx);
+  void Tick(float dt, float t);
+  void OnZoneLoaded(LoadedZone z); void OnZoneUnloaded(LoadedZone z);
+  void OnRuntimeData(in RuntimeDataDiff diff); void OnTierChanged(Tier tier);
+  void Dispose();
 }
-export const ORDER = { input: 10, cameraPlayer: 20, npcAi: 30, characters: 40, combat: 50, interaction: 60, fx: 70, render: 80, uiAudio: 90 } as const;
-export interface EngineContext {
-  scene: THREE.Scene; renderer: THREE.WebGLRenderer; camera: THREE.PerspectiveCamera;
-  tier: Tier; budgets: TierBudget; rng: RngRoot; clock: GameClock; bus: EventBus;
-  data: RuntimeData; zones: ZoneStreamer; physics: StaticWorld; nav?: NavService;
-  audio: AudioService; ui: UiService; save: SaveStore; logger: Logger; mode: BootstrapOptions['mode'];
-  state: GameState; input: InputState;
+public static class Order { public const int Input = 10, CameraPlayer = 20, NpcAi = 30, Characters = 40, Combat = 50, Interaction = 60, Fx = 70, Render = 80, UiAudio = 90; }
+public sealed class EngineContext {
+  public Camera Camera; public Tier Tier; public TierBudget Budgets; public RngRoot Rng; public GameClock Clock; public EventBus Bus;
+  public RuntimeData Data; public ZoneStreamer Zones; public NavService Nav;   // Nav = null khi game không có agent
+  public AudioService Audio; public UiService Ui; public SaveStore Save; public ILog Log; public Mode Mode;
+  public GameState State; public InputState Input;
 }
-export class Engine {
-  register(s: System): void;                       // chèn theo order, gọi init
-  async enableOptional(name: 'combat' | 'dialogueAi' | 'recast'): Promise<void>;   // import() theo manifest.chunks
-  start(): void; pause(): void; resume(): void; stepFixed(n: number): void;        // stepFixed chỉ mode 'test'
-  applyRuntimeData(diff: RuntimeDataDiff): void;   // IF-RTM-04
+public sealed class Engine {
+  public void Register(ISystem s);                  // chèn theo Order, gọi Init
+  public void EnableModule(string name);            // "combat"; theo manifest.modules, mã luôn có trong player
+  public void Start(); public void Pause(); public void Resume(); public void StepFixed(int n);   // StepFixed chỉ mode test
+  public void ApplyRuntimeData(string jsonPatch);   // IF-RTM-04, gọi qua SendMessage
 }
 
-// core/event-bus.ts
-export interface GsEvent { type: number; a: number; b: number; s?: string }      // không cấp phát: struct tái dùng trong vòng
-export class EventBus { emit(type: number, a?: number, b?: number, s?: string): void; on(type: number, fn: (e: GsEvent) => void): () => void; flush(): void }
+// Core/EventBus.cs — không cấp phát: mảng struct vòng 256
+public struct GsEvent { public int Type; public float A, B; public int S; }   // S = chỉ số chuỗi đã intern
+public sealed class EventBus { public void Emit(int type, float a = 0, float b = 0, int s = -1); public void On(int type, Action<GsEvent> fn); public void Flush(); }
 
-// loader/zone-streamer.ts
-export class ZoneStreamer {
-  constructor(ctx: EngineContext, manifest: Manifest, cache: AssetCache);
-  loadStart(zoneId: string): Promise<void>;        // core → cho điều khiển
-  update(playerPos: THREE.Vector3): void;          // prefetch/unload theo PSC-RTM-02
-  state(zoneId: string): ZoneState;                 // STM-RTM-02
-  requestLightmap(zoneId: string, todId: string): Promise<void>; releaseLightmap(zoneId: string, todId: string): void;
+// Loader/ZoneStreamer.cs
+public sealed class ZoneStreamer {
+  public Task LoadStart(string zoneId);             // core → cho điều khiển
+  public void Tick(Vector3 playerPos);              // prefetch/unload theo PSC-RTM-02
+  public ZoneState State(string zoneId);            // STM-RTM-02
+  public Task RequestLightmap(string zoneId, string todId); public void ReleaseLightmap(string zoneId, string todId);
 }
 
-// interaction/game-state.ts  (ALG-RTM-05)
-export class GameState {
-  getFlag(id: string): boolean; setFlag(id: string, v: boolean): void;
-  getCounter(id: string): number; addCounter(id: string, d: number): void;
-  questState(id: string): 0 | 1 | 2; setQuest(id: string, s: 0 | 1 | 2): void;
-  snapshot(): SaveState; restore(s: SaveState): void;
-  indexOf(kind: 'flag' | 'counter' | 'quest', id: string): number;   // dùng khi biên dịch biểu thức
+// Interaction/GameState.cs  (ALG-RTM-05)
+public sealed class GameState {
+  public bool GetFlag(int i); public void SetFlag(int i, bool v);
+  public int GetCounter(int i); public void AddCounter(int i, int d);
+  public byte QuestState(int i); public void SetQuest(int i, byte s);
+  public SaveState Snapshot(); public void Restore(in SaveState s);
+  public int IndexOf(StateKind kind, string id);    // dùng khi biên dịch biểu thức
 }
 
-// api/index.ts  (IF-RTM-05) — chỉ những gì dưới đây
-export { onEvent, setFlag, getFlag, addCounter, quest, spawn, playSound, showInfo, rng, registerSystem };
-export type { ReadonlyVec3, System, GsEvent };
+// Interaction/ActionCatalog.cs  (IF-RTM-05) — hợp đồng dữ liệu ↔ player
+// fire_event, set_flag, add_counter, quest, spawn, play_sound, show_info, start_dialogue, pick_item, change_zone
 ```
 
 ### 3.2 Biểu thức an toàn (`@gamestudio/expr`, ALG-RTM-04)
@@ -223,18 +220,19 @@ export function diffPublish(prev: GameDataFiles, cur: GameDataFiles, max = 200):
 ```mermaid
 sequenceDiagram
     participant P as index.html
-    participant B as bootstrap
-    participant T as tier/detect
+    participant B as Boot (Unity player)
+    participant T as Tier/Detect
     participant L as ZoneStreamer
-    participant W as loader.worker
+    participant W as GltfLoader/Ktx2Loader
     participant E as Engine
-    P->>B: bootstrap({canvas, manifestUrl})
-    B->>T: WebGL2? (không → ERR-RTM-01) ; chọn tier
-    B->>B: fetch manifest, validate engineVersion, validate runtimeData (ERR-RTM-03)
-    B->>E: tạo hệ thống bắt buộc theo ORDER; import() chunk tuỳ chọn theo manifest.chunks
-    B->>L: loadStart(startZone) → parts[tier].core
-    L->>W: tải song song ≤ 4, giải mã KTX2/Meshopt
-    W-->>L: buffer đã giải mã
+    P->>P: WebGL2? (không → ERR-RTM-01, không tải player)
+    P->>B: createUnityInstance(engine/<semver>) rồi SendMessage Boot({manifestUrl, mode})
+    B->>T: chọn tier
+    B->>B: fetch manifest, kiểm engineVersion, schemaVersion, trường bắt buộc (ERR-RTM-03)
+    B->>E: tạo hệ thống bắt buộc theo Order; bật module theo manifest.modules
+    B->>L: LoadStart(startZone) → parts[tier].core
+    L->>W: tải song song ≤ 4, giải mã KTX2/Meshopt chia lát theo khung
+    W-->>L: mesh/texture Unity
     L->>E: tải lên GPU theo lát ≤ 4 ms/khung
     E-->>P: SCR-RTM-01 "Chơi" (chạm bật âm thanh)
     P->>E: start() → đo 3 s (PSC-RTM-01 bước 5)
@@ -242,7 +240,7 @@ sequenceDiagram
 ```
 
 ### SEQ-RTM-02 Áp nóng dữ liệu runtime (xem trước)
-`web/api` ghi phiên bản → SSE `data.version {impact.runtimeOnly=true, ops}` → SPA `EditorBridge.applyRuntimePatch(ops)` (DDD-08) → `Engine.applyRuntimeData(diff)`: `applyPatch(RuntimeData)` → kiểm schema phần đổi → phát `onRuntimeData(diff)` tới mọi hệ thống theo `order` → từng hệ thống chỉ nạp lại phần của mình (npc-ai: graph/thông số agent; fx: khí quyển; interaction: điểm tương tác, cây thoại) → không tải lại zone. Mục tiêu ≤ 2 s đầu-cuối.
+`web/api` ghi phiên bản → SSE `data.version {impact.runtimeOnly=true, ops}` → SPA `EditorBridge.applyRuntimePatch(ops)` (DDD-08) → `SendMessage('GameStudio','ApplyRuntimeData', json)` → `Engine.ApplyRuntimeData(diff)`: `applyPatch(RuntimeData)` → kiểm schema phần đổi → phát `onRuntimeData(diff)` tới mọi hệ thống theo `order` → từng hệ thống chỉ nạp lại phần của mình (npc-ai: graph/thông số agent; fx: khí quyển; interaction: điểm tương tác, cây thoại) → không tải lại zone. Mục tiêu ≤ 2 s đầu-cuối.
 
 ### SEQ-CLI-01 `engine build --zone z1`
 ```mermaid
@@ -361,13 +359,13 @@ Bất biến: ở mọi trạng thái khác `DaAp`, `data/`, `build/<id>/cache/`
 ### PSC-RTM-01 Chọn tier khởi động (ALG-RTM-01)
 ```
 detect():
-  gl = canvas.getContext('webgl2'); if !gl → ERR-RTM-01
-  gpu = gl.getExtension('WEBGL_debug_renderer_info') ? gl.getParameter(UNMASKED_RENDERER_WEBGL) : ''
-  mem = navigator.deviceMemory ?? 4; cores = navigator.hardwareConcurrency ?? 4; px = min(screen.w, screen.h) * dpr
-  saved = localStorage['gs.tier']; if saved and saved != 'auto' → return saved (ThuCong)
+  # trang nạp đã kiểm WebGL2 (ERR-RTM-01) trước khi tải player (CR-02)
+  {gpu, mem, cores, px, saved} = gs-device.jslib: WEBGL_debug_renderer_info, navigator.deviceMemory ?? 4,
+      navigator.hardwareConcurrency ?? 4, min(screen.w, screen.h) * dpr, localStorage['gs.tier']
+  if if saved and saved != 'auto' → return saved (ThuCong)
   r = tierTable.rules.find(r => new RegExp(r.gpuRegex,'i').test(gpu)); if r → r.tier
   else mem >= 12 → 'cao'; mem >= 8 and px >= 1080 → 'vua'; else 'thap'
-  fmt = KTX2Loader.detectSupport(renderer): astc ? 'astc' : etc2 ? 'etc2' : bc7 ? 'bc7' : 'fallback' (dùng manifest.fallbacks)
+  fmt = SystemInfo.SupportsTextureFormat (KTX for Unity chọn đích chuyển mã): astc ? 'astc' : etc2 ? 'etc2' : bc7 ? 'bc7' : 'fallback' (dùng manifest.fallbacks)
 sau start(): đo 3 s; avg < 0.85 × fpsTarget → applyTier(tier - 1) trước khi tắt màn tải mờ dần
 ```
 
@@ -449,7 +447,7 @@ pack(ctx) cho mỗi tier trong game.tiers:
      kèm fallback PNG (map có alpha) / JPG q85 ở độ phân giải ½
   6 hình học: Meshopt (EXT_meshopt_compression) + quantize (vị trí 14 bit, normal 8, uv 12)
   7 tách core/full: core = địa hình LOD2–3 + collider + vật trong 60 m quanh spawn (zone xuất phát) + mip thấp (texture ½ hoặc ¼); full = phần còn lại
-  8 chunk tuỳ chọn: chép combat-*.js chỉ khi features.combat.enabled||hunting.enabled; dialogue-ai-*.js khi có NPC mode ai|hybrid; recast.wasm khi có agent di chuyển
+  8 module tuỳ chọn (CR-02): ghi manifest.modules.combat=true khi features.combat.enabled||hunting.enabled; mã module luôn nằm trong Unity player; không còn chunk JS, recast.wasm (NavMesh dựng lúc nạp zone)
      kiểm ngược: cờ tắt mà danh sách tệp có combat-*.js hoặc asset tag 'combat' → fail ERR-CBT-04 (DDD-06 PSC-CBT-01)
   9 metrics: drawCalls = Σ(mesh sau gộp × số vật liệu) + số InstancedMesh + ước lượng veg (loài × LOD × chunk thấy được tối đa); tris, materials, maxTexture, zoneDownloadMB
      report = evaluate(metrics, budgets[tier]) (DDD-00 PSC-GEN-04); checks[].source = top 5 nguồn đóng góp (lớp veg, rule, asset)
@@ -616,7 +614,7 @@ Bản test thêm `addInitScript` bọc `WebGL2RenderingContext.prototype.{drawEl
 | TC-RTM-01 | Schema | Mẫu hợp lệ; tệp sai `world.zones[0].polygon` | Hợp lệ 0 lỗi; sai → `instancePath='/zones/0/polygon'` | TST-RTM-01 |
 | TC-RTM-02 | Migrate | `fixtures/game-v1` | v2 đúng; `data.bak-*` tồn tại; `--dry-run` không ghi | TST-RTM-02 |
 | TC-RTM-03 | Biểu thức | Bảng 200 ca (đúng, sai cú pháp, hàm cấm, định danh lạ, sâu 40) | Đúng kết quả/lỗi + `pos`; grep CI không `eval(`/`new Function` | TST-RTM-03 |
-| TC-RTM-04 | Lint import scripts | `games/x/scripts/a.ts` import `@gamestudio/engine/src/core` | CI lỗi | TST-RTM-04 |
+| TC-RTM-04 | Không có mã riêng game (CR-02) | `games/x/` chứa `scripts/a.ts` hoặc tệp `.cs`/`.js` | `engine validate` và packager báo lỗi | TST-RTM-04 |
 | TC-RTM-05 | Không KTX2 | Giả lập `detectSupport` trả rỗng | Dùng PNG/JPG fallback, pixel không đen | TST-RTM-05 |
 | TC-RTM-06 | GC | Profiler 2 phút số thực thể tối đa | Không GC > 5 ms; heap không tăng đều | TST-RTM-06 |
 | TC-RTM-07 | Ngân sách ví dụ | DDD-00 TC-GEN-05 | Đúng | TST-RTM-07 |
@@ -701,3 +699,4 @@ Bản test thêm `addInitScript` bọc `WebGL2RenderingContext.prototype.{drawEl
 | 0.1 | 22/11/2026 | Claude | Bản đầu từ TSD-04 v1.1 |
 | 0.2 | 23/11/2026 | Claude | CR-01 theo TSD-04 v1.2 / SRS-04 v1.1: MOD-CLI-06…10, mục 3.4, DTO-RTM-03 mở rộng, DTO-CLI-05…07, EP-CLI-03, SEQ-CLI-02, 03, STM-CLI-01, PSC-CLI-04…08 (ALG-CLI-04…08), ERR-CLI-02, 03, CFG-CLI-02, TC-CLI-05…09 |
 | 1.0 | 23/11/2026 | Huy | Duyệt bộ DDD; thay đổi sau đây theo change request |
+| 1.1 | 25/11/2026 | Claude | CR-02 (runtime Unity, ADR-036; Huy duyệt phân tích 25/11/2026): viết lại mục 2.1 (MOD-RTM-01…17 sang C# `engine/unity`), 3.1 (giao diện C#), SEQ-RTM-01, 02, PSC-RTM-01, PSC-CLI-02 bước 8 (module thay chunk), TC-RTM-04; MOD-QA-04 giữ bọc WebGL2 |

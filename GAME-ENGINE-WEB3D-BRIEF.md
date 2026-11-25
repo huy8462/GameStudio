@@ -7,6 +7,7 @@
 > Bản 4 (22/11/2026 17:45): Huy trả lời các câu hỏi mở, ghi thành QĐ-03…08.
 > Bản 5 (22/11/2026 17:49): thêm QĐ-09…11 (sinh ảnh/âm thanh, thư viện CC0, bám đúng mô tả).
 > Bản 6 (22/11/2026 18:04): thêm QĐ-12 (mô hình 3D CC0). Hết câu hỏi mở, brief sẵn sàng để bắt đầu E0.
+> Bản 7 (25/11/2026, CR-02): Huy đổi runtime sang **Unity** (QĐ-16, ADR-036), thay QĐ-01 phần runtime. Các mục nhắc Three.js bên dưới giữ làm lịch sử; phần còn hiệu lực ghi ở QĐ-16.
 > Người quyết định: Huy.
 
 ## Quyết định đã chốt
@@ -25,6 +26,7 @@
 | QĐ-10 | **Cho dùng thư viện CC0** (ví dụ Poly Haven: vật liệu scan, HDRI bầu trời) | Module `materials` có bộ nạp CC0: tải về kho cục bộ, ghi nguồn và license CC0 vào provenance, chuẩn hoá về độ phân giải theo tier rồi nén KTX2. Kết hợp với vật liệu thủ tục như cách đã hiệu quả ở Thiền viện online |
 | QĐ-11 | **Engine phải bám đúng mô tả** của người dùng, không tự đề xuất đổi phong cách | Bước `/new-game` không được thay đổi thể loại hay phong cách. Nếu mô tả cần asset khó sinh bằng code (nhân vật, tượng chi tiết), engine vẫn làm đúng phong cách đó, chỉ báo rõ mức rủi ro chất lượng và tăng đầu tư cho các asset ấy (mục 4.5) |
 | QĐ-12 | **Cho dùng mô hình 3D CC0 làm nguồn bổ sung**, nhất là cho nhân vật và tượng (bổ sung cho QĐ-08) | Thứ tự ưu tiên khi cần một asset 3D: (1) mô hình CC0 phù hợp phong cách mô tả, (2) generator code của Claude, (3) chỉnh mô hình CC0 bằng code/Blender cho khớp. Mô hình CC0 đi qua `asset-import`: kiểm license CC0, chuẩn hoá scale/pivot/trục, decimate và LOD theo ngân sách A56, đồng bộ vật liệu với bảng màu, gắn bộ khung xương dùng chung nếu là nhân vật, ghi provenance (nguồn, URL, tác giả, ngày tải). Vẫn không dùng Meshy/Tripo |
+| QĐ-16 | **Runtime là Unity** (25/11/2026, CR-02), thay QĐ-01 phần "Three.js + Vite + TypeScript" | Một Unity player chung (Unity 6 LTS, URP, nền Web) cho mỗi `engineVersion`, đọc gói dữ liệu game (glb, KTX2, JSON). Pipeline build TS/Python/Blender giữ nguyên; Web Studio nhúng cùng player để xem trước. Vẫn giữ fork threejs-game-skills và ghi công MIT cho phần skill, script còn dùng. Chi tiết ở ADR-036 |
 
 ---
 
@@ -129,7 +131,7 @@
 | QA | `qa` | Playwright smoke, chụp góc chuẩn, visual regression, canvas inspector, đo fps/bộ nhớ, bot playtest, kiểm ngân sách |
 | Công cụ | `cli` | `engine new-game`, `engine build --zone`, `engine qa --level=nhe\|day-du`, `engine publish`, `engine doctor` |
 
-### 4.3 Runtime web (đã chốt theo QĐ-01)
+### 4.3 Runtime web (đã chốt theo QĐ-01; từ 25/11/2026 thay bằng Unity theo QĐ-16, ADR-036)
 
 **Three.js + Vite + TypeScript**, dùng khung scaffold có sẵn trong threejs-game-skills.
 

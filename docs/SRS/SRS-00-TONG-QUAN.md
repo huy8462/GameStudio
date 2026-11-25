@@ -3,13 +3,13 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | SRS-00 |
-| Phiên bản | 1.2 |
+| Phiên bản | 1.3 |
 | Ngày | 23/11/2026 |
 | Chủ sở hữu / người duyệt | Huy (đã duyệt 22/11/2026) |
 | Người soạn | Claude |
 | BRD nguồn | BRD-00 `BRD-TONG-QUAN.md` v1.1; BRD-01…09; BRD-10 (CR-01); `GAME-ENGINE-WEB3D-BRIEF.md` bản 6 |
 | Quyết định áp dụng | QĐ-01…15; đặc biệt QĐ-13 (chiến đấu/săn bắt tuỳ chọn), QĐ-14 (hội thoại tĩnh + AI khi chạy qua cổng giữ khoá), QĐ-15 (Web Studio riêng), CH-23 (chỉ người dùng nội bộ được mời) |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.2 bổ sung luồng làm tiếp và cập nhật game theo CR-01, Huy duyệt 23/11/2026 |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.2 bổ sung luồng làm tiếp và cập nhật game theo CR-01, Huy duyệt 23/11/2026; **v1.3 đổi runtime sang Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại |
 
 > SRS giữ tinh thần gọn của BRD (`rigor: minimal`, QT-DEV-01): đặc tả đủ để Claude Code viết phiếu và kiểm thử, không thay TSD/ADR. Con số ghi **(đề xuất)** đã được Huy chấp nhận làm giá trị nền khi duyệt bản 1.0 (22/11/2026); nhãn được giữ để đánh dấu các số sẽ đo lại và chốt cuối ở cổng tương ứng (ví dụ ngân sách sau baseline A56 ở G-E0).
 
@@ -22,12 +22,12 @@
 | SRS-01 | [Tạo game từ mô tả](SRS-01-TAO-GAME-TU-MO-TA.md) (v1.1) | BRD-01 | `INT` | 34 |
 | SRS-02 | [Thế giới, địa hình và môi trường](SRS-02-THE-GIOI-DIA-HINH-MOI-TRUONG.md) | BRD-02 | `WLD` | 40 |
 | SRS-03 | [Asset 3D, vật liệu và âm thanh](SRS-03-ASSET-VAT-LIEU-AM-THANH.md) | BRD-03 | `AST` | 40 |
-| SRS-04 | [Runtime, hiệu năng và QA](SRS-04-RUNTIME-HIEU-NANG-QA.md) (v1.1) | BRD-04 | `RTM`, `QA`, `CLI` | 45 |
+| SRS-04 | [Runtime, hiệu năng và QA](SRS-04-RUNTIME-HIEU-NANG-QA.md) (v1.2) | BRD-04 | `RTM`, `QA`, `CLI` | 45 |
 | SRS-05 | [Nhân vật người chơi, NPC và động vật](SRS-05-NHAN-VAT-NPC-DONG-VAT.md) | BRD-05 | `CHR` | 44 |
 | SRS-06 | [Chiến đấu và săn bắt (tuỳ chọn)](SRS-06-CHIEN-DAU-SAN-BAT.md) | BRD-06 | `CBT` | 28 |
 | SRS-07 | [Hội thoại NPC (tĩnh và AI)](SRS-07-HOI-THOAI-NPC.md) | BRD-07 | `DLG` | 31 |
-| SRS-08 | [Web Studio](SRS-08-WEB-STUDIO.md) (v1.2) | BRD-08 | `WEB` | 69 |
-| SRS-09 | [Studio AI, quy trình, tiết kiệm token và bảo mật](SRS-09-STUDIO-AI-QUY-TRINH-BAO-MAT.md) (v1.1) | BRD-09 | `DEV` | 27 |
+| SRS-08 | [Web Studio](SRS-08-WEB-STUDIO.md) (v1.3) | BRD-08 | `WEB` | 69 |
+| SRS-09 | [Studio AI, quy trình, tiết kiệm token và bảo mật](SRS-09-STUDIO-AI-QUY-TRINH-BAO-MAT.md) (v1.2) | BRD-09 | `DEV` | 27 |
 | | **Tổng** | | | **358** |
 
 ---
@@ -43,7 +43,7 @@ Trong phạm vi và ngoài phạm vi theo BRD-00 mục 4. Tóm tắt các khối
 | Khối | Mô tả | SRS |
 |---|---|---|
 | Pipeline build offline | Python + Blender headless + TypeScript: tiếp nhận mô tả, thế giới, địa hình, nước, thực vật, bố trí, asset, vật liệu, bake, đóng gói | 01, 02, 03, 04 |
-| Engine runtime web | Thư viện Three.js + TypeScript dùng chung cho khung xem trước, editor và bản xuất bản | 04, 05, 06, 07 |
+| Engine runtime web | Unity player Web chung (C#, QĐ-16, CR-02) nạp dữ liệu game; dùng chung cho khung xem trước, editor và bản xuất bản | 04, 05, 06, 07 |
 | QA tự động | Smoke, góc chuẩn, visual regression, đo hiệu năng, bot playtest | 04 |
 | CLI | `engine new-game / build / qa / publish / doctor / migrate / asset` | 04, 03 |
 | Web Studio | Frontend, backend API, CSDL, kho đối tượng, hàng đợi job, worker, cổng AI | 08 (+ màn hình ở 01, 02, 03, 05, 06, 07) |
@@ -104,6 +104,7 @@ flowchart LR
         COP[Copernicus GLO-30]
         CC0[Thư viện CC0: Poly Haven…]
         UP[threejs-game-skills MIT]
+        UN[Unity Editor + gói glTFast, KTX]
     end
     TG --> WS
     HUY --> WS
@@ -111,6 +112,7 @@ flowchart LR
     NC --> PUB[Bản xuất bản tĩnh]
     WS --> ENG
     CC --> ENG
+    UN --> ENG
     ENG --> PUB
     WS --> CL & GE & EL & GO
     ENG --> OSM & COP & CC0
@@ -125,9 +127,9 @@ flowchart LR
 | Build | `game-intake` | Mô tả → brief + dữ liệu khởi tạo; đề xuất thay đổi | 01 |
 | Build | `world`, `terrain`, `water`, `vegetation`, `placement`, `lighting` | Thế giới, địa hình hai nguồn, nước, thực vật, bố trí, bake | 02 |
 | Build | `asset-import`, `asset-forge`, `kit-builder`, `materials` | Asset CC0/generator, vật liệu, HDRI, âm thanh, provenance | 03 |
-| Build | `navmesh` (trong `npc-ai`) | Lưới điều hướng theo zone | 05 |
-| Build | `packager` | Gộp, atlas, nén, manifest theo zone/tier, cache theo hash | 04 |
-| Runtime | `core`, `camera-player`, `fx`, `interaction`, `ui-audio` | Vòng lặp, stream, tier, điều khiển, hiệu ứng, tương tác, UI, âm thanh | 04, 02, 05 |
+| Runtime | `navmesh` (trong `npc-ai`) | Lưới điều hướng theo zone, dựng lúc nạp zone bằng Unity AI Navigation (CR-02; trước là bước build) | 05 |
+| Build | `packager` | Gộp, atlas, nén, manifest theo zone/tier cho Unity player, cache theo hash | 04 |
+| Runtime (Unity player, C#) | `core`, `camera-player`, `fx`, `interaction`, `ui-audio` | Vòng lặp, stream, tier, điều khiển, hiệu ứng, tương tác, UI, âm thanh | 04, 02, 05 |
 | Runtime | `characters`, `npc-ai` (GD-11) | Khung xương, animation, LOD; hành vi, tìm đường, đàn, lịch trình | 05 |
 | Runtime tuỳ chọn | `combat` (QĐ-13) | Chiến đấu, săn bắt; chỉ đóng gói khi bật | 06 |
 | Runtime tuỳ chọn | `dialogue-ai` (QĐ-14) | Client hội thoại AI; gọi cổng AI | 07 |
@@ -138,7 +140,7 @@ flowchart LR
 
 ### 2.3 Nguyên tắc kiến trúc ràng buộc mọi SRS
 1. **Một nguồn sự thật**: bộ JSON dữ liệu game theo schema chung (SRS-04 FR-RTM-01); chat, editor, CLI, Claude Code cùng đọc/ghi (QT-GEN-01).
-2. **Engine runtime là thư viện độc lập có phiên bản**, dùng chung cho xem trước, editor và bản xuất bản (SRS-04 FR-RTM-03, SRS-08 FR-WEB-16).
+2. **Engine runtime là Unity player có phiên bản** (một bản chung cho mọi game, theo `engineVersion`; CR-02), dùng chung cho xem trước, editor và bản xuất bản (SRS-04 FR-RTM-03, SRS-08 FR-WEB-16).
 3. **Việc nặng chạy trên worker** qua cùng CLI với Claude Code (SRS-08 FR-WEB-41).
 4. **Logic `game-intake` viết một lần** cho hai lối vào (SRS-01 FR-INT-29).
 5. **Khoá API chỉ ở server/biến môi trường** (QT-GEN-04).
@@ -198,7 +200,7 @@ Chat → `ChangeProposal` (SRS-01) → người dùng duyệt → `PATCH` dữ l
 |---|---|---|---|
 | E0 | G-E0 | SRS-09 (toàn bộ FR-DEV trừ 06, 25); SRS-04 FR-RTM-12, 13, FR-QA-07 (baseline A56) | ADR-001…015; `doctor` đạt; baseline A56 ghi trong `budgets.json` |
 | E1 | G-E1 | SRS-01 (Claude Code); SRS-02 FR-WLD-01…16, 39; SRS-04 FR-RTM-01…06, 23, FR-QA-01…04, 06, 10, FR-CLI-01, 03, 05…08, 11, 12; SRS-09 FR-DEV-25…27 | AC-01-01…07, AC-02-01, 02, AC-04-06, AC-CR01-01, 02, 06, 12 |
-| E2 | G-E2 | SRS-01 FR-INT-20…22; SRS-03 vật liệu (FR-AST-14…19, 26…29, 39, 40); SRS-04 tier, stream, điều khiển, CLI-02, 04, 09; SRS-05 FR-CHR-01…09 | Đi lại được một zone trên A56 trong ngân sách |
+| E2 | G-E2 | SRS-01 FR-INT-20…22; SRS-03 vật liệu (FR-AST-14…19, 26…29, 39, 40); SRS-04 tier, stream, điều khiển, CLI-02, 04, 09; SRS-05 FR-CHR-01…09 ; POC-U1 đo player Unity trên A56 trước khi chốt ngân sách tải (CR-02) | Đi lại được một zone trên A56 trong ngân sách |
 | E3 | G-E3 | SRS-02 nước, thực vật, hiệu ứng (FR-WLD-17…24, 33…35, 40); SRS-04 FR-QA-05, 09, FR-CLI-10 | Baseline visual regression; AC-02-04 |
 | E4 | G-E4 | SRS-02 bố trí (FR-WLD-25…27); SRS-03 asset 3D (FR-AST-01…13, 31…33, 35); SRS-05 khung xương, mô hình, animation (FR-CHR-10, 24, 25, 30, 36, 39, 41) | AC-03-01…06, AC-05-02 |
 | E5 | G-E5 | SRS-02 ánh sáng (FR-WLD-28…32) | AC-02-05; Huy xác nhận bước nhảy chất lượng |
@@ -324,7 +326,8 @@ glTF (Meshopt/Draco), KTX2 + fallback, âm thanh Opus/AAC, `manifest.json`, báo
 | OpenStreetMap | Vector đường, nước, ruộng, công trình | Worker (`world.fetch`) | ODbL, ghi công | 02 |
 | Copernicus GLO-30 | DEM | Worker | Thông báo Copernicus | 02 |
 | Poly Haven và kho CC0 trong danh sách trắng | Mô hình, vật liệu scan, HDRI | Worker (`asset-import`) | CC0, lưu bằng chứng | 03 |
-| `threejs-game-skills` | Điểm xuất phát `.claude/` và scaffold | Repo | MIT, `UPSTREAM.md` | 09 |
+| `threejs-game-skills` | Điểm xuất phát `.claude/` (giữ skill sinh ảnh, âm thanh sau CR-02) | Repo | MIT, `UPSTREAM.md` | 09 |
+| Unity | Runtime game, xem trước (QĐ-16) | Unity Editor trên máy dev build player; player Web chạy trong trình duyệt | License Unity Personal (Huy chốt 25/11/2026) | 04, 08 |
 
 ### 6.2 Danh mục giao diện lập trình
 
@@ -387,7 +390,7 @@ Wireframe chi tiết ở `docs/UIUX/` (UIUX-00…04).
 | Mã | Nhóm | Yêu cầu | Cách kiểm | Chi tiết |
 |---|---|---|---|---|
 | NFR-GEN-01 | Hiệu năng game | Fps ≥ 30 ổn định (P5 ≥ 25) tier Vừa trên Galaxy A56 (đề xuất, CH-01); ngân sách tier Vừa ≤ 120 draw call, ≤ 32 vật liệu, ~450k tri tĩnh / 650k tổng | Đo A56 mỗi cổng | SRS-04 mục 6.3 |
-| NFR-GEN-02 | Tải game | ≤ 10 s tới khi điều khiển được trên 4G; ≤ 50 MB mỗi zone tier Vừa (đề xuất, CH-03) | Đo | NFR-RTM-01 |
+| NFR-GEN-02 | Tải game | ≤ 10 s tới khi điều khiển được trên 4G; ≤ 50 MB mỗi zone tier Vừa (đề xuất, CH-03; đo lại với Unity player ở POC-U1, OI-GEN-05) | Đo | NFR-RTM-01 |
 | NFR-GEN-03 | Web Studio | Trang ≤ 3 s; thao tác editor ≤ 100 ms; cập nhật nóng ≤ 2 s; API P95 ≤ 500 ms (đề xuất) | Đo | NFR-WEB-01, 02 |
 | NFR-GEN-04 | Năng suất | Mô tả → bản chơi được ≤ 30 phút cho game nhỏ, không tính bake (BO-09) | AC-08-02 | NFR-WEB-08 |
 | NFR-GEN-05 | Build | Zone 1 km² không bake ≤ 15 phút; bake một mốc ≤ 2 giờ CPU; build lại khi không đổi ≤ 30 s (đề xuất) | Báo cáo build | NFR-WLD-01, 02, NFR-CLI-01 |
@@ -395,7 +398,7 @@ Wireframe chi tiết ở `docs/UIUX/` (UIUX-00…04).
 | NFR-GEN-07 | Bảo mật | HTTPS, phiên có hạn, chống CSRF/XSS/SSRF, cách ly dữ liệu, không khoá ở client, rà soát OWASP Top 10 trước G-W4 | Rà soát, quét | SRS-08 FR-WEB-46, NFR-WEB-09 |
 | NFR-GEN-08 | Chi phí AI | Mọi lần gọi dịch vụ trả phí ghi chi phí; hạn mức theo người/ngày và theo game cho hội thoại | Báo cáo chi phí | SRS-08 FR-WEB-06, 42; SRS-07 FR-DLG-22 |
 | NFR-GEN-09 | Tin cậy | Sẵn sàng giờ làm việc ≥ 99%/tháng; RPO 24 giờ (CSDL), RTO 4 giờ (đề xuất) | Giám sát, diễn tập | NFR-WEB-05, 06 |
-| NFR-GEN-10 | Tương thích | Chrome Android (A56), Chrome/Edge desktop; WebGL2 (GD-01, GD-02) | Ma trận thiết bị | NFR-RTM-03 |
+| NFR-GEN-10 | Tương thích | Chrome Android (A56), Chrome/Edge desktop; WebGL2 qua nền Web của Unity (GD-01, GD-02) | Ma trận thiết bị | NFR-RTM-03 |
 | NFR-GEN-11 | Bảo trì | Module ≤ ~300 dòng mỗi file, interface rõ, README ngắn, có test (RB-07); `CLAUDE.md` < 150 dòng | Review, CI | SRS-09 |
 | NFR-GEN-12 | Token | Token trung bình mỗi phiếu giảm ≥ 50% so với Thiền viện online (đề xuất, BO-02) | `tokens.csv` | NFR-DEV-01 |
 | NFR-GEN-13 | Ngôn ngữ | Giao diện Web Studio và game tiếng Việt mặc định; game theo ngôn ngữ mô tả (GD-06) | Kiểm thủ công | FR-RTM-22 |
@@ -447,7 +450,7 @@ Ràng buộc RB-01…09 và giả định GD-01…17 của BRD-00 áp dụng ngu
 | Mã | Giả định | Ảnh hưởng nếu sai |
 |---|---|---|
 | GĐ-GEN-01 | JSON Schema draft 2020-12 là chuẩn schema dữ liệu game | Đổi bộ kiểm ở SRS-04, editor |
-| GĐ-GEN-02 | Phiên bản engine phát hành dạng gói npm nội bộ trong monorepo | Đổi cách khai báo `engineVersion` |
+| GĐ-GEN-02 | Phiên bản engine phát hành dạng bản build Unity player có số phiên bản trong monorepo (CR-02; trước là gói npm) | Đổi cách khai báo `engineVersion` |
 | GĐ-GEN-03 | Hội thoại AI chỉ khả dụng khi bản xuất bản được phục vụ cùng hệ thống có cổng AI (Web Studio hoặc máy chủ poc có backend) | Bản tĩnh thuần chạy hội thoại ở chế độ dự phòng |
 | GĐ-GEN-04 | Múi giờ hệ thống Asia/Ho_Chi_Minh cho hạn mức ngày, log, lịch sao lưu | Lệch mốc tính hạn mức |
 
@@ -496,6 +499,7 @@ Open item mới của SRS tổng quan:
 | OI-GEN-02 | Có cần mốc ngày cho từng pha không | Không; pha kết thúc khi qua cổng |
 | OI-GEN-03 | Mô tả thử pipeline E1–E5 | Claude soạn một mô tả nhỏ khác Thiền viện online, Huy duyệt trước G-E1 |
 | OI-GEN-04 | SRS có cần xuất bản DOCX/HTML ngoài Markdown | Không; giữ Markdown như BRD |
+| OI-GEN-05 | Unity player có đạt NFR-GEN-02 (≤ 10 s tới điều khiển được trên 4G) không (CR-02) | Đo ở POC-U1 trên A56; nếu vượt, đề xuất số mới (vd. ≤ 15 s lần đầu, ≤ 10 s khi đã cache) cho Huy duyệt |
 
 ---
 
@@ -560,3 +564,4 @@ Thuật ngữ chung ở BRD-00 mục 16. Bổ sung:
 | 1.0 | 22/11/2026 | Claude | Huy duyệt toàn bộ SRS-00…09 và Phụ lục A, gồm các giá trị "(đề xuất)" và đề xuất mặc định của Open item (mục 1.4, 12); đổi trạng thái sang Đã duyệt |
 | 1.1 | 23/11/2026 | Claude | Theo SRS-08 v1.1 (change request quản trị Huy duyệt 23/11/2026): thêm SCR-WEB-15…18 vào danh mục màn hình, FR-WEB-51…59 vào bảng pha, `Announcement` vào danh sách thực thể |
 | 1.2 | 23/11/2026 | Claude | CR-01 (Huy yêu cầu 23/11/2026: bổ sung luồng xây dựng cho game đang làm dở hoặc đã có để làm tiếp hoặc cập nhật): thêm mục 4.4 (ba trường hợp, giai đoạn tiến độ, cờ), QT-GEN-11, 12, thuật ngữ; cập nhật danh mục SRS (SRS-01 v1.1, SRS-04 v1.1, SRS-08 v1.2, SRS-09 v1.1; tổng FR 358, sửa tổng cũ 328 chưa cộng FR-WEB-51…59), bảng pha 4.3, mục 5.3, 5.4, 6.2, 7; Huy duyệt 23/11/2026 (giá trị "(đề xuất)" mới được chấp nhận làm giá trị nền). Sau khi BRD-10 (BR-119…126) được viết cho CR-01: cột "Nguồn" của 21 FR mới trỏ tới BR-119.1…126.3, phủ 126/126 BR tổng quan và 319/319 BR chi tiết |
+| 1.3 | 25/11/2026 | Claude | CR-02 (Huy yêu cầu 25/11/2026: chỉ dùng Unity thay Three.js; Huy duyệt phân tích, chọn "player chung + dữ liệu", ADR-036): mục 1.2 (engine runtime), sơ đồ 2.1 thêm Unity, bảng 2.2 (navmesh dựng lúc nạp, runtime C#), nguyên tắc 2.3 mục 2, bảng pha 4.3 (POC-U1 ở E2), 6.1 thêm Unity, NFR-GEN-02, 10, GĐ-GEN-02, OI-GEN-05 |

@@ -3,12 +3,12 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | BRD-00 |
-| Phiên bản | 1.1 |
+| Phiên bản | 1.2 |
 | Ngày | 22/11/2026 |
 | Chủ sở hữu / người quyết định | Huy |
 | Người soạn | Claude |
 | Nguồn | `GAME-ENGINE-WEB3D-BRIEF.md` bản 6 (22/11/2026 18:04), các quyết định QĐ-01…12 |
-| Trạng thái | **Đã duyệt** v1.1 (Huy, 23/11/2026) |
+| Trạng thái | Đã duyệt v1.1 (Huy, 23/11/2026); **cập nhật theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại |
 
 > Tài liệu này cố ý gọn. Brief đã chỉ ra (mục 3.1, 5) rằng viết nhiều tài liệu trước khi có prototype không làm game hay hơn. BRD chỉ chốt **vì sao làm, làm cho ai, thế nào là thành công, phạm vi đến đâu**. Chi tiết kỹ thuật để ở TSD/ADR, chi tiết chức năng để ở SRS khi tới pha tương ứng.
 
@@ -33,7 +33,7 @@ Mỗi BRD chi tiết dùng mã `BR-<số gốc>.<n>` cho yêu cầu chi tiết, 
 
 ## 1. Tóm tắt điều hành
 
-GameStudio xây một **engine web 3D theo hướng dữ liệu** trên nền Three.js, một **Web Studio** (giao diện web riêng: chat mô tả, xem trước 3D, trình chỉnh sửa trực quan, lưu trữ và chia sẻ game), đi kèm một **"studio AI" gọn cho Claude Code** dùng để phát triển engine, để từ **mô tả bằng lời của người dùng** tạo ra web game 3D chạy được trên điện thoại tầm trung (Samsung Galaxy A56). Engine được kiểm chứng bằng một game mẫu (E7) và một game thứ hai cỡ nhỏ (E8).
+GameStudio xây một **engine web 3D theo hướng dữ liệu** trên nền Unity (player Web chung, QĐ-16; trước CR-02 là Three.js), một **Web Studio** (giao diện web riêng: chat mô tả, xem trước 3D, trình chỉnh sửa trực quan, lưu trữ và chia sẻ game), đi kèm một **"studio AI" gọn cho Claude Code** dùng để phát triển engine, để từ **mô tả bằng lời của người dùng** tạo ra web game 3D chạy được trên điện thoại tầm trung (Samsung Galaxy A56). Engine được kiểm chứng bằng một game mẫu (E7) và một game thứ hai cỡ nhỏ (E8).
 
 Giá trị kinh doanh chính:
 1. **Dùng lại**: game mới chủ yếu là dữ liệu và asset, không phải viết lại công cụ như ở dự án Thiền viện online (v1 → v2).
@@ -90,7 +90,7 @@ Cột "Mục tiêu" ghi **(đề xuất)** khi brief chưa có con số; các co
 ## 4. Phạm vi
 
 ### 4.1 Trong phạm vi
-1. **Repo engine** fork từ `majidmanzarpour/threejs-game-skills` (MIT), runtime Three.js + Vite + TypeScript (QĐ-01).
+1. **Repo engine** fork từ `majidmanzarpour/threejs-game-skills` (MIT) (QĐ-01); runtime là **Unity player chung** nạp dữ liệu game (QĐ-16, ADR-036, CR-02), pipeline build TS/Python giữ nguyên.
 2. **Pipeline build offline**: tiếp nhận mô tả, thế giới/địa hình hai nguồn, nước, thực vật, bố trí, lắp công trình, nhập mô hình CC0, sinh asset bằng code, vật liệu, bake ánh sáng, đóng gói theo zone/tier.
 3. **Runtime web**: nạp manifest, stream theo zone, chọn tier tự động, camera/người chơi, hiệu ứng, tương tác, UI và âm thanh.
    - **Nhân vật và NPC**: nhân vật người chơi, NPC người, động vật theo họ (thú bốn chân, gia cầm, chim, cá); khung xương và animation dùng chung, hành vi khai báo bằng dữ liệu (mục 7.10).
@@ -143,7 +143,7 @@ Nguyên tắc:
 3. Sao nguyên framework studio AI cỡ lớn (40–50 agent).
 4. Hỗ trợ harness khác Claude Code (Codex, Cursor…) (QĐ-02).
 5. Dịch vụ AI 3D như Meshy, Tripo (QĐ-08).
-6. Runtime khác: Babylon.js, PlayCanvas, Unity WebGL, Unreal.
+6. Runtime khác: Babylon.js, PlayCanvas, Three.js (bỏ theo CR-02), Unreal; build Unity riêng cho từng game.
 7. Phát hành ra ngoài / thương mại hoá (QĐ-07).
 8. **Giả định ngoài phạm vi** (cần xác nhận, xem GD-05): multiplayer trong game, tài khoản người chơi bên trong game (khác tài khoản Web Studio), thanh toán, chợ asset, đa ngôn ngữ giao diện.
 9. Mở Web Studio cho công chúng / đăng ký tự do (giữ QĐ-07, xem CH-23).
@@ -172,7 +172,8 @@ Toàn văn ở brief. Tóm tắt để truy vết:
 
 | Mã | Nội dung ngắn |
 |---|---|
-| QĐ-01 | Xuất phát từ threejs-game-skills; Three.js + Vite + TypeScript |
+| QĐ-01 | Xuất phát từ threejs-game-skills; Three.js + Vite + TypeScript (phần runtime bị QĐ-16 thay) |
+| QĐ-16 | Runtime là Unity: một player Web chung (Unity 6 LTS, URP) đọc dữ liệu game; Web Studio nhúng cùng player (CR-02, 25/11/2026) |
 | QĐ-02 | Chỉ hỗ trợ Claude Code |
 | QĐ-03 | Game do người dùng mô tả; engine không gắn thể loại; có bước `/new-game` |
 | QĐ-04 | Thiết bị tối thiểu Galaxy A56 |
@@ -528,7 +529,7 @@ Brief chưa nêu mốc thời gian hay ước lượng công sức cho từng ph
 
 | Mã | Ràng buộc |
 |---|---|
-| RB-01 | Runtime cố định Three.js + Vite + TypeScript; không xem xét runtime khác |
+| RB-01 | Runtime cố định Unity (player Web chung, C#) theo QĐ-16; không xem xét runtime khác; không build Unity riêng cho từng game |
 | RB-02 | Phát triển chỉ bằng Claude Code (`.claude/agents`, `.claude/skills`, hook, subagent, slash command). Web Studio dùng Claude API qua backend cho người dùng cuối (QĐ-15) |
 | RB-03 | Thiết bị tối thiểu Galaxy A56 (web mobile) |
 | RB-04 | Máy dev Windows, không có GPU; Blender chạy headless qua script |
@@ -545,7 +546,7 @@ Brief chưa nêu mốc thời gian hay ước lượng công sức cho từng ph
 | Mã | Giả định | Ảnh hưởng nếu sai |
 |---|---|---|
 | GD-01 | Trình duyệt mục tiêu là Chrome trên Android (A56) và Chrome/Edge trên desktop Windows | Phải thêm kiểm thử Safari/iOS, hỗ trợ KTX2/WebGL khác |
-| GD-02 | Đồ hoạ dùng WebGL2 qua Three.js; WebGPU không bắt buộc | Thay đổi pipeline shader và ngân sách |
+| GD-02 | Đồ hoạ dùng nền Web của Unity (WebGL2); WebGPU không bắt buộc | Thay đổi pipeline shader và ngân sách |
 | GD-03 | Máy chủ poc hiện có (như ở Thiền viện online) tiếp tục dùng được để publish bản thử | Cần dựng máy chủ mới ở E0 |
 | GD-04 | Huy có sẵn Galaxy A56 thật để đo ở mọi cổng | Không đo được BO-04 |
 | GD-05 | **(Sửa ở v0.4)** Có backend cho Web Studio (tài khoản, dự án, lưu trữ, job, cổng AI). Game khi chơi là một người chơi, chạy phía trình duyệt; không multiplayer, không tài khoản người chơi trong game | Nếu cần multiplayer hoặc lưu tiến trình người chơi trên server thì phạm vi tăng lớn |
@@ -639,7 +640,7 @@ Brief ghi "không còn câu hỏi mở" ở mức quyết định chiến lượ
 | Mã | Phụ thuộc | Dùng cho |
 |---|---|---|
 | PT-01 | `majidmanzarpour/threejs-game-skills` (MIT) | Điểm xuất phát, 8 skill giữ lại |
-| PT-02 | Three.js, Vite, TypeScript, Playwright | Runtime và QA |
+| PT-02 | Unity (Personal, Huy chốt 25/11/2026), glTFast, KTX for Unity; TypeScript, Playwright | Runtime (Unity); pipeline, Web Studio và QA (TS) |
 | PT-03 | Blender headless + Sapling Tree Gen + A.N.T. Landscape | Thực vật, địa hình, asset hữu cơ, bake |
 | PT-04 | Google Gemini (API) | Texture, decal, ảnh tham chiếu, UI |
 | PT-05 | ElevenLabs (API) | Âm thanh môi trường, hiệu ứng |
@@ -711,3 +712,4 @@ Brief ghi "không còn câu hỏi mở" ở mức quyết định chiến lượ
 | 1.0 | 22/11/2026 | Huy | Duyệt bộ tài liệu BRD (BRD-00…09) |
 | 1.1 | 23/11/2026 | Claude | CR-01 (Huy yêu cầu 23/11/2026: bổ sung luồng xây dựng cho game đang làm dở hoặc đã có để làm tiếp hoặc cập nhật), căn theo SRS-00 v1.2: thêm mục 7.12 (BR-119…126), phạm vi mục 4.1 mục 12, luồng ở mục 8, truy vết, BRD-10 mới; dẫn chiếu trong BRD-01, 04, 08, 09 |
 | 1.1 | 23/11/2026 | Huy | Duyệt bộ BRD v1.1 (BRD-00…10) |
+| 1.2 | 25/11/2026 | Claude | CR-02 (Huy yêu cầu 25/11/2026: chỉ dùng Unity thay Three.js; Huy duyệt phân tích tác động, chọn "player chung + dữ liệu"): thêm QĐ-16; sửa mục 2, mục 4 (ngoài phạm vi), RB-01, GD-02, PT-02 |

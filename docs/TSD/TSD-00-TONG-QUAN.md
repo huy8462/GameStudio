@@ -3,13 +3,13 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | TSD-00 |
-| Phiên bản | 1.2 (đã duyệt) |
+| Phiên bản | 1.3 |
 | Ngày | 22/11/2026 |
 | Chủ sở hữu / người duyệt | Huy |
 | Người soạn | Claude |
 | Nguồn | SRS-00 v0.1 và SRS-01…09 v0.1 (328 FR); BRD-00 v0.5, BRD-01…09 v0.1; `GAME-ENGINE-WEB3D-BRIEF.md` bản 6 |
 | Quyết định áp dụng | QĐ-01…15; CH-23 (chỉ người dùng nội bộ được mời). Ba quyết định đã chốt chi phối TSD: chiến đấu/săn bắt là module tuỳ chọn mặc định tắt (QĐ-13); hội thoại NPC tĩnh, AI khi chạy là tuỳ chọn và chỉ đi qua cổng AI phía server (QĐ-14); Web Studio riêng, chỉ người được mời (QĐ-15) |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026; bản 1.2 gồm CR-01 duyệt 23/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026; bản 1.2 gồm CR-01 duyệt 23/11/2026); **v1.3 runtime Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại |
 
 > TSD giữ tinh thần gọn của BRD/SRS (`rigor: minimal`): đủ để Claude Code viết phiếu, chọn file, viết test và để Huy chốt ADR. Lựa chọn công nghệ là **quyết định kỹ thuật (TD)**; TD-01…18 đã được Huy chốt ngày 22/11/2026 và ghi thành ADR-016…033 trong `docs/ADR/`. TD mới về sau phải được Huy chốt và ghi ADR trước khi dùng làm căn cứ phiếu. Con số còn ghi ở SRS giữ nguyên nhãn đó ở đây; TSD không tự chốt số.
 
@@ -22,9 +22,9 @@
 | TSD-01 | [Tạo game từ mô tả](TSD-01-TAO-GAME-TU-MO-TA.md) | SRS-01 | `INT` | `@gamestudio/intake` |
 | TSD-02 | [Thế giới, địa hình và môi trường](TSD-02-THE-GIOI-DIA-HINH-MOI-TRUONG.md) | SRS-02 | `WLD` | `engine/build/world`, `terrain`, `water`, `vegetation`, `placement`, `lighting`; runtime `fx` |
 | TSD-03 | [Asset 3D, vật liệu và âm thanh](TSD-03-ASSET-VAT-LIEU-AM-THANH.md) | SRS-03 | `AST` | `asset-import`, `asset-forge`, `kit-builder`, `materials`, `audio` |
-| TSD-04 | [Runtime, hiệu năng và QA](TSD-04-RUNTIME-HIEU-NANG-QA.md) | SRS-04 | `RTM`, `QA`, `CLI` | `@gamestudio/engine`, `schema`, `packager`, `qa`, `cli` |
+| TSD-04 | [Runtime, hiệu năng và QA](TSD-04-RUNTIME-HIEU-NANG-QA.md) | SRS-04 | `RTM`, `QA`, `CLI` | Unity player `engine/unity`, `schema`, `packager`, `qa`, `cli` |
 | TSD-05 | [Nhân vật, NPC và động vật](TSD-05-NHAN-VAT-NPC-DONG-VAT.md) | SRS-05 | `CHR` | `characters`, `npc-ai`, `navmesh` |
-| TSD-06 | [Chiến đấu và săn bắt (tuỳ chọn)](TSD-06-CHIEN-DAU-SAN-BAT.md) | SRS-06 | `CBT` | `@gamestudio/engine/combat` (chunk riêng) |
+| TSD-06 | [Chiến đấu và săn bắt (tuỳ chọn)](TSD-06-CHIEN-DAU-SAN-BAT.md) | SRS-06 | `CBT` | module `Combat` trong Unity player (bật bằng dữ liệu) |
 | TSD-07 | [Hội thoại NPC](TSD-07-HOI-THOAI-NPC.md) | SRS-07 | `DLG` | `interaction/dialogue`, `dialogue-ai` (chunk riêng), dịch vụ hội thoại trong cổng AI |
 | TSD-08 | [Web Studio](TSD-08-WEB-STUDIO.md) | SRS-08 | `WEB` | `web/app`, `web/api`, `web/worker`, `web/ai-gateway` |
 | TSD-09 | [Studio AI, quy trình, bảo mật dev](TSD-09-STUDIO-AI-QUY-TRINH-BAO-MAT.md) | SRS-09 | `DEV` | `.claude/`, `project.yaml`, `engine doctor`, CI |
@@ -117,7 +117,7 @@ Nguyên tắc: **một máy chủ Linux** (GĐ-WEB-01, OI-WEB-06), các dịch v
 | Dữ liệu dùng chung | `engine/schema` (`@gamestudio/schema`), `engine/shared/expr` (`@gamestudio/expr`), `engine/shared/rng` (`@gamestudio/rng`) | TS (+ bản Python cho rng) | Mọi nơi | 04, 05, 06, 07 |
 | Tiếp nhận | `engine/intake` (`@gamestudio/intake`) | TS | CLI (máy dev), `web/api` | 01 |
 | Build offline | `engine/build/*` (bước build), `engine/build/py/*` (Python), `engine/build/blender/*` (script Blender) | TS điều phối; Python 3.12; Blender Python | Máy dev, worker | 02, 03, 04, 05 |
-| Runtime | `engine/runtime` (`@gamestudio/engine`), chunk tuỳ chọn `combat`, `dialogue-ai` | TS + GLSL | Trình duyệt | 04, 05, 06, 07, 02 (fx) |
+| Runtime | `engine/unity` (Unity player chung, CR-02), module tuỳ chọn `Combat` bật bằng dữ liệu | C# + HLSL/Shader Graph (URP) | Trình duyệt (nền Web của Unity) | 04, 05, 06, 07, 02 (fx) |
 | QA | `engine/qa` (`@gamestudio/qa`) | TS (Playwright) | Máy dev, worker, CI | 04 |
 | CLI | `engine/cli` (`@gamestudio/cli`, lệnh `engine`) | TS | Máy dev, worker | 04 |
 | Web | `web/app`, `web/api`, `web/worker`, `web/ai-gateway`, `web/shared` | TS (React ở app) | Máy chủ, trình duyệt | 08, 07 |
@@ -134,7 +134,7 @@ sequenceDiagram
     participant Q as Hàng đợi (pg-boss)
     participant W as Worker
     participant O as Kho đối tượng
-    participant P as Khung xem trước (@gamestudio/engine)
+    participant P as Khung xem trước (Unity player)
     U->>A: Mô tả game
     A->>I: analyze/generate (LlmClient)
     I->>G: Claude API (structured output)
@@ -158,7 +158,7 @@ sequenceDiagram
 | # | Nguyên tắc SRS | Cách hiện thực |
 |---|---|---|
 | 1 | Một nguồn sự thật (QT-GEN-01) | Bộ JSON `games/<id>/data/**` + JSON Schema 2020-12; trên web lưu snapshot JSON theo `GameVersion` (TSD-08 SCH-WEB-03); mọi ghi là JSON Patch RFC 6902 qua một hàm `applyPatch` dùng chung (`@gamestudio/schema/patch`) |
-| 2 | Engine là thư viện có phiên bản | `@gamestudio/engine` semver, đóng gói ESM; bản xuất bản và khung xem trước nạp đúng bản ghi trong `manifest.engineVersion` từ `/engine/<semver>/` (TSD-04 IF-RTM-01) |
+| 2 | Engine là Unity player có phiên bản (CR-02) | Một bản Unity Web build cho mỗi semver, đặt ở `/engine/<semver>/` (loader, `.wasm`, `.data`, `.framework.js` nén Brotli); bản xuất bản và khung xem trước nạp đúng bản ghi trong `manifest.engineVersion` (TSD-04 IF-RTM-01). Game là gói dữ liệu, không build Unity theo từng game |
 | 3 | Việc nặng trên worker, cùng CLI | Worker chỉ gọi `engine …` qua tiến trình con; không có đường build thứ hai (TSD-08 ALG-WEB-03) |
 | 4 | `game-intake` viết một lần | Gói `@gamestudio/intake` không phụ thuộc Node API đặc thù server; `LlmClient` tiêm từ ngoài (TSD-01 IF-INT-01) |
 | 5 | Khoá chỉ ở server | Khoá chỉ là biến môi trường của container `ai-gateway`; CI quét bí mật trên mã nguồn và trên thư mục bản build (TSD-09 TST-DEV-04) |
@@ -193,23 +193,23 @@ flowchart LR
 | Mã | Chủ đề | Quyết định | Lý do chính | Phương án đã loại | ADR |
 |---|---|---|---|---|---|
 | TD-01 | Monorepo và công cụ | Monorepo (OI-DEV-02); **pnpm workspaces** cho TS, **uv** cho Python; không dùng Turborepo/Nx ở bản đầu, chạy song song bằng `pnpm -r` | Ít bề mặt; một lockfile; Claude Code dễ đọc | Nx/Turborepo (thêm cấu hình), nhiều repo (khó đồng bộ schema) | ADR-016 |
-| TD-02 | Phiên bản nền | Node **24 LTS**, TypeScript 5.x (strict), Python **3.12**, **Blender 4.5 LTS** + Sapling Tree Gen + A.N.T. Landscape (extension cố định bản), Three.js bản cố định tại E0; tất cả ghi trong `tools/versions.json` | LTS đủ dài cho dự án; Blender 4.5 LTS hỗ trợ tới 2027 | Blender bản thường (đổi API nhanh) | ADR-017 |
-| TD-03 | Runtime đồ hoạ | **Three.js WebGLRenderer (WebGL2)**; không dùng WebGPU ở bản đầu; GLSL riêng cho địa hình, nước, cỏ, impostor qua `onBeforeCompile` / `ShaderMaterial` | GD-01; A56 chạy ổn WebGL2; scaffold gốc dùng WebGL | WebGPURenderer (chưa đủ ổn định trên Chrome Android cho toàn bộ tính năng) | ADR-018 |
-| TD-04 | Kiến trúc runtime | "Hệ thống" có `init/update(dt)/dispose` theo thứ tự cố định (SRS-04 mục 2.1) + kho thành phần dạng mảng kiểu (SoA, `Float32Array`) cho NPC/động vật/đạn; không dùng thư viện ECS ngoài | Không cấp phát trong vòng lặp nóng (FR-RTM-23); ít phụ thuộc | bitecs/miniplex (thêm khái niệm, lợi ích nhỏ ở quy mô ≤ 300 thực thể động) | ADR-019 |
-| TD-05 | Va chạm, điều hướng | **three-mesh-bvh** (MIT) cho truy vấn tia/khối với hình tĩnh; bộ điều khiển nhân vật viên nang tự viết; **recast-navigation-js** (MIT, WASM) để dựng navmesh ở build và truy vấn/đám đông (DetourCrowd) ở runtime | Navmesh chuẩn ngành, RVO sẵn có; tránh engine vật lý nặng | Rapier/Ammo (nặng, không cần vật lý đầy đủ), A* lưới tự viết (kém với địa hình dốc) | ADR-020 |
+| TD-02 | Phiên bản nền | Node **24 LTS**, TypeScript 5.x (strict), Python **3.12**, **Blender 4.5 LTS** + Sapling Tree Gen + A.N.T. Landscape (extension cố định bản), Three.js bản cố định tại E0; tất cả ghi trong `tools/versions.json` **CR-02 (ADR-036):** bỏ Three.js; thêm Unity 6 LTS (Editor chỉ trên máy dev) và gói glTFast, Meshopt decompress, KTX for Unity cố định bản trong `tools/versions.json`. | LTS đủ dài cho dự án; Blender 4.5 LTS hỗ trợ tới 2027 | Blender bản thường (đổi API nhanh) | ADR-017, ADR-036 |
+| TD-03 | Runtime đồ hoạ | **Three.js WebGLRenderer (WebGL2)**; không dùng WebGPU ở bản đầu; GLSL riêng cho địa hình, nước, cỏ, impostor qua `onBeforeCompile` / `ShaderMaterial` **CR-02 (ADR-036):** thay toàn bộ: Unity 6 LTS, URP, nền Web (WebGL2); shader riêng bằng Shader Graph/HLSL; không WebGPU ở bản đầu. | GD-01; A56 chạy ổn WebGL2; scaffold gốc dùng WebGL | WebGPURenderer (chưa đủ ổn định trên Chrome Android cho toàn bộ tính năng) | ADR-018, ADR-036 |
+| TD-04 | Kiến trúc runtime | "Hệ thống" có `init/update(dt)/dispose` theo thứ tự cố định (SRS-04 mục 2.1) + kho thành phần dạng mảng kiểu (SoA, `Float32Array`) cho NPC/động vật/đạn; không dùng thư viện ECS ngoài **CR-02 (ADR-036):** giữ ý tưởng hệ thống thứ tự cố định + dữ liệu động dạng mảng struct/`NativeArray` trong một `MonoBehaviour` điều phối, viết bằng C#; không dùng DOTS/ECS. | Không cấp phát trong vòng lặp nóng (FR-RTM-23); ít phụ thuộc | bitecs/miniplex (thêm khái niệm, lợi ích nhỏ ở quy mô ≤ 300 thực thể động) | ADR-019, ADR-036 |
+| TD-05 | Va chạm, điều hướng | **three-mesh-bvh** (MIT) cho truy vấn tia/khối với hình tĩnh; bộ điều khiển nhân vật viên nang tự viết; **recast-navigation-js** (MIT, WASM) để dựng navmesh ở build và truy vấn/đám đông (DetourCrowd) ở runtime **CR-02 (ADR-036):** thay toàn bộ: Unity Physics (PhysX tích hợp; `MeshCollider` tĩnh, `CharacterController`/`CapsuleCast`), Unity AI Navigation dựng NavMesh lúc nạp zone, `NavMeshAgent` thay DetourCrowd. | Navmesh chuẩn ngành, RVO sẵn có; tránh engine vật lý nặng | Rapier/Ammo (nặng, không cần vật lý đầy đủ), A* lưới tự viết (kém với địa hình dốc) | ADR-020, ADR-036 |
 | TD-06 | Dữ liệu và schema | JSON Schema **draft 2020-12**; **Ajv** (MIT) biên dịch sẵn (standalone) cho runtime; kiểu TS sinh từ schema (`json-schema-to-typescript`); Python nhận dữ liệu đã kiểm từ bộ điều phối, không kiểm lại | Một bộ kiểm cho CLI, runtime, intake, editor (FR-RTM-01) | Zod làm nguồn (khó dùng từ Python, khó xuất JSON Schema chuẩn) | ADR-021 |
 | TD-07 | Biểu thức an toàn | Gói `@gamestudio/expr`: lexer + Pratt parser → AST → hàm đóng (closure); không `eval`/`Function`; một ngữ pháp cho điều kiện tương tác, graph hành vi, cây thoại, công thức sát thương | FR-RTM-20, FR-CHR-16, FR-DLG-02, FR-CBT-07 dùng chung | jsep + tự đánh giá (phụ thuộc ngoài, khó giới hạn hàm) | ADR-022 |
 | TD-08 | Điều phối build | Bộ chạy bước TS trong `engine/cli`: mỗi bước khai báo `step.json` (phụ thuộc, bộ chọn đầu vào, `runner: node \| python \| blender`); giao thức tiến trình con JSON vào/ra (TSD-04 IF-CLI-02); cache nội dung theo SHA-256 | Build tăng dần (FR-CLI-02), một CLI cho dev và worker | Make/Bazel (khó đọc, Windows), Python làm điều phối (tách xa runtime TS) | ADR-023 |
-| TD-09 | Nén asset | **glTF-Transform** (MIT) cho dedup, gộp, instancing (`EXT_mesh_gpu_instancing`), Meshopt (`EXT_meshopt_compression`), Draco tuỳ chọn; **KTX-Software** (`ktx create`, Apache-2.0) cho KTX2 UASTC/ETC1S; **ffmpeg** (bản LGPL) + libopus cho âm thanh | Chuẩn mở, chạy CLI được trên Windows/Linux | gltfpack đơn thuần (ít kiểm soát vật liệu), Basis CLI riêng | ADR-024 |
+| TD-09 | Nén asset | **glTF-Transform** (MIT) cho dedup, gộp, instancing (`EXT_mesh_gpu_instancing`), Meshopt (`EXT_meshopt_compression`), Draco tuỳ chọn; **KTX-Software** (`ktx create`, Apache-2.0) cho KTX2 UASTC/ETC1S; **ffmpeg** (bản LGPL) + libopus cho âm thanh **CR-02 (ADR-036):** giữ định dạng glTF + Meshopt + KTX2; runtime giải mã bằng glTFast + Meshopt decompress + KTX for Unity; âm thanh AAC làm dự phòng nếu Opus không đều trên nền Web (POC-U1). | Chuẩn mở, chạy CLI được trên Windows/Linux | gltfpack đơn thuần (ít kiểm soát vật liệu), Basis CLI riêng | ADR-024, ADR-036 |
 | TD-10 | Địa hình | Python: `numpy`, `rasterio` (GeoTIFF COG), `pyproj` (UTM), `shapely`, `numba` (xói mòn, chế độ một luồng, tất định); DEM từ **Copernicus GLO-30 trên AWS Open Data** (COG công khai); OSM qua **Overpass API** có cache, dự phòng trích từ **Geofabrik** (`osmium`) | Đủ cho bbox ≤ 4 km²; COG đọc theo cửa sổ | GDAL toàn phần trong TS; dịch vụ tile thương mại | ADR-025 |
-| TD-11 | Bake ánh sáng | **Blender Cycles CPU** bake lightmap + AO vào UV2, khử nhiễu OpenImageDenoise, mã hoá **RGBM 8 bit** rồi nén KTX2 UASTC | Không có GPU (CH-07); RGBM chạy mọi thiết bị | Lightmapper WebGL tự viết (chất lượng thấp), HDR KTX2 (hỗ trợ thiết bị không đều) | ADR-026 |
-| TD-12 | Frontend Web Studio | **React 19 + Vite + TypeScript**, TanStack Query (dữ liệu máy chủ), Zustand (trạng thái editor + hoàn tác), **Tailwind CSS + Radix UI**, **@xyflow/react** (sơ đồ hành vi, cây thoại), Monaco (JSON thô W4); khung xem trước nhúng trực tiếp `@gamestudio/engine` (không dùng react-three-fiber) | Xem trước phải là đúng engine xuất bản (FR-WEB-16) | Vue/Svelte (Claude Code quen React hơn trong scaffold), R3F (tạo lớp engine thứ hai) | ADR-027 |
+| TD-11 | Bake ánh sáng | **Blender Cycles CPU** bake lightmap + AO vào UV2, khử nhiễu OpenImageDenoise, mã hoá **RGBM 8 bit** rồi nén KTX2 UASTC **CR-02 (ADR-036):** giữ bake Blender; hiển thị lightmap RGBM bằng shader URP riêng ở UV2, không dùng lightmapper Unity. | Không có GPU (CH-07); RGBM chạy mọi thiết bị | Lightmapper WebGL tự viết (chất lượng thấp), HDR KTX2 (hỗ trợ thiết bị không đều) | ADR-026, ADR-036 |
+| TD-12 | Frontend Web Studio | **React 19 + Vite + TypeScript**, TanStack Query (dữ liệu máy chủ), Zustand (trạng thái editor + hoàn tác), **Tailwind CSS + Radix UI**, **@xyflow/react** (sơ đồ hành vi, cây thoại), Monaco (JSON thô W4); khung xem trước nhúng trực tiếp `@gamestudio/engine` (không dùng react-three-fiber) **CR-02 (ADR-036):** khung xem trước nhúng Unity player (`createUnityInstance`); `EditorBridge` gọi `SendMessage` và nhận sự kiện qua `.jslib`; gizmo, chọn, vẽ địa hình làm trong player. | Xem trước phải là đúng engine xuất bản (FR-WEB-16) | Vue/Svelte (Claude Code quen React hơn trong scaffold), R3F (tạo lớp engine thứ hai) | ADR-027, ADR-036 |
 | TD-13 | Backend | **Fastify** (Node 24, TS) cho `web/api` và `web/ai-gateway`; **PostgreSQL 17** + **Drizzle ORM** (migration SQL có phiên bản); hàng đợi **pg-boss** (không cần Redis); tiến độ qua `LISTEN/NOTIFY` → SSE | Dùng lại gói TS của engine (intake, schema, expr, impact); một CSDL cho ≤ 20 người, ≤ 5 job | Python API (phải viết lại intake), Redis + BullMQ (thêm dịch vụ) | ADR-028 |
 | TD-14 | Kho đối tượng | Giao diện `ObjectStore` (get/put/list/presign); cài đặt **thư mục cục bộ** `/srv/gs-objects` do Caddy phục vụ tĩnh; có thể đổi sang S3/MinIO bằng cấu hình | Một máy chủ; ít dịch vụ; GĐ-WEB-02 cho phép | MinIO ngay từ W1 (thêm vận hành) | ADR-029 |
 | TD-15 | Xác thực | Google OIDC (`openid-client`), phiên **opaque** lưu trong PostgreSQL (cookie `HttpOnly; Secure; SameSite=Lax`), không JWT cho người dùng web; JWT HS256 chỉ cho token phiên chơi hội thoại và token đo | Khoá tài khoản huỷ phiên ≤ 1 phút (FR-WEB-03) | JWT phiên người dùng (khó thu hồi) | ADR-030 |
 | TD-16 | Dịch vụ AI | SDK chính thức `@anthropic-ai/sdk`; mặc định `claude-opus-5-5` cho tiếp nhận/đề xuất thay đổi/viết nháp kịch bản, `claude-haiku-5-5` cho hội thoại NPC (mô hình nhỏ, OI-DLG-04); đầu ra JSON bằng **structured outputs** (`output_config.format`); `@google/genai` cho Gemini; ElevenLabs qua REST; mô hình theo loại việc cấu hình được trên SCR-WEB-13 | Mô hình mạnh nhất cho phần cần suy luận, mô hình nhỏ cho phần đông lượt | Gọi trực tiếp từ client (vi phạm QT-GEN-04) | ADR-031 |
 | TD-17 | Triển khai | **Docker Compose** trên Ubuntu Server 24.04 LTS; **Caddy** (HTTPS tự động, HSTS); sao lưu **restic** ra vị trí ngoài máy; giám sát bằng endpoint `/healthz` + Uptime Kuma | Một máy chủ, ít vận hành | Kubernetes (quá tải cho quy mô) | ADR-032 |
-| TD-18 | QA | **Playwright** + Chromium; SSIM bằng `ssim.js`, khác pixel bằng `pixelmatch`; thống kê render từ `renderer.info` + `EXT_disjoint_timer_query_webgl2` khi có | Theo bộ gốc threejs-game-skills | Puppeteer (bộ gốc đã dùng Playwright) | ADR-033 |
+| TD-18 | QA | **Playwright** + Chromium; SSIM bằng `ssim.js`, khác pixel bằng `pixelmatch`; thống kê render từ `renderer.info` + `EXT_disjoint_timer_query_webgl2` khi có **CR-02 (ADR-036):** giữ Playwright; thống kê render lấy từ player (`ProfilerRecorder`, `FrameTimingManager`) qua `.jslib`; test C# bằng Unity Test Framework chạy batchmode trên máy dev. | Theo bộ gốc threejs-game-skills | Puppeteer (bộ gốc đã dùng Playwright) | ADR-033, ADR-036 |
 
 ---
 
@@ -223,8 +223,8 @@ flowchart LR
   shared/rng/        @gamestudio/rng      PCG32, suy seed (TS) + engine/build/py/gsrng.py (Python, cùng vector chuẩn)
   shared/expr/       @gamestudio/expr     biểu thức an toàn
   intake/            @gamestudio/intake   SRS-01
-  runtime/           @gamestudio/engine   core, render, camera-player, fx, interaction, ui-audio, characters, npc-ai,
-                                         combat/ (chunk), dialogue/ , dialogue-ai/ (chunk), api/ (API công khai)
+  unity/             Unity player (C#, CR-02): Assets/GameStudio/{Core, Render, CameraPlayer, Fx, Interaction, UiAudio,
+                                         Characters, NpcAi, Combat, Dialogue, Editor, Shared/Rng, Shared/Expr}, Tests/
   build/
     steps/<bước>/    step.json + mã bước (index.ts | main.py | blender.py)
     py/              gói Python dùng chung (gsrng, heightfield, io)
@@ -258,9 +258,7 @@ flowchart BT
     schema["@gamestudio/schema"] --> expr
     intake["@gamestudio/intake"] --> schema
     intake --> rng
-    engine["@gamestudio/engine"] --> schema
-    engine --> rng
-    engine --> expr
+    engine["engine/unity (Unity player, C#)"] -. "schema JSON, vector rng/expr chung" .-> schema
     qa["@gamestudio/qa"] --> engine
     cli["@gamestudio/cli"] --> intake
     cli --> qa
@@ -274,7 +272,7 @@ flowchart BT
     app --> schema
 ```
 
-Luật lint (`eslint-plugin-boundaries` hoặc `dependency-cruiser` trong CI): `engine/runtime/**` không import `node:*`; `games/*/scripts/**` chỉ import `@gamestudio/engine/api` (FR-RTM-04); `web/app/**` không import `web/api/**`, `web/ai-gateway/**`.
+Luật lint (`eslint-plugin-boundaries` hoặc `dependency-cruiser` trong CI): `engine/unity/**` không phụ thuộc gói TS (chỉ đọc schema JSON và vector kiểm chung); game không có mã riêng (FR-RTM-04, CR-02); `web/app/**` không import `web/api/**`, `web/ai-gateway/**`.
 
 ### 4.3 Quy ước mã nguồn
 - File ≤ ~300 dòng (NFR-GEN-11); mỗi gói có `README.md` ≤ 60 dòng, `src/index.ts` chỉ xuất API công khai.
@@ -341,13 +339,13 @@ Samsung Galaxy A56: Exynos 1580, GPU Xclipse 540, RAM 8 GB, màn 6,7 inch 1080 �
 | Culling + LOD + gửi lệnh render | Chính | ≤ 8 ms | TSD đề xuất |
 | Dự trữ GC/trình duyệt | Chính | ≥ 5 ms | TSD đề xuất |
 | GPU (tổng) | GPU | ≤ 28 ms | TSD đề xuất |
-| Giải nén KTX2/Meshopt, parse glTF | Web Worker | không chặn luồng chính; ≤ 50 ms mỗi lát trên luồng chính khi tải lên GPU | AC-02-05 |
+| Giải nén KTX2/Meshopt, parse glTF (glTFast, CR-02) | Chính, chia lát bất đồng bộ (nền Web của Unity mặc định một luồng; đa luồng chỉ thử ở POC-U1) | không chặn khung hình; ≤ 50 ms mỗi lát trên luồng chính khi tải lên GPU | AC-02-05 |
 
 ### 7.3 Ngân sách tài nguyên
-Giá trị theo SRS-04 mục 6.3 (draw call 120, vật liệu 32, texture 2048 đã chốt; còn lại, OI-RTM-01). Phân bổ bộ nhớ tier Vừa 500 MB: texture GPU ≤ 250 MB, hình học ≤ 150 MB, âm thanh giải mã ≤ 30 MB, JS heap ≤ 70 MB (TSD đề xuất).
+Giá trị theo SRS-04 mục 6.3 (draw call 120, vật liệu 32, texture 2048 đã chốt; còn lại, OI-RTM-01). Phân bổ bộ nhớ tier Vừa 500 MB: texture GPU ≤ 250 MB, hình học ≤ 150 MB, âm thanh giải mã ≤ 30 MB, heap WASM của player ≤ 70 MB (TSD đề xuất).
 
 ### 7.4 Ngân sách tải
-- JS khởi động (engine core + game) ≤ 1,2 MB gzip (TSD đề xuất); chunk `combat` ≤ 120 KB, `dialogue-ai` ≤ 40 KB, recast WASM ≤ 450 KB chỉ khi game có NPC/động vật di chuyển.
+- Unity player (loader + `.wasm` + `.data` + framework, nén Brotli): ngân sách chốt sau POC-U1 (OI-GEN-05); số cũ "JS khởi động ≤ 1,2 MB gzip" của Three.js không còn áp dụng. Player được cache trình duyệt theo semver nên chỉ tốn ở lần đầu mỗi phiên bản. Module tuỳ chọn (`Combat`) luôn nằm trong player, chi phí khi tắt chỉ là dung lượng tải (QT-GEN-07 hiểu theo nghĩa không tốn CPU/GPU) (CR-02).
 - Zone tier Vừa ≤ 50 MB (CH-03); tới điều khiển được ≤ 10 s trên 4G 9 Mbps: zone xuất phát cần ≤ 8 MB "lõi điều khiển được" (địa hình LOD thấp + vật cận cảnh + texture fallback thấp), phần còn lại stream nền (TSD-04 ALG-RTM-02).
 
 ### 7.5 Ngân sách hạ tầng web
@@ -507,3 +505,4 @@ NFR chung (SRS-00) sang TSD:
 | 1.1 | 22/11/2026 | Claude | Chốt các số "(đề xuất)" có nguồn từ SRS sau khi Huy duyệt SRS |
 | 1.2 | 23/11/2026 | Claude | CR-01 (Huy yêu cầu 23/11/2026, SRS-00 v1.2): thêm mục 2.5 luồng làm tiếp/cập nhật game, gói `@gamestudio/status`, SCH-GEN-07, ALG-GEN-05 |
 | 1.2 | 23/11/2026 | Huy | Duyệt phần bổ sung CR-01 |
+| 1.3 | 25/11/2026 | Claude | CR-02 (Huy yêu cầu 25/11/2026: chỉ dùng Unity thay Three.js; Huy duyệt phân tích, chọn "player chung + dữ liệu", ADR-036): danh mục TSD-04, 06; bảng tầng (runtime C#), sơ đồ xem trước, nguyên tắc 2; TD-02, 03, 04, 05, 09, 11, 12, 18 ghi phần thay bởi ADR-036; cây thư mục `engine/unity`; đồ thị gói; luật lint; ngân sách 7.2, 7.3, 7.4 |

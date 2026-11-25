@@ -3,7 +3,7 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | SRS-09 |
-| Phiên bản | 1.1 |
+| Phiên bản | 1.2 |
 | Ngày | 23/11/2026 |
 | Tài liệu cha | SRS-00 `SRS-00-TONG-QUAN.md` |
 | BRD nguồn | BRD-09 v0.1; BRD-00 v0.5 mục 7.7–7.9 (BR-32…46); BRD-10 (BR-126, v1.1) |
@@ -11,7 +11,7 @@
 | Thành phần | `.claude/` (agent, skill, lệnh, rule, hook, template), `project.yaml`, `CLAUDE.md`, `UPSTREAM.md`, `LICENSES.md`, `docs/ADR/`, `engine doctor`, CI |
 | Nhóm mã | `DEV` |
 | Pha | E0 (thiết lập), áp dụng suốt dự án |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.1 bổ sung luồng làm tiếp và cập nhật game theo CR-01, Huy duyệt 23/11/2026 |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.1 bổ sung luồng làm tiếp và cập nhật game theo CR-01, Huy duyệt 23/11/2026; v1.2 **cập nhật theo CR-02** (runtime Unity; Huy duyệt phân tích 25/11/2026), chờ Huy xem lại |
 
 ---
 
@@ -96,7 +96,7 @@ flowchart LR
 | Mã | Yêu cầu | Nguồn | Ưu tiên | Pha |
 |---|---|---|---|---|
 | FR-DEV-01 | Tối đa 8 agent: `director` (Opus), `engine-dev`, `tech-artist`, `world-builder`, `gameplay-ui` (Sonnet), `asset-designer` (Opus khi viết generator mới, Sonnet khi chỉnh tham số), `qa` (Sonnet/Haiku), `docs` (Haiku); mỗi agent có mô tả một đoạn và danh sách thư mục phụ trách | BR-32, BR-32.1 | M | E0 |
-| FR-DEV-02 | Skill: giữ 8 skill bộ gốc (`threejs-game-director`, `threejs-gameplay-systems`, `threejs-aaa-graphics-builder`, `threejs-game-ui-designer`, `threejs-debug-profiler`, `threejs-qa-release`, `threejs-image-generator`, `threejs-audio-generator`), bỏ `threejs-3d-generator` (QĐ-08); thêm 10–15 skill engine (`engine-intake`, `engine-world`, `engine-asset-forge`, `engine-cc0`, `engine-texture-proc`, `engine-materials`, `engine-lighting-bake`, `engine-packager`, `engine-blender`, …) | BR-32 | M | E0 |
+| FR-DEV-02 | Skill: giữ 2 skill bộ gốc `threejs-image-generator`, `threejs-audio-generator`; bỏ `threejs-3d-generator` (QĐ-08) và 6 skill gắn Three.js (`threejs-game-director`, `threejs-gameplay-systems`, `threejs-aaa-graphics-builder`, `threejs-game-ui-designer`, `threejs-debug-profiler`, `threejs-qa-release`), thay bằng skill `engine-unity-*` (dựng player, gameplay C#, đồ hoạ URP, hồ sơ hiệu năng, QA) theo CR-02; thêm 10–15 skill engine (`engine-intake`, `engine-world`, `engine-asset-forge`, `engine-cc0`, `engine-texture-proc`, `engine-materials`, `engine-lighting-bake`, `engine-packager`, `engine-blender`, …) | BR-32 | M | E0 |
 | FR-DEV-03 | Lệnh: `/start`, `/new-game`, `/ticket`, `/build-zone`, `/qa-light`, `/qa-full`, `/perf-snapshot`, `/visual-diff`, `/gate-check`, `/asset-recipe`, `/adr`, `/publish-poc`, `/handoff`; v1.1 thêm `/resume-game`, `/import-game` (FR-DEV-26, 27) | BR-32 | M | E0 |
 | FR-DEV-04 | Rule theo đường dẫn: `engine/runtime/**` (không cấp phát trong vòng lặp nóng, chỉ API công khai), `engine/build/**` (tất định, seed, báo cáo JSON), `games/**/data/**` (không giá trị cứng ngoài dữ liệu, hợp lệ schema), `web/**` (không khoá API phía client, kiểm quyền ở backend), `prototypes/**` (nới lỏng) | BR-32 | M | E0 |
 
@@ -121,7 +121,7 @@ flowchart LR
 | FR-DEV-14 | `CLAUDE.md` < 150 dòng: luật, cấu trúc thư mục, lệnh CLI, hướng dẫn chọn mô hình, chỉ dẫn tới ADR; CI báo lỗi khi vượt | BR-39, BR-39.1 | M | E0 |
 | FR-DEV-15 | Ghi chú dự án gọn `docs/handoff.md` (ràng buộc, việc đã xong, asset đang chờ, bước tiếp; ≤ 150 dòng) cập nhật bằng `/handoff` cuối mỗi phiếu | BR-41, BR-41.1 | M | E0 |
 | FR-DEV-16 | `/clear` giữa các phiếu; phiếu sau đọc ghi chú dự án thay vì lịch sử | BR-41.2 | M | E0 |
-| FR-DEV-17 | MCP xem cảnh (Three.js, Blender) chỉ bật khi gỡ lỗi, không nằm trong cấu hình mặc định | BR-42, BR-42.1 | S | E0 |
+| FR-DEV-17 | MCP xem cảnh (Unity, Blender) chỉ bật khi gỡ lỗi, không nằm trong cấu hình mặc định | BR-42, BR-42.1 | S | E0 |
 | FR-DEV-18 | Hook theo bảng mục 6.3: chặn đọc nguyên `.md` > 40 KB (trả heading), chặn đọc nhị phân/log dài (gợi ý báo cáo JSON, `grep`, `tail`), cảnh báo khi ghi JSON dữ liệu sai schema, chặn đọc `.env`/bí mật và lệnh phá huỷ, nhắc `/perf-snapshot` khi sửa thư mục đồ hoạ | BR-38 | M | E0 |
 | FR-DEV-19 | Đo token mỗi phiếu (từ thống kê phiên) và ghi vào phiếu + bảng `docs/metrics/tokens.csv` để tính BO-02 | BR-38.2 | M | E0 |
 | FR-DEV-21 | Claude chỉ xem 2–4 ảnh khác biệt nhất khi qua cổng; ngoài ra đọc số liệu (SRS-04 QT-RTM-04) | BR-38.3 | M | E0 |
@@ -271,3 +271,4 @@ Không có màn hình. Giao diện là lệnh Claude Code (FR-DEV-03), CLI `engi
 | 0.1 | 22/11/2026 | Claude | Bản đầu từ BRD-09 v0.1 |
 | 1.0 | 22/11/2026 | Claude | Huy duyệt; chấp nhận các giá trị "(đề xuất)" và đề xuất của Open item làm giá trị nền; đổi trạng thái sang Đã duyệt |
 | 1.1 | 23/11/2026 | Claude | CR-01 (Huy yêu cầu 23/11/2026: luồng xây dựng cho game đang làm dở hoặc đã có): thêm mục 4.5 FR-DEV-26 `/resume-game`, FR-DEV-27 `/import-game`, mở rộng FR-DEV-03, AC-CR01-12; Huy duyệt 23/11/2026 (giá trị "(đề xuất)" mới được chấp nhận làm giá trị nền) |
+| 1.2 | 25/11/2026 | Claude | CR-02 (runtime Unity, QĐ-16, ADR-036): FR-DEV-02 (giữ 2 skill gốc, thay 6 skill Three.js bằng `engine-unity-*`), FR-DEV-17 (MCP Unity) |

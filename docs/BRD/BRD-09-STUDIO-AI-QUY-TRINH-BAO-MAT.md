@@ -3,8 +3,8 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | BRD-09 |
-| Phiên bản | 1.1 |
-| Trạng thái | **Đã duyệt** v1.1 (Huy, 23/11/2026) |
+| Phiên bản | 1.2 |
+| Trạng thái | Đã duyệt v1.1 (Huy, 23/11/2026); **v1.2 cập nhật theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại |
 | Ngày | 22/11/2026 |
 | Tài liệu cha | BRD-00 `BRD-TONG-QUAN.md` v1.1, mục 7.7–7.9 |
 | Yêu cầu tổng quan được chi tiết hoá | BR-32…46 |
@@ -41,7 +41,7 @@ Ghi chú: phát triển Web Studio (frontend, backend) do `engine-dev` và `game
 
 | Nhóm | Skill |
 |---|---|
-| Giữ từ bộ gốc (8) | `threejs-game-director`, `threejs-gameplay-systems`, `threejs-aaa-graphics-builder`, `threejs-game-ui-designer`, `threejs-debug-profiler`, `threejs-qa-release`, `threejs-image-generator`, `threejs-audio-generator` |
+| Giữ từ bộ gốc (2, sau CR-02) | `threejs-image-generator`, `threejs-audio-generator` (không phụ thuộc Three.js). Sáu skill gốc gắn Three.js (`threejs-game-director`, `threejs-gameplay-systems`, `threejs-aaa-graphics-builder`, `threejs-game-ui-designer`, `threejs-debug-profiler`, `threejs-qa-release`) được thay bằng skill `engine-unity-*` (QĐ-16) |
 | Bỏ | `threejs-3d-generator` (QĐ-08) |
 | Skill engine | `engine-intake`, `engine-world`, `engine-asset-forge`, `engine-cc0`, `engine-texture-proc`, `engine-materials`, `engine-lighting-bake`, `engine-packager`, `engine-blender` |
 | Lệnh | `/start`, `/new-game`, `/ticket`, `/build-zone`, `/qa-light`, `/qa-full`, `/perf-snapshot`, `/visual-diff`, `/gate-check`, `/asset-recipe`, `/adr`, `/publish-poc`, `/handoff` |
@@ -106,7 +106,7 @@ flowchart LR
 | BR-39.1 | `CLAUDE.md` < khoảng 150 dòng: luật, cấu trúc thư mục, lệnh CLI, chỉ dẫn tới ADR | M |
 | BR-41.1 | Ghi chú dự án gọn (ràng buộc, việc đã xong, asset đang chờ, bước tiếp) cập nhật bằng `/handoff` cuối mỗi phiếu | M |
 | BR-41.2 | `/clear` giữa các phiếu; phiếu sau đọc ghi chú thay vì lịch sử | M |
-| BR-42.1 | MCP xem cảnh (Three.js, Blender) chỉ bật khi gỡ lỗi | S |
+| BR-42.1 | MCP xem cảnh (Unity, Blender) chỉ bật khi gỡ lỗi | S |
 | BR-38.2 | Đo token mỗi phiếu và ghi vào báo cáo để tính BO-02 | M |
 | BR-38.3 | Ảnh: Claude chỉ xem 2–4 ảnh khác biệt nhất khi qua cổng; ngoài ra đọc số liệu | M |
 
@@ -161,3 +161,7 @@ flowchart LR
 ## Bổ sung v1.1 (CR-01)
 
 Luồng làm tiếp, cập nhật và nhập game đã có được mô tả ở **BRD-10** (BR-119…126). Phần liên quan đến tài liệu này: lệnh `/resume-game`, `/import-game` và ghi chú handoff theo từng game (BR-126).
+
+## Bổ sung v1.2 (CR-02)
+
+Ngày 25/11/2026 Huy đổi runtime sang Unity (QĐ-16, ADR-036). Sửa trong tài liệu này: bảng skill giữ từ bộ gốc còn hai skill sinh ảnh và âm thanh, sáu skill gắn Three.js thay bằng skill `engine-unity-*`; BR-42.1 dùng MCP Unity thay Three.js. Mục tiêu và BR khác không đổi.

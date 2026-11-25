@@ -3,7 +3,7 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | SRS-08 |
-| Phiên bản | 1.2 |
+| Phiên bản | 1.3 |
 | Ngày | 23/11/2026 |
 | Tài liệu cha | SRS-00 `SRS-00-TONG-QUAN.md` |
 | BRD nguồn | BRD-08 v0.1; BRD-10 (v1.2); BRD-00 v0.5 mục 4.1b, 7.11 (BR-90…118) |
@@ -11,7 +11,7 @@
 | Thành phần | Frontend Web Studio (`web/app`), backend API (`web/api`), CSDL, kho đối tượng (asset, bản build), hàng đợi job, worker build, cổng AI |
 | Nhóm mã | `WEB` |
 | Pha | W1…W4 (song song engine, bắt đầu sau G-E1) |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.1 bổ sung phần quản trị theo change request Huy duyệt 23/11/2026 (nguồn UIUX-04 FRP-ADM-01…11); v1.2 bổ sung luồng làm tiếp và cập nhật game theo CR-01, Huy duyệt 23/11/2026 |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.1 bổ sung phần quản trị theo change request Huy duyệt 23/11/2026 (nguồn UIUX-04 FRP-ADM-01…11); v1.2 bổ sung luồng làm tiếp và cập nhật game theo CR-01, Huy duyệt 23/11/2026; v1.3 **cập nhật theo CR-02** (runtime Unity; Huy duyệt phân tích 25/11/2026), chờ Huy xem lại |
 
 Nội dung nghiệp vụ của từng loại chỉnh sửa nằm ở SRS-01 (chat, brief, đề xuất), SRS-02 (môi trường), SRS-03 (asset), SRS-05 (NPC, động vật), SRS-06 (chiến đấu), SRS-07 (hội thoại). SRS này đặc tả **tài khoản, phân quyền, không gian làm việc, xem trước, editor chung, phiên bản, chia sẻ, xuất bản, backend, job, cổng AI và vận hành**.
 
@@ -58,7 +58,7 @@ flowchart LR
     G[Game đã xuất bản] -->|API-DLG| AIG
 ```
 
-Khung xem trước nhúng `@gamestudio/engine` (cùng bản với bản xuất bản, SRS-04 FR-RTM-03), nạp bản build mới nhất từ kho đối tượng và dữ liệu runtime từ API.
+Khung xem trước nhúng Unity player (cùng bản với bản xuất bản, SRS-04 FR-RTM-03; CR-02), nạp bản build mới nhất từ kho đối tượng và dữ liệu runtime từ API.
 
 ### 2.2 Tác nhân
 | Vai trò hệ thống | Mô tả |
@@ -607,3 +607,4 @@ Trạng thái job: `Cho → DangChay → Xong | Loi | DaHuy`; `Loi` do môi trư
 | 1.0 | 22/11/2026 | Claude | Huy duyệt; chấp nhận các giá trị "(đề xuất)" và đề xuất của Open item làm giá trị nền; đổi trạng thái sang Đã duyệt |
 | 1.1 | 23/11/2026 | Claude | Change request Huy duyệt 23/11/2026 (UIUX-04 FRP-ADM-01…11): thêm UC-WEB-09, FR-WEB-51…59, QT-WEB-09, SCR-WEB-15…18, MSG-WEB-05, API-WEB-75…82, ERR-WEB-13, thực thể `Announcement`; mở rộng quyền Quản trị (mục 3), FR-WEB-03, 38, 48, 49 |
 | 1.2 | 23/11/2026 | Claude | CR-01 (Huy yêu cầu 23/11/2026: luồng xây dựng cho game đang làm dở hoặc đã có): thêm UC-WEB-10…12, FR-WEB-60…69 (mục 5.10), QT-WEB-10, 11, SCR-WEB-19, MSG-WEB-06, API-WEB-83…86, ERR-WEB-14, 15, `ImportCheck`, chế độ link `coDinh`/`moiNhat`; mở rộng mục 3.2, FR-WEB-31, 40, API-WEB-30; AC-CR01-07…11, OI-WEB-10, 11; Huy duyệt 23/11/2026 (giá trị "(đề xuất)" mới được chấp nhận làm giá trị nền) |
+| 1.3 | 25/11/2026 | Claude | CR-02 (runtime Unity, ADR-036): khung xem trước nhúng Unity player thay `@gamestudio/engine`; FR-WEB-16 giữ nguyên ý (cùng phiên bản player với bản xuất bản) |

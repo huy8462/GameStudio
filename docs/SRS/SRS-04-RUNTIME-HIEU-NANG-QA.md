@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | SRS-04 |
-| Phiên bản | 1.1 |
+| Phiên bản | 1.2 |
 | Ngày | 23/11/2026 |
 | Tài liệu cha | SRS-00 `SRS-00-TONG-QUAN.md` |
 | BRD nguồn | BRD-04 v0.1; BRD-00 v0.5 (BR-06…09, BR-22…31, BR-40, BR-111 phần bản build); BRD-10 (BR-119, 122…125, v1.1) |
 | Module | Runtime: `core`, `camera-player` (phần chung), `ui-audio`, `interaction` (phần chung); Build: `packager`; `qa`; `cli` |
 | Nhóm mã | `RTM` (runtime, dữ liệu, ngân sách), `QA` (kiểm thử tự động), `CLI` (dòng lệnh, đóng gói, xuất bản) |
 | Pha | E0 (baseline), E1 (core, schema, QA khung, CLI), E2 (tier, zone, điều khiển), E3 (visual regression), E6 (bot playtest, vòng chơi) |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.1 bổ sung luồng làm tiếp và cập nhật game theo CR-01, Huy duyệt 23/11/2026 |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.1 bổ sung luồng làm tiếp và cập nhật game theo CR-01, Huy duyệt 23/11/2026; **v1.2 runtime Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại |
 
 ---
 
@@ -79,7 +79,7 @@ flowchart TD
 
 ### 3.1 UC-RTM-01 Khởi động và vào game
 1. Trình duyệt mở `index.html` của bản xuất bản.
-2. Runtime kiểm WebGL2 và định dạng nén hỗ trợ; dò thiết bị (renderer GPU, `deviceMemory`, kích thước màn hình) để chọn tier đề xuất (FR-RTM-07).
+2. Unity player kiểm WebGL2 và định dạng nén hỗ trợ; dò thiết bị (renderer GPU, `deviceMemory`, kích thước màn hình) để chọn tier đề xuất (FR-RTM-07).
 3. Runtime hiển thị SCR-RTM-01 (màn hình tải có thanh tiến độ), nạp `manifest.json`, kiểm `schemaVersion` và `engineVersion` (FR-RTM-02, 03).
 4. Nạp zone xuất phát của tier đã chọn; khi đủ để điều khiển thì vào game; đo fps 3 s đầu, điều chỉnh tier nếu cần.
 5. Nạp nền các zone kề (FR-RTM-09).
@@ -93,7 +93,7 @@ Ngoại lệ: không có WebGL2 → ERR-RTM-01; định dạng nén không hỗ 
 
 ### 3.3 UC-QA-03 Đo hiệu năng trên A56 thật
 1. Huy mở link xuất bản có tham số `?perf=1&route=<id>` trên A56 (hoặc quét QR, SRS-08 FR-WEB-19).
-2. Runtime chạy đường đi chuẩn của zone (khai báo dữ liệu), thu fps (trung bình, P5, P1), thời gian khung hình, bộ nhớ JS heap (nếu có), số draw call, tri, nhiệt (nếu API có).
+2. Runtime chạy đường đi chuẩn của zone (khai báo dữ liệu), thu fps (trung bình, P5, P1), thời gian khung hình, bộ nhớ heap WASM của player, số draw call, tri, nhiệt (nếu API có).
 3. Runtime gửi số đo về endpoint thu thập của Web Studio (OI-QA-03) hoặc hiển thị JSON để sao chép khi không có mạng.
 4. Báo cáo cổng đính kèm số đo A56.
 
@@ -120,8 +120,8 @@ Ngoại lệ: brief đang `ChoXacNhan` → mã thoát 3 (ERR-INT-06); thư mục
 |---|---|---|---|---|
 | FR-RTM-01 | Mỗi loại file dữ liệu game có JSON Schema (draft 2020-12) trong `engine/schema/`; một bộ kiểm dùng chung cho CLI, runtime, `game-intake`, editor web; runtime từ chối nạp dữ liệu sai schema và báo đường dẫn trường sai | BR-06, BR-06.1 | M | E1 |
 | FR-RTM-02 | Schema có `schemaVersion` (semver); mỗi lần tăng major có bộ chuyển đổi `migrate(vN → vN+1)`; CLI `engine migrate` chuyển dữ liệu cũ, giữ bản sao lưu | BR-06.2 | M | E1 |
-| FR-RTM-03 | Engine runtime là gói npm nội bộ `@gamestudio/engine` có semver; `game.json.engineVersion` khai báo dải phiên bản dùng; build từ chối khi không khớp | BR-07, BR-07.1 | M | E1 |
-| FR-RTM-04 | Script gameplay riêng của game (thư mục `games/<id>/scripts/`) chỉ được import API công khai `@gamestudio/engine/api`; lint chặn import đường dẫn nội bộ | BR-07.2 | M | E1 |
+| FR-RTM-03 | Engine runtime là Unity player Web chung (C#, QĐ-16, CR-02), build theo phiên bản semver và đặt ở thư mục phiên bản trong kho xuất bản; `game.json.engineVersion` khai báo dải phiên bản dùng; build từ chối khi không khớp | BR-07, BR-07.1 | M | E1 |
+| FR-RTM-04 | Logic riêng của game khai báo bằng dữ liệu trong `games/<id>/` (biểu thức `expr`, đồ thị hành vi, sự kiện); không nạp mã C# theo từng game; tính năng cần mã mới được thêm thành module của Unity player qua phiếu (CR-02; trước là `games/<id>/scripts/` TS) | BR-07.2 | M | E1 |
 | FR-RTM-05 | Công cụ build và runtime không chứa hằng số riêng của một cảnh; giá trị riêng nằm trong dữ liệu game; rule `games/**/data/**` và review kiểm | BR-08 | M | E1 |
 | FR-RTM-06 | RNG có seed (thuật toán cố định, ví dụ PCG32) cho build và runtime; mỗi hệ thống lấy luồng RNG con theo seed + id; chế độ test `?test=1&seed=<n>` cố định bước thời gian 1/30 s | BR-09, BR-09.1 | M | E1 |
 
@@ -222,7 +222,7 @@ games/<id>/
         entities/ player.json npc/*.json animals/*.json interactions/*.json weapons/*.json
         dialogue/*.json
   assets/ recipes/*.json  imported/**  (mỗi file kèm *.provenance.json)
-  scripts/ (tuỳ chọn, chỉ API công khai)
+  (không còn scripts/ từ CR-02: logic qua dữ liệu, FR-RTM-04)
   qa/ views.json  routes.json  bot/*.json  baseline/**
   game-brief.md  style-bible.md
 build/<id>/ <zone>/<tier>/**  manifest.json  reports/*.json  publish/<version>/**
@@ -242,7 +242,7 @@ build/<id>/ <zone>/<tier>/**  manifest.json  reports/*.json  publish/<version>/*
 | `water` | `terrain.mesh` | `world.water` | 02 |
 | `vegetation` | `terrain.splat`, `assets` | `world.vegetation` | 02 |
 | `placement` | `terrain.mesh`, `water`, `vegetation`, `assets` | `world.placementRules`, `world.placedObjects` | 02 |
-| `navmesh` | `terrain.mesh`, `water`, `placement` | thông số tác nhân điều hướng | 05 |
+| `navmesh` | `terrain.mesh`, `water`, `placement` | thông số tác nhân điều hướng; từ CR-02 bước này chỉ gom hình nguồn và thông số, NavMesh dựng lúc nạp zone trong Unity player | 05 |
 | `lighting.bake` | `placement` | `world.timeOfDay[baked=true]` | 02 |
 | `audio` | — | âm thanh, `ambience` | 03 |
 | `dialogue.check` | — | `dialogue/**` | 07 |
@@ -375,9 +375,9 @@ Tất cả số ngoài cột Vừa của draw call, vật liệu, texture là đ
 
 | Mã | Yêu cầu | Cách kiểm |
 |---|---|---|
-| NFR-RTM-01 | Thời gian từ mở link tới điều khiển được ≤ 10 s trên 4G tier Vừa (đề xuất, NFR-04-01) | Đo A56, mạng 4G giả lập 9 Mbps |
+| NFR-RTM-01 | Thời gian từ mở link tới điều khiển được ≤ 10 s trên 4G tier Vừa (đề xuất, NFR-04-01; đo lại với Unity player ở POC-U1, OI-GEN-05) | Đo A56, mạng 4G giả lập 9 Mbps |
 | NFR-RTM-02 | Fps ≥ 30 ổn định (P5 ≥ 25) tier Vừa trên A56 (đề xuất, NFR-04-02) | UC-QA-03 |
-| NFR-RTM-03 | Trình duyệt: Chrome Android bản ổn định mới nhất và trước đó; Chrome/Edge desktop (NFR-04-03) | Ma trận thiết bị |
+| NFR-RTM-03 | Trình duyệt: Chrome Android bản ổn định mới nhất và trước đó; Chrome/Edge desktop; nền Web của Unity (WebGL2) (NFR-04-03) | Ma trận thiết bị |
 | NFR-QA-01 | QA nhẹ ≤ 5 phút, đầy đủ ≤ 30 phút mỗi zone (đề xuất, NFR-04-04) | Báo cáo `durationS` |
 | NFR-QA-02 | QA tất định: cùng seed, cùng bản build → cùng kết quả bot và ảnh (sai khác pixel ≤ ngưỡng nhiễu) | AC-04-07 |
 | NFR-CLI-01 | Build lại khi không đổi gì (tất cả cache) ≤ 30 s mỗi zone | Đo |
@@ -444,3 +444,4 @@ Tất cả số ngoài cột Vừa của draw call, vật liệu, texture là đ
 | 0.1 | 22/11/2026 | Claude | Bản đầu từ BRD-04 v0.1 |
 | 1.0 | 22/11/2026 | Claude | Huy duyệt; chấp nhận các giá trị "(đề xuất)" và đề xuất của Open item làm giá trị nền; đổi trạng thái sang Đã duyệt |
 | 1.1 | 23/11/2026 | Claude | CR-01 (Huy yêu cầu 23/11/2026: luồng xây dựng cho game đang làm dở hoặc đã có): thêm UC-CLI-03, 04, FR-CLI-08…12 (`status`, `build --stale`, `upgrade`, `import`, xuất bản bản mới), QT-RTM-08, mục 6.6 báo cáo tiến độ, ERR-CLI-02, 03, NFR-CLI-02, AC-CR01-04…06; Huy duyệt 23/11/2026 (giá trị "(đề xuất)" mới được chấp nhận làm giá trị nền) |
+| 1.2 | 25/11/2026 | Claude | CR-02 (runtime Unity, QĐ-16, ADR-036; Huy duyệt phân tích 25/11/2026): FR-RTM-03 (Unity player thay gói npm), FR-RTM-04 (logic qua dữ liệu, bỏ script TS riêng game), luồng khởi động bước 2, đo heap WASM, bước `navmesh` (NavMesh dựng lúc nạp), cây thư mục game, NFR-RTM-01, 03 |
