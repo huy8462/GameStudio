@@ -157,18 +157,18 @@ Cần đọc lại AC-02-01, 02 để biết G-E1 có đòi dữ liệu thật k
 |---|---|
 | AC-01-01, 02, 03, 06, 07 | Đạt (T-0012, golden test intake) |
 | AC-01-04 | Đạt (guard `engine build` T-0005; brief từ `engine new-game` T-0013) |
-| AC-01-05 | **Thiếu**: đổi thời điểm → v2 + ảnh hưởng `lighting` z1 (cần `impact` PSC-GEN-03, phiên bản dữ liệu, bước `lighting.bake`) |
+| AC-01-05 | **Hoãn sang E2** (Huy, 25/11/2026). Thiếu: đổi thời điểm → v2 + ảnh hưởng `lighting` z1 (cần `impact` PSC-GEN-03, phiên bản dữ liệu, bước `lighting.bake`) |
 | AC-02-01 | **Thiếu**: bbox 2×2 km thật, đường/sông khớp OSM (cần nguồn `real`: DEM Copernicus + OSM, PSC-WLD-02, 03; cần mạng) |
 | AC-02-02 | Đạt (procedural "đồi", hai build cùng hash, T-0007…T-0011) |
 | AC-04-06 | Đạt (`engine validate` và guard: lỗi có đường dẫn trường, T-0002, T-0005) |
 | AC-CR01-01 | Đạt (T-0015: intake + `engine new-game --resume`) |
 | AC-CR01-02 | Đạt (T-0016: `engine import` + `reverseBrief`; build thoát 3 tới khi `engine brief confirm`) |
-| AC-CR01-06 | **Thiếu**: xuất bản lần hai `publish/2/` (`engine publish`, packager E2) |
+| AC-CR01-06 | **Hoãn sang E2** (Huy, 25/11/2026). Thiếu: xuất bản lần hai `publish/2/` (`engine publish`, packager E2) |
 | AC-CR01-12 | Đạt phần CLI (`engine status` + `/resume-game` ≤ 15 dòng, T-0014); cần thử bằng phiên Claude Code thật |
 
 **Phiếu E1 kế tiếp (đề xuất, theo thứ tự khuyến nghị):**
-1. **T-0017 nguồn thật `world.fetch`** (PSC-WLD-02, 03; AC-02-01): DEM Copernicus + OSM (cần quyết: mạng, `rasterio`/`osmium` hay thay thế thuần Python, cache dữ liệu tải).
-2. **AC-01-05, AC-CR01-06** cần `impact`, phiên bản dữ liệu, `lighting.bake`, packager/publish (phần lớn ở E2): đề xuất Huy xét **hoãn sang E2** khi chốt cổng G-E1.
+1. **T-0017 nguồn thật `world.fetch`** (Huy chọn làm, 25/11/2026; soạn phương án trước khi viết mã: `docs/tickets/T-0017-phuong-an.md`) (PSC-WLD-02, 03; AC-02-01): DEM Copernicus + OSM (cần quyết: mạng, `rasterio`/`osmium` hay thay thế thuần Python, cache dữ liệu tải).
+2. ~~AC-01-05, AC-CR01-06~~: **Huy quyết hoãn sang E2 (25/11/2026)**; cổng G-E1 xét không gồm hai AC này. Cần `impact`, phiên bản dữ liệu, `lighting.bake`, packager/publish.
 - Khung QA (`@gamestudio/qa`) để sau packager/runtime E2; nguồn `qaReports` của `status` đang rỗng.
 - Phiếu nhỏ: tách test nặng (`world-steps.test.ts`, `new-game.test.ts` chạy `uv`/numba thật, ~130 s) sang lệnh `pnpm test:heavy`; `LongPathsEnabled` hoặc `\\?\` trong `gsio` cho bước python nếu game nằm sâu. Sau T-0013, cũng nên viết thêm skill `engine-*` (structure-check cần 10–15, hiện 1).
 
