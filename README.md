@@ -7,7 +7,7 @@ Engine web game 3D dùng lại được, kèm Web Studio, để tạo, chỉnh v
 - Fork từ [majidmanzarpour/threejs-game-skills](https://github.com/majidmanzarpour/threejs-game-skills) (MIT, tác giả Majid Manzarpour). Thay đổi so với bản gốc: `UPSTREAM.md`. README gốc: nhánh `vendor/upstream`.
 - Skill Claude Code: `.claude/skills/` (8 skill gốc; đã bỏ `threejs-3d-generator` theo QĐ-08).
 
-Trạng thái: pha E0 (xem `HANDOFF-API.md` §6.1).
+Runtime: Unity player Web dùng chung, game là gói dữ liệu (ADR-036, CR-02). Trạng thái: E1, chuẩn bị E2 (xem `HANDOFF-API.md` §6).
 
 ## Bắt đầu
 

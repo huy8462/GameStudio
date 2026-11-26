@@ -73,4 +73,4 @@ Mỗi phiếu ghi dòng "**Mô hình khuyến nghị:** <mô hình>, effort <m�
 
 ## Công nghệ đã chốt (ADR-016…034)
 
-pnpm workspaces + uv; Node 24, TS 5.9 strict; Python 3.12; Blender 5.2 LTS (ADR-034); Three.js 0.187.0 WebGL2; JSON Schema 2020-12 + Ajv; Vitest, Playwright; Fastify + PostgreSQL 17 + Drizzle + pg-boss; React 19 + Vite. Web Studio soạn game bằng Claude Code CLI chạy trên máy người dùng qua cầu nối cục bộ, người dùng tự đăng nhập, máy chủ không gọi Claude; hội thoại NPC chỉ kịch bản tĩnh (ADR-035). Gemini/ElevenLabs theo ADR-031. Phiên bản công cụ: `tools/versions.json`.
+pnpm workspaces + uv; Node 24, TS 5.9 strict; Python 3.12; Blender 5.2 LTS (ADR-034); runtime Unity 6000.3.29f1 (URP, Web/WebGL2, player chung + dữ liệu, ADR-036; âm thanh AAC, ADR-037); JSON Schema 2020-12 + Ajv; Vitest, Playwright; Fastify + PostgreSQL 17 + Drizzle + pg-boss; React 19 + Vite. Web Studio soạn game bằng Claude Code CLI chạy trên máy người dùng qua cầu nối cục bộ, người dùng tự đăng nhập, máy chủ không gọi Claude; hội thoại NPC chỉ kịch bản tĩnh (ADR-035). Gemini/ElevenLabs theo ADR-031. Phiên bản công cụ: `tools/versions.json`.
