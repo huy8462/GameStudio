@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | SRS-04 |
-| Phiên bản | 1.2 |
+| Phiên bản | 1.3 |
 | Ngày | 23/11/2026 |
 | Tài liệu cha | SRS-00 `SRS-00-TONG-QUAN.md` |
 | BRD nguồn | BRD-04 v0.1; BRD-00 v0.5 (BR-06…09, BR-22…31, BR-40, BR-111 phần bản build); BRD-10 (BR-119, 122…125, v1.1) |
 | Module | Runtime: `core`, `camera-player` (phần chung), `ui-audio`, `interaction` (phần chung); Build: `packager`; `qa`; `cli` |
 | Nhóm mã | `RTM` (runtime, dữ liệu, ngân sách), `QA` (kiểm thử tự động), `CLI` (dòng lệnh, đóng gói, xuất bản) |
 | Pha | E0 (baseline), E1 (core, schema, QA khung, CLI), E2 (tier, zone, điều khiển), E3 (visual regression), E6 (bot playtest, vòng chơi) |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.1 bổ sung luồng làm tiếp và cập nhật game theo CR-01, Huy duyệt 23/11/2026; **v1.2 runtime Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.1 bổ sung luồng làm tiếp và cập nhật game theo CR-01, Huy duyệt 23/11/2026; **v1.2 runtime Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại; v1.3 ngân sách tải theo POC-U1, Huy chốt 26/11/2026 |
 
 ---
 
@@ -375,7 +375,7 @@ Tất cả số ngoài cột Vừa của draw call, vật liệu, texture là đ
 
 | Mã | Yêu cầu | Cách kiểm |
 |---|---|---|
-| NFR-RTM-01 | Thời gian từ mở link tới điều khiển được ≤ 10 s trên 4G tier Vừa (đề xuất, NFR-04-01; đo lại với Unity player ở POC-U1, OI-GEN-05) | Đo A56, mạng 4G giả lập 9 Mbps |
+| NFR-RTM-01 | Thời gian từ mở link tới điều khiển được trên 4G 9 Mbps tier Vừa: lần đầu (chưa cache Unity player) ≤ 20 s; đã cache player ≤ 10 s (POC-U1, Huy chốt 26/11/2026; NFR-04-01) | Đo A56, mạng 4G giả lập 9 Mbps |
 | NFR-RTM-02 | Fps ≥ 30 ổn định (P5 ≥ 25) tier Vừa trên A56 (đề xuất, NFR-04-02) | UC-QA-03 |
 | NFR-RTM-03 | Trình duyệt: Chrome Android bản ổn định mới nhất và trước đó; Chrome/Edge desktop; nền Web của Unity (WebGL2) (NFR-04-03) | Ma trận thiết bị |
 | NFR-QA-01 | QA nhẹ ≤ 5 phút, đầy đủ ≤ 30 phút mỗi zone (đề xuất, NFR-04-04) | Báo cáo `durationS` |
@@ -445,3 +445,4 @@ Tất cả số ngoài cột Vừa của draw call, vật liệu, texture là đ
 | 1.0 | 22/11/2026 | Claude | Huy duyệt; chấp nhận các giá trị "(đề xuất)" và đề xuất của Open item làm giá trị nền; đổi trạng thái sang Đã duyệt |
 | 1.1 | 23/11/2026 | Claude | CR-01 (Huy yêu cầu 23/11/2026: luồng xây dựng cho game đang làm dở hoặc đã có): thêm UC-CLI-03, 04, FR-CLI-08…12 (`status`, `build --stale`, `upgrade`, `import`, xuất bản bản mới), QT-RTM-08, mục 6.6 báo cáo tiến độ, ERR-CLI-02, 03, NFR-CLI-02, AC-CR01-04…06; Huy duyệt 23/11/2026 (giá trị "(đề xuất)" mới được chấp nhận làm giá trị nền) |
 | 1.2 | 25/11/2026 | Claude | CR-02 (runtime Unity, QĐ-16, ADR-036; Huy duyệt phân tích 25/11/2026): FR-RTM-03 (Unity player thay gói npm), FR-RTM-04 (logic qua dữ liệu, bỏ script TS riêng game), luồng khởi động bước 2, đo heap WASM, bước `navmesh` (NavMesh dựng lúc nạp), cây thư mục game, NFR-RTM-01, 03 |
+| 1.3 | 26/11/2026 | Claude | POC-U1 (docs/POC/POC-U1.md): NFR-RTM-01 đổi thành lần đầu ≤ 20 s, đã cache Unity player ≤ 10 s trên 4G 9 Mbps tier Vừa; Huy chốt 26/11/2026 |

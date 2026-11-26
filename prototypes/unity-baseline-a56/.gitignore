@@ -1,0 +1,10 @@
+# POC-U1: thư mục sinh của Unity và bản build
+UnityProject/Library/
+UnityProject/Temp/
+UnityProject/Logs/
+UnityProject/obj/
+UnityProject/Build*/
+UnityProject/UserSettings/
+UnityProject/*.csproj
+UnityProject/*.sln
+logs/

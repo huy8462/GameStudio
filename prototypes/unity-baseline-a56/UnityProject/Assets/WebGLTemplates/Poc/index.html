@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <!-- POC-U1 (CR-02, ADR-036): khung trang tối giản cho player Unity Web; ?dpr=<n> đặt trần DPR (mặc định 1,5 như baseline Three.js, OIT-GEN-01). -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>{{{ PRODUCT_NAME }}}</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #1b1f24; overflow: hidden; }
+    #unity-canvas { width: 100vw; height: 100vh; display: block; background: #1b1f24; }
+    #poc-load { position: fixed; left: 8px; bottom: 8px; color: #fff; font: 12px monospace; }
+    #poc-result { position: fixed; left: 4px; right: 4px; bottom: 4px; height: 38vh; display: none;
+      font: 11px/1.3 monospace; background: rgba(0,0,0,.8); color: #fff; z-index: 9; }
+    #poc-copy { position: fixed; right: 8px; top: 8px; z-index: 10; padding: 12px; font: 16px sans-serif; display: none; }
+  </style>
+</head>
+<body>
+  <canvas id="unity-canvas" tabindex="-1"></canvas>
+  <div id="poc-load">Đang tải…</div>
+  <textarea id="poc-result" readonly></textarea>
+  <button id="poc-copy">Sao chép JSON</button>
+  <script>
+    (function () {
+      var q = new URLSearchParams(location.search);
+      var d = Number(q.get('dpr'));
+      var cap = Number.isFinite(d) && d > 0 && d <= 4 ? d : 1.5;
+      window.__POC_DPR__ = Math.min(window.devicePixelRatio || 1, cap);
+      var ta = document.querySelector('#poc-result');
+      var btn = document.querySelector('#poc-copy');
+      window.__pocShowResult = function (json) {
+        ta.value = json; ta.style.display = 'block'; btn.style.display = 'block';
+      };
+      btn.onclick = function () {
+        ta.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (e) {}
+        if (navigator.clipboard) navigator.clipboard.writeText(ta.value).then(function () { btn.textContent = 'Đã sao chép'; }, function () {});
+        btn.textContent = ok ? 'Đã sao chép' : 'Chọn chữ trong khung để chép';
+      };
+      var loadEl = document.querySelector('#poc-load');
+      var script = document.createElement('script');
+      script.src = 'Build/{{{ LOADER_FILENAME }}}';
+      script.onload = function () {
+        createUnityInstance(document.querySelector('#unity-canvas'), {
+          dataUrl: 'Build/{{{ DATA_FILENAME }}}',
+          frameworkUrl: 'Build/{{{ FRAMEWORK_FILENAME }}}',
+          codeUrl: 'Build/{{{ CODE_FILENAME }}}',
+          streamingAssetsUrl: 'StreamingAssets',
+          companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+          productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+          productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+          devicePixelRatio: window.__POC_DPR__,
+          matchWebGLToCanvasSize: true
+        }, function (p) { loadEl.textContent = 'Đang tải ' + Math.round(p * 100) + '%'; })
+          .then(function () { loadEl.style.display = 'none'; })
+          .catch(function (e) { loadEl.textContent = 'Lỗi: ' + e; console.error(e); });
+      };
+      document.body.appendChild(script);
+    })();
+  </script>
+</body>
+</html>

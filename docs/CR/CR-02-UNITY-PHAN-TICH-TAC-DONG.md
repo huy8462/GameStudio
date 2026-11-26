@@ -107,7 +107,7 @@ Kết luận cho cổng G-E1 (luồng "Tiếp tục dự án sau phần làm tr�
 
 | Mã | Nội dung | Cách xử lý |
 |---|---|---|
-| RR-CR02-01 | Tải lần đầu: runtime Unity Web nén cỡ vài MB, có thể vượt NFR-RTM-01 (≤ 10 s 4G) và ngân sách JS 1,2 MB | POC-U1 đo; nếu vượt thì đề xuất số mới (vd. ≤ 15 s lần đầu, ≤ 10 s khi đã cache) cho Huy duyệt |
+| RR-CR02-01 | Tải lần đầu: runtime Unity Web nén cỡ vài MB, có thể vượt NFR-RTM-01 (≤ 10 s 4G) và ngân sách JS 1,2 MB | POC-U1 đo; nếu vượt thì đề xuất số mới (vd. ≤ 15 s lần đầu, ≤ 10 s khi đã cache) cho Huy duyệt. Đã đo (lần đầu 17,5 s, đã cache 8,3 s, player 9,18 MB), ngân sách mới Huy chốt 26/11/2026: lần đầu ≤ 20 s, đã cache ≤ 10 s, player ≤ 10 MB |
 | RR-CR02-02 | Bộ nhớ heap WASM trên Chrome Android | Đặt `maximumMemorySize`, đo ở POC-U1 |
 | RR-CR02-03 | Bỏ script C# riêng từng game (phương án A) | Logic qua dữ liệu + expr; module mới vào player qua phiếu |
 | RR-CR02-04 | Hai bản rng/expr (TS + C#) lệch nhau | Vector kiểm chéo chung, test cả hai phía |
@@ -140,7 +140,13 @@ Kết luận cho cổng G-E1 (luồng "Tiếp tục dự án sau phần làm tr�
 | TSD-04 | 1.3 | Viết lại mục 2 (Unity player), ALG-RTM-01, 04, UI Toolkit, SCH-RTM-01, 04, ALG-QA-01, 05, TST-RTM-04, OIT-RTM-02 |
 | DDD-00 | 1.1 | MOD-GEN-14, luật phụ thuộc, NFR-GEN-10 |
 | DDD-04 | 1.1 | Mục 2.1, 3.1 sang C#, SEQ-RTM-01, 02, PSC-RTM-01, PSC-CLI-02, TC-RTM-04 |
+| POC-U1 | — | docs/POC/POC-U1.md, `prototypes/unity-baseline-a56` (26/11/2026) |
+| SRS-04 | 1.3 | NFR-RTM-01: lần đầu ≤ 20 s, đã cache ≤ 10 s (26/11/2026) |
+| SRS-00 | 1.4 | NFR-GEN-02, CH-03, đóng OI-GEN-05, danh mục SRS-04 (26/11/2026) |
+| TSD-00 | 1.4 | §7.4: player ≤ 10 MB Brotli, ≤ 20 s lần đầu / ≤ 10 s đã cache (26/11/2026) |
 
 Script truy vết: `srs-trace.py`, `tsd-trace.py`, `ddd-trace.py` đều exit 0 sau khi sửa.
+
+POC-U1 xong 26/11/2026: docs/POC/POC-U1.md (ngân sách tải Huy chốt 26/11/2026).
 
 Còn lại (sau POC-U1, theo mục 8): TSD/DDD-02, 03, 05, 08 (render địa hình/thực vật, turntable, BVH/recast → Unity Physics/AI Navigation, EditorBridge), TSD/DDD-01, 07, 09 (tên skill, MCP), UIUX-01…03, ngân sách SRS-04 §6.3; phiếu mã doctor/versions và skill `.claude`.

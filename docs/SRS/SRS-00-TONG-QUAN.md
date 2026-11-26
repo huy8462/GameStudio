@@ -3,13 +3,13 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | SRS-00 |
-| Phiên bản | 1.3 |
+| Phiên bản | 1.4 |
 | Ngày | 23/11/2026 |
 | Chủ sở hữu / người duyệt | Huy (đã duyệt 22/11/2026) |
 | Người soạn | Claude |
 | BRD nguồn | BRD-00 `BRD-TONG-QUAN.md` v1.1; BRD-01…09; BRD-10 (CR-01); `GAME-ENGINE-WEB3D-BRIEF.md` bản 6 |
 | Quyết định áp dụng | QĐ-01…15; đặc biệt QĐ-13 (chiến đấu/săn bắt tuỳ chọn), QĐ-14 (hội thoại tĩnh + AI khi chạy qua cổng giữ khoá), QĐ-15 (Web Studio riêng), CH-23 (chỉ người dùng nội bộ được mời) |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.2 bổ sung luồng làm tiếp và cập nhật game theo CR-01, Huy duyệt 23/11/2026; **v1.3 đổi runtime sang Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.2 bổ sung luồng làm tiếp và cập nhật game theo CR-01, Huy duyệt 23/11/2026; **v1.3 đổi runtime sang Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại; v1.4 ngân sách tải theo POC-U1, Huy chốt 26/11/2026 |
 
 > SRS giữ tinh thần gọn của BRD (`rigor: minimal`, QT-DEV-01): đặc tả đủ để Claude Code viết phiếu và kiểm thử, không thay TSD/ADR. Con số ghi **(đề xuất)** đã được Huy chấp nhận làm giá trị nền khi duyệt bản 1.0 (22/11/2026); nhãn được giữ để đánh dấu các số sẽ đo lại và chốt cuối ở cổng tương ứng (ví dụ ngân sách sau baseline A56 ở G-E0).
 
@@ -22,7 +22,7 @@
 | SRS-01 | [Tạo game từ mô tả](SRS-01-TAO-GAME-TU-MO-TA.md) (v1.1) | BRD-01 | `INT` | 34 |
 | SRS-02 | [Thế giới, địa hình và môi trường](SRS-02-THE-GIOI-DIA-HINH-MOI-TRUONG.md) | BRD-02 | `WLD` | 40 |
 | SRS-03 | [Asset 3D, vật liệu và âm thanh](SRS-03-ASSET-VAT-LIEU-AM-THANH.md) | BRD-03 | `AST` | 40 |
-| SRS-04 | [Runtime, hiệu năng và QA](SRS-04-RUNTIME-HIEU-NANG-QA.md) (v1.2) | BRD-04 | `RTM`, `QA`, `CLI` | 45 |
+| SRS-04 | [Runtime, hiệu năng và QA](SRS-04-RUNTIME-HIEU-NANG-QA.md) (v1.3) | BRD-04 | `RTM`, `QA`, `CLI` | 45 |
 | SRS-05 | [Nhân vật người chơi, NPC và động vật](SRS-05-NHAN-VAT-NPC-DONG-VAT.md) | BRD-05 | `CHR` | 44 |
 | SRS-06 | [Chiến đấu và săn bắt (tuỳ chọn)](SRS-06-CHIEN-DAU-SAN-BAT.md) | BRD-06 | `CBT` | 28 |
 | SRS-07 | [Hội thoại NPC (tĩnh và AI)](SRS-07-HOI-THOAI-NPC.md) | BRD-07 | `DLG` | 31 |
@@ -390,7 +390,7 @@ Wireframe chi tiết ở `docs/UIUX/` (UIUX-00…04).
 | Mã | Nhóm | Yêu cầu | Cách kiểm | Chi tiết |
 |---|---|---|---|---|
 | NFR-GEN-01 | Hiệu năng game | Fps ≥ 30 ổn định (P5 ≥ 25) tier Vừa trên Galaxy A56 (đề xuất, CH-01); ngân sách tier Vừa ≤ 120 draw call, ≤ 32 vật liệu, ~450k tri tĩnh / 650k tổng | Đo A56 mỗi cổng | SRS-04 mục 6.3 |
-| NFR-GEN-02 | Tải game | ≤ 10 s tới khi điều khiển được trên 4G; ≤ 50 MB mỗi zone tier Vừa (đề xuất, CH-03; đo lại với Unity player ở POC-U1, OI-GEN-05) | Đo | NFR-RTM-01 |
+| NFR-GEN-02 | Tải game | Lần đầu ≤ 20 s, đã cache Unity player ≤ 10 s tới khi điều khiển được trên 4G; Unity player ≤ 10 MB Brotli; ≤ 50 MB mỗi zone tier Vừa (CH-03; POC-U1, Huy chốt 26/11/2026) | Đo | NFR-RTM-01 |
 | NFR-GEN-03 | Web Studio | Trang ≤ 3 s; thao tác editor ≤ 100 ms; cập nhật nóng ≤ 2 s; API P95 ≤ 500 ms (đề xuất) | Đo | NFR-WEB-01, 02 |
 | NFR-GEN-04 | Năng suất | Mô tả → bản chơi được ≤ 30 phút cho game nhỏ, không tính bake (BO-09) | AC-08-02 | NFR-WEB-08 |
 | NFR-GEN-05 | Build | Zone 1 km² không bake ≤ 15 phút; bake một mốc ≤ 2 giờ CPU; build lại khi không đổi ≤ 30 s (đề xuất) | Báo cáo build | NFR-WLD-01, 02, NFR-CLI-01 |
@@ -466,7 +466,7 @@ Câu hỏi mở của BRD-00 và nơi SRS xử lý (mỗi SRS có thêm OI riên
 |---|---|---|---|
 | CH-01 | Fps mục tiêu A56 | ≥ 30 ổn định tier Vừa | OI-RTM-01 |
 | CH-02 | Ý nghĩa 450k/650k tri | 450k tĩnh, 650k tổng mỗi khung, tier Vừa | OI-RTM-01 |
-| CH-03 | Thời gian tải, dung lượng zone | ≤ 10 s 4G, ≤ 50 MB | OI-RTM-01 |
+| CH-03 | Thời gian tải, dung lượng zone | ≤ 20 s lần đầu / ≤ 10 s đã cache 4G, ≤ 50 MB | OI-RTM-01 |
 | CH-04 | Số liệu nền token/build | Lấy lịch sử hoặc đo E0–E1 | OI-DEV-04 |
 | CH-05 | Ngưỡng dùng lại BO-01 | ≥ 80% thay đổi là dữ liệu/asset | OI-GEN-01 |
 | CH-06 | Hạn mức chi phí sinh ảnh/âm thanh | Hỏi xác nhận khi lô vượt ngưỡng | OI-AST-04 |
@@ -499,7 +499,7 @@ Open item mới của SRS tổng quan:
 | OI-GEN-02 | Có cần mốc ngày cho từng pha không | Không; pha kết thúc khi qua cổng |
 | OI-GEN-03 | Mô tả thử pipeline E1–E5 | Claude soạn một mô tả nhỏ khác Thiền viện online, Huy duyệt trước G-E1 |
 | OI-GEN-04 | SRS có cần xuất bản DOCX/HTML ngoài Markdown | Không; giữ Markdown như BRD |
-| OI-GEN-05 | Unity player có đạt NFR-GEN-02 (≤ 10 s tới điều khiển được trên 4G) không (CR-02) | Đo ở POC-U1 trên A56; nếu vượt, đề xuất số mới (vd. ≤ 15 s lần đầu, ≤ 10 s khi đã cache) cho Huy duyệt |
+| OI-GEN-05 | Unity player có đạt NFR-GEN-02 (≤ 10 s tới điều khiển được trên 4G) không (CR-02) | Đo ở POC-U1 trên A56; nếu vượt, đề xuất số mới (vd. ≤ 15 s lần đầu, ≤ 10 s khi đã cache) cho Huy duyệt. Đóng 26/11/2026: POC-U1 đo lần đầu 17,5 s, đã cache 8,3 s; Huy chốt lần đầu ≤ 20 s, đã cache ≤ 10 s |
 
 ---
 
@@ -565,3 +565,4 @@ Thuật ngữ chung ở BRD-00 mục 16. Bổ sung:
 | 1.1 | 23/11/2026 | Claude | Theo SRS-08 v1.1 (change request quản trị Huy duyệt 23/11/2026): thêm SCR-WEB-15…18 vào danh mục màn hình, FR-WEB-51…59 vào bảng pha, `Announcement` vào danh sách thực thể |
 | 1.2 | 23/11/2026 | Claude | CR-01 (Huy yêu cầu 23/11/2026: bổ sung luồng xây dựng cho game đang làm dở hoặc đã có để làm tiếp hoặc cập nhật): thêm mục 4.4 (ba trường hợp, giai đoạn tiến độ, cờ), QT-GEN-11, 12, thuật ngữ; cập nhật danh mục SRS (SRS-01 v1.1, SRS-04 v1.1, SRS-08 v1.2, SRS-09 v1.1; tổng FR 358, sửa tổng cũ 328 chưa cộng FR-WEB-51…59), bảng pha 4.3, mục 5.3, 5.4, 6.2, 7; Huy duyệt 23/11/2026 (giá trị "(đề xuất)" mới được chấp nhận làm giá trị nền). Sau khi BRD-10 (BR-119…126) được viết cho CR-01: cột "Nguồn" của 21 FR mới trỏ tới BR-119.1…126.3, phủ 126/126 BR tổng quan và 319/319 BR chi tiết |
 | 1.3 | 25/11/2026 | Claude | CR-02 (Huy yêu cầu 25/11/2026: chỉ dùng Unity thay Three.js; Huy duyệt phân tích, chọn "player chung + dữ liệu", ADR-036): mục 1.2 (engine runtime), sơ đồ 2.1 thêm Unity, bảng 2.2 (navmesh dựng lúc nạp, runtime C#), nguyên tắc 2.3 mục 2, bảng pha 4.3 (POC-U1 ở E2), 6.1 thêm Unity, NFR-GEN-02, 10, GĐ-GEN-02, OI-GEN-05 |
+| 1.4 | 26/11/2026 | Claude | POC-U1 (docs/POC/POC-U1.md): NFR-GEN-02 (lần đầu ≤ 20 s, đã cache ≤ 10 s, Unity player ≤ 10 MB Brotli), CH-03, đóng OI-GEN-05; danh mục SRS-04 v1.3; Huy chốt 26/11/2026 |

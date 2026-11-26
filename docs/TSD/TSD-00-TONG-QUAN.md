@@ -3,13 +3,13 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | TSD-00 |
-| Phiên bản | 1.3 |
+| Phiên bản | 1.4 |
 | Ngày | 22/11/2026 |
 | Chủ sở hữu / người duyệt | Huy |
 | Người soạn | Claude |
 | Nguồn | SRS-00 v0.1 và SRS-01…09 v0.1 (328 FR); BRD-00 v0.5, BRD-01…09 v0.1; `GAME-ENGINE-WEB3D-BRIEF.md` bản 6 |
 | Quyết định áp dụng | QĐ-01…15; CH-23 (chỉ người dùng nội bộ được mời). Ba quyết định đã chốt chi phối TSD: chiến đấu/săn bắt là module tuỳ chọn mặc định tắt (QĐ-13); hội thoại NPC tĩnh, AI khi chạy là tuỳ chọn và chỉ đi qua cổng AI phía server (QĐ-14); Web Studio riêng, chỉ người được mời (QĐ-15) |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026; bản 1.2 gồm CR-01 duyệt 23/11/2026); **v1.3 runtime Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026; bản 1.2 gồm CR-01 duyệt 23/11/2026); **v1.3 runtime Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại; v1.4 ngân sách tải theo POC-U1, Huy chốt 26/11/2026 |
 
 > TSD giữ tinh thần gọn của BRD/SRS (`rigor: minimal`): đủ để Claude Code viết phiếu, chọn file, viết test và để Huy chốt ADR. Lựa chọn công nghệ là **quyết định kỹ thuật (TD)**; TD-01…18 đã được Huy chốt ngày 22/11/2026 và ghi thành ADR-016…033 trong `docs/ADR/`. TD mới về sau phải được Huy chốt và ghi ADR trước khi dùng làm căn cứ phiếu. Con số còn ghi ở SRS giữ nguyên nhãn đó ở đây; TSD không tự chốt số.
 
@@ -345,8 +345,8 @@ Samsung Galaxy A56: Exynos 1580, GPU Xclipse 540, RAM 8 GB, màn 6,7 inch 1080 �
 Giá trị theo SRS-04 mục 6.3 (draw call 120, vật liệu 32, texture 2048 đã chốt; còn lại, OI-RTM-01). Phân bổ bộ nhớ tier Vừa 500 MB: texture GPU ≤ 250 MB, hình học ≤ 150 MB, âm thanh giải mã ≤ 30 MB, heap WASM của player ≤ 70 MB (TSD đề xuất).
 
 ### 7.4 Ngân sách tải
-- Unity player (loader + `.wasm` + `.data` + framework, nén Brotli): ngân sách chốt sau POC-U1 (OI-GEN-05); số cũ "JS khởi động ≤ 1,2 MB gzip" của Three.js không còn áp dụng. Player được cache trình duyệt theo semver nên chỉ tốn ở lần đầu mỗi phiên bản. Module tuỳ chọn (`Combat`) luôn nằm trong player, chi phí khi tắt chỉ là dung lượng tải (QT-GEN-07 hiểu theo nghĩa không tốn CPU/GPU) (CR-02).
-- Zone tier Vừa ≤ 50 MB (CH-03); tới điều khiển được ≤ 10 s trên 4G 9 Mbps: zone xuất phát cần ≤ 8 MB "lõi điều khiển được" (địa hình LOD thấp + vật cận cảnh + texture fallback thấp), phần còn lại stream nền (TSD-04 ALG-RTM-02).
+- Unity player (loader + `.wasm` + `.data` + framework, nén Brotli): ≤ 10 MB Brotli (POC-U1 đo 9,18 MB, Huy chốt 26/11/2026); số cũ "JS khởi động ≤ 1,2 MB gzip" của Three.js không còn áp dụng. Player được cache trình duyệt theo semver nên chỉ tốn ở lần đầu mỗi phiên bản. Module tuỳ chọn (`Combat`) luôn nằm trong player, chi phí khi tắt chỉ là dung lượng tải (QT-GEN-07 hiểu theo nghĩa không tốn CPU/GPU) (CR-02).
+- Zone tier Vừa ≤ 50 MB (CH-03); tới điều khiển được ≤ 20 s lần đầu, ≤ 10 s khi đã cache player trên 4G 9 Mbps: zone xuất phát cần ≤ 8 MB "lõi điều khiển được" (địa hình LOD thấp + vật cận cảnh + texture fallback thấp), phần còn lại stream nền (TSD-04 ALG-RTM-02).
 
 ### 7.5 Ngân sách hạ tầng web
 API P95 ≤ 500 ms trừ endpoint gọi AI; thao tác editor ≤ 100 ms; áp nóng ≤ 2 s; ≤ 20 người dùng, ≤ 5 job đồng thời (NFR-WEB-01…03). Cấu hình máy chủ tối thiểu (TSD đề xuất, OIT-GEN-02): 16 lõi CPU, 64 GB RAM, 1 TB NVMe, không cần GPU.
@@ -506,3 +506,4 @@ NFR chung (SRS-00) sang TSD:
 | 1.2 | 23/11/2026 | Claude | CR-01 (Huy yêu cầu 23/11/2026, SRS-00 v1.2): thêm mục 2.5 luồng làm tiếp/cập nhật game, gói `@gamestudio/status`, SCH-GEN-07, ALG-GEN-05 |
 | 1.2 | 23/11/2026 | Huy | Duyệt phần bổ sung CR-01 |
 | 1.3 | 25/11/2026 | Claude | CR-02 (Huy yêu cầu 25/11/2026: chỉ dùng Unity thay Three.js; Huy duyệt phân tích, chọn "player chung + dữ liệu", ADR-036): danh mục TSD-04, 06; bảng tầng (runtime C#), sơ đồ xem trước, nguyên tắc 2; TD-02, 03, 04, 05, 09, 11, 12, 18 ghi phần thay bởi ADR-036; cây thư mục `engine/unity`; đồ thị gói; luật lint; ngân sách 7.2, 7.3, 7.4 |
+| 1.4 | 26/11/2026 | Claude | POC-U1 (docs/POC/POC-U1.md): §7.4 Unity player ≤ 10 MB Brotli, tới điều khiển được ≤ 20 s lần đầu, ≤ 10 s khi đã cache player; Huy chốt 26/11/2026 |
