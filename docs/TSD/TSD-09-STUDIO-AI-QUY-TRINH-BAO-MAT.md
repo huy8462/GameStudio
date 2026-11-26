@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | TSD-09 |
-| Phiên bản | 1.2 (đã duyệt) |
-| Ngày | 22/11/2026 |
+| Phiên bản | 1.3 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | TSD-00 `TSD-00-TONG-QUAN.md` |
 | SRS nguồn | SRS-09 v0.1 (FR-DEV-01…25, NFR-DEV-01…03) |
 | Quyết định | Monorepo đến E8 (OI-DEV-02, TD-01); CI nhẹ trên GitHub Actions, QA đầy đủ trên worker (OI-DEV-03, OIT-GEN-04) |
 | Thành phần | `.claude/` (agents, skills, commands, rules, hooks, templates), `.githooks/`, `tools/versions.json`, `tools/scripts/` (probe, token-meter, secret-scan), `engine doctor`, `.github/workflows/ci.yml`, `project.yaml`, `CLAUDE.md`, `UPSTREAM.md`, `LICENSES.md`, `docs/handoff.md`, `docs/metrics/tokens.csv` |
 | Pha | E0 (đa số), E1 (CI), W1 (rigor `standard` cho web) |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026; bản 1.2 gồm CR-01 duyệt 23/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026; bản 1.2 gồm CR-01 duyệt 23/11/2026); **v1.3 theo CR-02 và ADR-037**, chờ Huy xem lại |
 
 ---
 
@@ -42,7 +42,7 @@ flowchart LR
 ```
 .claude/
   settings.json            hook, quyền mặc định (không có MCP xem cảnh)
-  settings.debug.json      bản mẫu bật MCP Three.js/Blender khi gỡ lỗi (FR-DEV-17)
+  settings.debug.json      bản mẫu bật MCP Unity/Blender khi gỡ lỗi (FR-DEV-17, CR-02)
   agents/<tên>.md          8 agent (mục 3, IF-DEV-01)
   skills/<tên>/SKILL.md    8 skill gốc + skill engine-*
   commands/<lệnh>.md       13 lệnh (FR-DEV-03)
@@ -71,7 +71,7 @@ flowchart LR
 |---|---|---|
 | SCH-DEV-01 | `project.yaml` | Như SRS-09 mục 6.1; JSON Schema `tools/schema/project.schema.json`: `rigor ∈ {minimal, standard, full}`, `overrides[{path (glob), rigor}]`, `budgetsDefault`, `targetDevice`, `tiers[]`, `gates[]`. Khởi tạo: `minimal` mặc định; `web/api/**`, `web/worker/**`, `web/ai-gateway/**`, `web/shared/src/permissions.ts`, `web/api/src/plugins/auth*` ở `standard` (FR-DEV-05, 06) |
 | SCH-DEV-02 | Phiếu `docs/tickets/T-nnnn.md` | Frontmatter `{id, title, phase, gate?, rigor (tính bởi ALG-DEV-01), model: {name: opus\|sonnet\|haiku, effort: low\|medium\|high\|xhigh}, read[] (glob), write[] (glob), done[] (tiêu chí), evidence[] (báo cáo JSON, ảnh), status, tokens?: {input, cacheWrite, cacheRead, output, total, sessions}}`; thân: mục tiêu, phạm vi, ghi chú, sửa ngoài danh sách (lý do) (FR-DEV-07, QT-DEV-02) |
-| SCH-DEV-03 | `tools/versions.json` | `{node: "24.x.y", pnpm, python: "3.12.x", uv, blender: "4.5.x", addons: {sapling: {version, sha256}, ant_landscape: {version, sha256}}, ktx, gltfTransform, ffmpeg, gitleaks, playwright, chromium, three}`; mỗi mục có `check` (lệnh lấy phiên bản) và `match: exact\|minor` (FR-DEV-20) |
+| SCH-DEV-03 | `tools/versions.json` | `{node: "24.x.y", pnpm, python: "3.12.x", uv, blender: "4.5.x", addons: {sapling: {version, sha256}, ant_landscape: {version, sha256}}, ktx, gltfTransform, ffmpeg, gitleaks, playwright, chromium, unity /*vai trò dev, CR-02 thay three*/, unityPackages: {urp, gltfast, meshoptDecompress, ktxUnity, aiNavigation, inputSystem}}` (bản ghim theo POC-U1); mỗi mục có `check` (lệnh lấy phiên bản) và `match: exact\|minor` (FR-DEV-20) |
 | SCH-DEV-04 | `docs/metrics/tokens.csv` | Cột `ticket, date, phase, agent, model, effort, sessions, input, cache_write, cache_read, output, total, wall_min, result` (UTF-8, phân tách dấu phẩy, một dòng mỗi phiếu) (FR-DEV-19) |
 | SCH-DEV-05 | Báo cáo cổng `docs/gates/<cổng>.md` | Frontmatter `{gate, date, autoChecks[{id, desc, result: dat\|chua, evidence}], manualChecks[{id, desc}], a56: {fpsAvg, fpsP5, frameMsP95, memMB, loadS}, images[2..4], risks[], proposal, huyConfirm: {by, at} \| null, status: chua_qua\|da_qua}` (FR-DEV-09) |
 | SCH-DEV-06 | `UPSTREAM.md`, `LICENSES.md` | `UPSTREAM.md`: nguồn (repo, commit, ngày fork), tác giả và license MIT, bảng thay đổi `{file, kind: them\|sua\|xoa, reason, ticket}`, quy trình lấy bản mới (ALG-DEV-09). `LICENSES.md`: bảng nguồn dữ liệu (OSM ODbL, Copernicus), thư viện (tên, phiên bản, license; sinh tự động bằng `pnpm licenses list --json` + `pip-licenses`), dịch vụ (Gemini, ElevenLabs, Claude API), asset CC0 theo nhóm (FR-DEV-12, 13, 24) |
@@ -89,8 +89,8 @@ flowchart LR
 | ALG-DEV-02 | Đo token mỗi phiếu | Nguồn: tệp phiên JSONL của Claude Code trên máy dev (thư mục dự án trong `~/.claude/projects/`). `/ticket` ghi dấu mốc `[[ticket:T-nnnn start]]` vào tin nhắn đầu; `/handoff` ghi `[[ticket:T-nnnn end]]`. `tools/scripts/token-meter.mjs --ticket T-nnnn`: quét các phiên có dấu mốc (kể cả phiên sau `/clear` có nhắc mã phiếu), lấy các bản ghi trợ lý trong khoảng mốc, khử trùng theo `message.id`, cộng `usage.input_tokens`, `cache_creation_input_tokens`, `cache_read_input_tokens`, `output_tokens`, kể cả phiên subagent liên kết. `total = input + cache_write + cache_read + output`. Ghi vào frontmatter phiếu và nối dòng `tokens.csv`. Chỉ tiêu BO-02: trung bình `total` mỗi phiếu theo pha so với số nền Thiền viện online đo cùng định nghĩa (OI-DEV-04); báo cáo kèm chỉ số phụ "token quy đổi chi phí" (cache read × 0,1) để không lẫn hiệu ứng cache. Định dạng JSONL không phải giao diện công khai ổn định → script có bộ test mẫu và báo lỗi rõ khi gặp trường lạ (OIT-DEV-01) (FR-DEV-19, NFR-DEV-01) |
 | ALG-DEV-03 | H-01 `.md` lớn | `Read` tệp `.md` có `stat.size > 40 KB` và không có `offset`/`limit` → chặn; thông báo ERR-DEV-01 kèm tối đa 60 heading (`^#{1,4} `) với số dòng để agent đọc đúng đoạn. `Grep` không bị chặn (FR-DEV-18) |
 | ALG-DEV-04 | H-02 nhị phân/log, H-04 bí mật và lệnh phá huỷ | H-02: `Read` đuôi `.glb .gltf(bin) .ktx2 .bin .wasm`, ảnh `.png .jpg .jpeg .webp` > 1 MB, `.log` hoặc tệp `build/**/logs/**` > 2.000 dòng (đếm nhanh bằng đọc luồng dừng ở dòng 2.001) → chặn, ERR-DEV-02. H-04: đường dẫn khớp `**/.env*` (trừ `.env.example`), `**/*.key`, `**/*.pem`, `**/secrets/**`, `/etc/gamestudio/**` cho `Read`/`Grep`/`Bash`; `Bash` khớp mẫu `rm -rf /`, `rm -rf ~`, `rm -rf *` ở gốc repo, `git push --force`/`-f` tới `main`/`master`, `git reset --hard origin`, đọc bí mật qua `cat/type/Get-Content/printenv/env` với tên khoá đã biết → chặn, ERR-DEV-03. Mẫu đặt trong `hooks/lib/patterns.json` có test (TST-DEV-01) |
-| ALG-DEV-05 | H-03 schema, H-05 nhắc đo | H-03 (`PostToolUse`, cảnh báo): tệp ghi khớp `games/**/data/**/*.json` → chạy validator Ajv standalone đã biên dịch (`engine/schema/dist/validators.cjs`, không biên dịch lúc chạy) → in tối đa 10 lỗi `{instancePath, message}`. H-05 (cảnh báo): ghi vào `engine/runtime/render/**`, `**/*.glsl`, `**/materials/**`, `**/budgets.json` → nhắc `/perf-snapshot` (QT-RTM-02). Tổng số hook chặn = 3 (H-01, H-02, H-04) (NFR-DEV-03) |
-| ALG-DEV-06 | `engine doctor` | Đọc SCH-DEV-03; với mỗi mục chạy lệnh `check` (thời gian chờ 10 s), so phiên bản theo `match`; Blender: chạy `blender -b --factory-startup --python-expr` in phiên bản Blender và add-on đã bật + `sha256` gói add-on; kiểm `ffmpeg` có libopus, `ktx` có `create`; kiểm biến môi trường bắt buộc theo vai trò máy (`dev`: `ANTHROPIC_API_KEY` tuỳ chọn khi dùng chế độ chuyển giao (TSD-01), `GEMINI_API_KEY`, `ELEVENLABS_API_KEY`; `worker`: không cần khoá AI, cần `GS_GATEWAY_TOKEN`); in ERR-DEV-04/05. Worker chạy khi khởi động (TSD-08 mục 8.1) |
+| ALG-DEV-05 | H-03 schema, H-05 nhắc đo | H-03 (`PostToolUse`, cảnh báo): tệp ghi khớp `games/**/data/**/*.json` → chạy validator Ajv standalone đã biên dịch (`engine/schema/dist/validators.cjs`, không biên dịch lúc chạy) → in tối đa 10 lỗi `{instancePath, message}`. H-05 (cảnh báo): ghi vào `engine/unity/Assets/GameStudio/{Render,World,Characters}/**`, `**/*.shadergraph`, `**/*.hlsl`, `**/materials/**`, `**/budgets.json` (CR-02) → nhắc `/perf-snapshot` (QT-RTM-02). Tổng số hook chặn = 3 (H-01, H-02, H-04) (NFR-DEV-03) |
+| ALG-DEV-06 | `engine doctor` | Đọc SCH-DEV-03; với mỗi mục chạy lệnh `check` (thời gian chờ 10 s), so phiên bản theo `match`; Blender: chạy `blender -b --factory-startup --python-expr` in phiên bản Blender và add-on đã bật + `sha256` gói add-on; kiểm `ffmpeg` có bộ mã `aac` (ADR-037), `ktx` có `create`; vai trò `dev`: Unity Editor đúng bản `ProjectVersion.txt` có Web Build Support, gói Unity khớp `packages-lock.json` (CR-02); kiểm biến môi trường bắt buộc theo vai trò máy (`dev`: `ANTHROPIC_API_KEY` tuỳ chọn khi dùng chế độ chuyển giao (TSD-01), `GEMINI_API_KEY`, `ELEVENLABS_API_KEY`; `worker`: không cần khoá AI, cần `GS_GATEWAY_TOKEN`); in ERR-DEV-04/05. Worker chạy khi khởi động (TSD-08 mục 8.1) |
 | ALG-DEV-07 | `/gate-check` | Đọc danh sách điều kiện của cổng từ `docs/gates/<cổng>.conditions.json` (sinh từ bảng cổng SRS-00); tự kiểm điều kiện đo được: báo cáo ngân sách mới nhất tier Vừa không `Fail`, `engine qa --level=day-du` `Pass`, provenance đủ (`engine asset check --provenance`), không còn lỗi mức cao trong rà soát bảo mật (W4), số đo A56 từ API-WEB-60 hoặc báo cáo đo tay; chọn 2–4 ảnh có SSIM thấp nhất so baseline (FR-DEV-21); dựng báo cáo SCH-DEV-05 với `status: chua_qua`. Chỉ Huy đổi sang `da_qua` bằng cách điền `huyConfirm`; CI kiểm không có cổng `da_qua` mà `huyConfirm` rỗng (FR-DEV-10, QT-DEV-03) |
 | ALG-DEV-08 | Ghi chú gọn | `/handoff`: cập nhật SCH-DEV-08 (thay mục "việc đã xong" theo cửa sổ 5 phiếu, xoá mục đã đóng), chạy token-meter, kiểm ≤ 150 dòng; nhắc `/clear` trước phiếu sau, phiếu sau đọc `CLAUDE.md` + `docs/handoff.md` + phiếu, không đọc lịch sử (FR-DEV-15, 16). `CLAUDE.md` gồm: luật, cây thư mục, lệnh CLI, hướng dẫn chọn mô hình (FR-DEV-08: Opus high/xhigh cho kiến trúc, thuật toán mới, generator họ mới, cổng; Sonnet medium cho chỉnh tham số, script lặp, sửa nhỏ, test; Haiku cho đổi tên, tài liệu, việc cơ học), chỉ dẫn ADR; kiểm < 150 dòng ở pre-commit và CI (FR-DEV-14) |
 | ALG-DEV-09 | Lấy bản mới upstream | Nhánh `vendor/upstream` chứa bản gốc nguyên vẹn tại commit đã fork. Lấy bản mới: cập nhật nhánh vendor tới commit mới → `git merge vendor/upstream` vào nhánh làm việc (hợp nhất ba chiều giữ thay đổi riêng) → giải xung đột theo bảng thay đổi `UPSTREAM.md` → cập nhật commit gốc và bảng trong cùng commit (QT-DEV-04) → chạy CI + `/qa-light` (UC-DEV-03, FR-DEV-12). `LICENSE` MIT và thông báo bản quyền gốc giữ nguyên; CI kiểm tệp `LICENSE` không đổi so với vendor (FR-DEV-13) |
@@ -106,7 +106,7 @@ flowchart LR
 - `.gitignore`: `.env*` (trừ `.env.example` không có giá trị), `*.key`, `*.pem`, `secrets/`, `build/`, `**/cache/`, `data.bak-*/`, tệp DEM/OSM tải về, `node_modules/`, `.venv/` (FR-DEV-23).
 - Quét bí mật ba lớp: pre-commit (IF-DEV-05), CI (ALG-DEV-10), thư mục xuất bản trước khi chép ra (`engine publish`, TSD-04 ALG-CLI-03). Cấu hình `gitleaks.toml` thêm luật cho tiền tố khoá Anthropic, Google API, ElevenLabs, khoá ký JWT của dự án.
 - H-04 chặn agent đọc tệp bí mật và lệnh phá huỷ; `settings.json` không cấp sẵn quyền `Bash(*)`.
-- MCP xem cảnh (Three.js, Blender) không nằm trong `settings.json` mặc định; bật bằng cách chép `settings.debug.json` → `settings.local.json` (không commit) (FR-DEV-17).
+- MCP xem cảnh (Unity, Blender; CR-02) không nằm trong `settings.json` mặc định; bật bằng cách chép `settings.debug.json` → `settings.local.json` (không commit) (FR-DEV-17).
 - Ghi công: `UPSTREAM.md`, `LICENSES.md`, credit trong game (TSD-03 provenance) (FR-DEV-13, 24).
 
 ---
@@ -184,3 +184,4 @@ flowchart LR
 | 1.1 | 22/11/2026 | Claude | Chốt các số "(đề xuất)" có nguồn từ SRS sau khi Huy duyệt SRS |
 | 1.2 | 23/11/2026 | Claude | CR-01 (SRS-09 v1.1): lệnh `/resume-game`, `/import-game` (ALG-DEV-11, 12), SCH-DEV-09, TST-DEV-09, truy vết FR-DEV-26, 27 |
 | 1.2 | 23/11/2026 | Huy | Duyệt phần bổ sung CR-01 |
+| 1.3 | 26/11/2026 | Claude | CR-02 (ADR-036), POC-U1, ADR-037: cây `.claude` (MCP Unity), SCH-DEV-03 (bỏ `three`, thêm `unity` và gói Unity), ALG-DEV-06 (kiểm `aac`, Unity Editor), mục MCP |

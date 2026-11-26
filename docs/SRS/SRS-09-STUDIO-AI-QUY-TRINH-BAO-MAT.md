@@ -3,8 +3,8 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | SRS-09 |
-| Phiên bản | 1.2 |
-| Ngày | 23/11/2026 |
+| Phiên bản | 1.3 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | SRS-00 `SRS-00-TONG-QUAN.md` |
 | BRD nguồn | BRD-09 v0.1; BRD-00 v0.5 mục 7.7–7.9 (BR-32…46); BRD-10 (BR-126, v1.1) |
 | Phạm vi áp dụng | Quy trình **phát triển** engine và Web Studio bằng Claude Code (QĐ-02), không phải trải nghiệm người dùng Web Studio |
@@ -98,7 +98,7 @@ flowchart LR
 | FR-DEV-01 | Tối đa 8 agent: `director` (Opus), `engine-dev`, `tech-artist`, `world-builder`, `gameplay-ui` (Sonnet), `asset-designer` (Opus khi viết generator mới, Sonnet khi chỉnh tham số), `qa` (Sonnet/Haiku), `docs` (Haiku); mỗi agent có mô tả một đoạn và danh sách thư mục phụ trách | BR-32, BR-32.1 | M | E0 |
 | FR-DEV-02 | Skill: giữ 2 skill bộ gốc `threejs-image-generator`, `threejs-audio-generator`; bỏ `threejs-3d-generator` (QĐ-08) và 6 skill gắn Three.js (`threejs-game-director`, `threejs-gameplay-systems`, `threejs-aaa-graphics-builder`, `threejs-game-ui-designer`, `threejs-debug-profiler`, `threejs-qa-release`), thay bằng skill `engine-unity-*` (dựng player, gameplay C#, đồ hoạ URP, hồ sơ hiệu năng, QA) theo CR-02; thêm 10–15 skill engine (`engine-intake`, `engine-world`, `engine-asset-forge`, `engine-cc0`, `engine-texture-proc`, `engine-materials`, `engine-lighting-bake`, `engine-packager`, `engine-blender`, …) | BR-32 | M | E0 |
 | FR-DEV-03 | Lệnh: `/start`, `/new-game`, `/ticket`, `/build-zone`, `/qa-light`, `/qa-full`, `/perf-snapshot`, `/visual-diff`, `/gate-check`, `/asset-recipe`, `/adr`, `/publish-poc`, `/handoff`; v1.1 thêm `/resume-game`, `/import-game` (FR-DEV-26, 27) | BR-32 | M | E0 |
-| FR-DEV-04 | Rule theo đường dẫn: `engine/runtime/**` (không cấp phát trong vòng lặp nóng, chỉ API công khai), `engine/build/**` (tất định, seed, báo cáo JSON), `games/**/data/**` (không giá trị cứng ngoài dữ liệu, hợp lệ schema), `web/**` (không khoá API phía client, kiểm quyền ở backend), `prototypes/**` (nới lỏng) | BR-32 | M | E0 |
+| FR-DEV-04 | Rule theo đường dẫn: `engine/unity/**` (runtime C#, CR-02; không cấp phát trong vòng lặp nóng, chỉ API công khai), `engine/build/**` (tất định, seed, báo cáo JSON), `games/**/data/**` (không giá trị cứng ngoài dữ liệu, hợp lệ schema), `web/**` (không khoá API phía client, kiểm quyền ở backend), `prototypes/**` (nới lỏng) | BR-32 | M | E0 |
 
 ### 4.2 Mức rigor, phiếu, cổng, ADR, upstream
 
@@ -188,7 +188,7 @@ gates: [G-E0, G-E1, G-E2, G-E3, G-E4, G-E5, G-E6, G-E7, G-E8, G-W1, G-W2, G-W3, 
 | H-02 | Đọc `.glb`, `.ktx2`, `.png/.jpg` > 1 MB, `.log` > 2.000 dòng | Chặn | ERR-DEV-02, gợi ý báo cáo JSON, `grep`, `tail` |
 | H-03 | Ghi `games/**/data/**/*.json` | Cảnh báo | Chạy kiểm schema, báo trường sai |
 | H-04 | Đọc `.env*`, `*.key`, thư mục bí mật; lệnh `rm -rf /`, `git push --force` lên nhánh chính | Chặn | ERR-DEV-03 |
-| H-05 | Sửa `engine/runtime/render/**`, shader, vật liệu, `budgets.json` | Cảnh báo | Nhắc `/perf-snapshot` (SRS-04 QT-RTM-02) |
+| H-05 | Sửa mã render Unity player (`engine/unity/Assets/GameStudio/{Render,World,Characters}/**`, CR-02), shader, vật liệu, `budgets.json` | Cảnh báo | Nhắc `/perf-snapshot` (SRS-04 QT-RTM-02) |
 
 ---
 
@@ -272,3 +272,4 @@ Không có màn hình. Giao diện là lệnh Claude Code (FR-DEV-03), CLI `engi
 | 1.0 | 22/11/2026 | Claude | Huy duyệt; chấp nhận các giá trị "(đề xuất)" và đề xuất của Open item làm giá trị nền; đổi trạng thái sang Đã duyệt |
 | 1.1 | 23/11/2026 | Claude | CR-01 (Huy yêu cầu 23/11/2026: luồng xây dựng cho game đang làm dở hoặc đã có): thêm mục 4.5 FR-DEV-26 `/resume-game`, FR-DEV-27 `/import-game`, mở rộng FR-DEV-03, AC-CR01-12; Huy duyệt 23/11/2026 (giá trị "(đề xuất)" mới được chấp nhận làm giá trị nền) |
 | 1.2 | 25/11/2026 | Claude | CR-02 (runtime Unity, QĐ-16, ADR-036): FR-DEV-02 (giữ 2 skill gốc, thay 6 skill Three.js bằng `engine-unity-*`), FR-DEV-17 (MCP Unity) |
+| 1.3 | 26/11/2026 | Claude | CR-02 phần còn lại: FR-DEV-04 và H-05 trỏ đường dẫn runtime `engine/unity` |

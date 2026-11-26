@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | DDD-05 |
-| Phiên bản | 1.0 |
-| Ngày | 23/11/2026 |
+| Phiên bản | 1.1 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | DDD-00 `DDD-00-TONG-QUAN.md` |
-| TSD nguồn | TSD-05 v1.1 (IF-CHR-01…04, SCH-CHR-01…06, ALG-CHR-01…16, TST-CHR-01…10) |
-| SRS nguồn | SRS-05 v1.0 (FR-CHR-01…44, NFR-CHR-01…04) |
-| Gói | Runtime `engine/runtime/src/{camera-player, characters, npc-ai}`; bước build `engine/build/steps/{navmesh, characters-bake}`; `engine/families/<family>/`; retarget `engine/build/asset-import/src/retarget` + `engine/build/blender/retarget`; panel `web/app/src/features/{npc, animals, behavior}` |
+| TSD nguồn | TSD-05 v1.2 (IF-CHR-01…04, SCH-CHR-01…06, ALG-CHR-01…16, TST-CHR-01…10) |
+| SRS nguồn | SRS-05 v1.1 (FR-CHR-01…44, NFR-CHR-01…04) |
+| Gói | Runtime trong Unity player `engine/unity/Assets/GameStudio/{CameraPlayer, Characters, NpcAi}` (C#, CR-02; dưới đây viết tắt bỏ tiền tố `engine/unity/Assets/GameStudio/`); bước build `engine/build/steps/{navmesh, characters-bake}`; `engine/families/<family>/`; retarget `engine/build/asset-import/src/retarget` + `engine/build/blender/retarget`; panel `web/app/src/features/{npc, animals, behavior}` |
 | Pha | E2 (người chơi), E4 (họ, retarget), E6 (NPC, động vật), E7 (đám đông VAT); W3 |
-| Trạng thái | Đã duyệt (Huy, 23/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 23/11/2026); **v1.1 runtime Unity theo CR-02 và POC-U1**, chờ Huy xem lại |
 
 > Số còn mở: ngưỡng LOD hành vi gần/vừa/xa **30/80 m** là giá trị khởi tạo của cấu hình CFG-CHR-01, chờ đo ở E6 (OI-CHR-07). Mã không viết cứng hai số này.
 
@@ -25,24 +25,24 @@ Thiết kế chi tiết người chơi (controller viên nang, camera), khung x�
 
 | Mã | Tệp | Trách nhiệm |
 |---|---|---|
-| MOD-CHR-01 | `camera-player/player-controller.ts`, `camera-player/capsule.ts`, `camera-player/player-system.ts` | Hệ thống `cameraPlayer` (order 20): controller viên nang, trạng thái di chuyển STM-CHR-01 |
-| MOD-CHR-02 | `camera-player/third-person-camera.ts`, `camera-player/first-person-camera.ts` | Camera ngôi ba (sphere cast, kéo gần), ngôi một (head-bob) |
-| MOD-CHR-03 | `characters/family-registry.ts`, `characters/family-loader.ts` | Nạp `family.json`, khung xương, clip của họ |
-| MOD-CHR-04 | `characters/characters-system.ts`, `characters/mixer-pool.ts`, `characters/foot-ik.ts`, `characters/head-look.ts`, `characters/character-lod.ts` | Hệ thống `characters` (order 40): pool `AnimationMixer`, IK chân, xoay đầu, LOD hình |
-| MOD-CHR-05 | `characters/crowd-instancing.ts`, `characters/vat-material.ts` | Đám đông xa bằng VAT trên GPU |
-| MOD-CHR-06 | `npc-ai/store.ts` | `AgentStore` SoA (DTO-CHR-08) |
-| MOD-CHR-07 | `npc-ai/graph/{loader.ts, compile.ts, check.ts, extends.ts}` | Nạp, gộp `extends`, biên dịch điều kiện, kiểm tĩnh |
-| MOD-CHR-08 | `npc-ai/actions/{idle, patrol, wander, goto, follow, react, graze, rest, herd, flee, animal-action}.ts`, `npc-ai/actions/registry.ts` | Thư viện hành động (`ActionImpl`) |
-| MOD-CHR-09 | `npc-ai/scheduler.ts` | Phân nhóm LOD hành vi, xoay vòng, nhảy cóc |
-| MOD-CHR-10 | `npc-ai/nav-service.ts`, `npc-ai/recast-loader.ts` | `NavService` bọc recast-navigation-js (WASM, chunk `recast`) |
-| MOD-CHR-11 | `npc-ai/perception.ts`, `npc-ai/personality.ts` | Nhận thức người chơi, tham số tính cách |
-| MOD-CHR-12 | `npc-ai/herd.ts`, `npc-ai/poultry.ts` | Đàn thú, gia cầm tán loạn/tụ lại |
-| MOD-CHR-13 | `npc-ai/flock-birds.ts`, `npc-ai/spatial-hash.ts` | Boids chim 3D, đậu/cất cánh, sprite xa |
-| MOD-CHR-14 | `npc-ai/school-fish.ts` | Boids cá 2,5D trong mask nước |
-| MOD-CHR-15 | `npc-ai/schedule.ts` | Lịch trình theo giờ game |
-| MOD-CHR-16 | `npc-ai/spawn.ts` | Luật xuất hiện khi zone nạp |
-| MOD-CHR-17 | `npc-ai/npc-ai-system.ts`, `npc-ai/animal-audio.ts` | Hệ thống `npcAi` (order 30) điều phối; pool âm động vật |
-| MOD-CHR-18 | `engine/build/steps/navmesh/{step.json, index.ts, agent-types.ts}` | Dựng navmesh zone × loại tác nhân |
+| MOD-CHR-01 | `CameraPlayer/PlayerController.cs`, `CameraPlayer/PlayerSystem.cs` | Hệ thống `cameraPlayer` (order 20): controller viên nang trên `CharacterController` của Unity Physics, trạng thái di chuyển STM-CHR-01 |
+| MOD-CHR-02 | `CameraPlayer/ThirdPersonCamera.cs`, `CameraPlayer/FirstPersonCamera.cs` | Camera ngôi ba (sphere cast, kéo gần), ngôi một (head-bob) |
+| MOD-CHR-03 | `Characters/FamilyRegistry.cs`, `Characters/FamilyLoader.cs` (glTFast) | Nạp `family.json`, khung xương, clip của họ |
+| MOD-CHR-04 | `Characters/CharactersSystem.cs`, `Characters/AnimatorPool.cs` (Playables `AnimationMixerPlayable`), `Characters/FootIk.cs`, `Characters/HeadLook.cs`, `Characters/CharacterLod.cs` | Hệ thống `characters` (order 40): pool đồ thị Playables, IK chân, xoay đầu, LOD hình |
+| MOD-CHR-05 | `Characters/CrowdInstancing.cs`, `Shaders/Vat.shadergraph` | Đám đông xa bằng VAT trên GPU |
+| MOD-CHR-06 | `NpcAi/AgentStore.cs` | `AgentStore` SoA bằng `NativeArray` (DTO-CHR-08) |
+| MOD-CHR-07 | `NpcAi/Graph/{GraphLoader.cs, GraphCompile.cs}`; kiểm tĩnh và gộp `extends` chạy ở build/Web Studio (`engine/shared/behavior/src/{check.ts, extends.ts}`) | Nạp graph đã gộp, biên dịch điều kiện bằng `Shared/Expr` C# |
+| MOD-CHR-08 | `NpcAi/Actions/{Idle, Patrol, Wander, Goto, Follow, React, Graze, Rest, Herd, Flee, AnimalAction}.cs`, `NpcAi/Actions/ActionRegistry.cs` | Thư viện hành động (`ActionImpl`) |
+| MOD-CHR-09 | `NpcAi/Scheduler.cs` | Phân nhóm LOD hành vi, xoay vòng, nhảy cóc |
+| MOD-CHR-10 | `NpcAi/Nav/NavService.cs`, `NpcAi/Nav/NavMeshZoneBuilder.cs` | `NavService` bọc Unity AI Navigation (`NavMesh.CalculatePath`, `NavMeshAgent`); dựng `NavMeshData` theo ô bất đồng bộ lúc nạp zone, giữ trong phiên (CR-02, POC-U1) |
+| MOD-CHR-11 | `NpcAi/Perception.cs`, `NpcAi/Personality.cs` | Nhận thức người chơi, tham số tính cách |
+| MOD-CHR-12 | `NpcAi/Herd.cs`, `NpcAi/Poultry.cs` | Đàn thú, gia cầm tán loạn/tụ lại |
+| MOD-CHR-13 | `NpcAi/FlockBirds.cs`, `NpcAi/SpatialHash.cs` | Boids chim 3D, đậu/cất cánh, sprite xa |
+| MOD-CHR-14 | `NpcAi/SchoolFish.cs` | Boids cá 2,5D trong mask nước |
+| MOD-CHR-15 | `NpcAi/Schedule.cs` | Lịch trình theo giờ game |
+| MOD-CHR-16 | `NpcAi/Spawn.cs` | Luật xuất hiện khi zone nạp |
+| MOD-CHR-17 | `NpcAi/NpcAiSystem.cs`, `NpcAi/AnimalAudio.cs` | Hệ thống `npcAi` (order 30) điều phối; pool âm động vật |
+| MOD-CHR-18 | `engine/build/steps/navmesh/{step.json, index.ts, agent-types.ts}` | Gom hình nguồn (collider địa hình, vật đặt, vùng nước sâu) và thông số tác nhân thành `nav/sources.json` cho player; không dựng navmesh ở build (CR-02) |
 | MOD-CHR-19 | `engine/build/steps/characters-bake/{step.json, index.ts, vat-bake.ts}` | Nướng clip thành texture VAT |
 | MOD-CHR-20 | `engine/families/<family>/{family.json, skeleton.glb, clips/*.glb, default.graph.json}` | 6 họ: `nguoi`, `dong_vat_4_chan_nho`, `dong_vat_4_chan_lon`, `gia_cam`, `chim`, `ca` |
 | MOD-CHR-21 | `engine/build/asset-import/src/retarget/{bone-map.ts, retarget.ts}`, `engine/build/blender/retarget/retarget.py` | Retarget mô hình và clip về họ |
@@ -53,40 +53,41 @@ Thiết kế chi tiết người chơi (controller viên nang, camera), khung x�
 ## 3. Thiết kế lớp và giao diện
 
 ```ts
-// npc-ai/actions/registry.ts  (IF-CHR-01)
-export const enum Status { Running = 0, Success = 1, Failure = 2 }
-export interface ActionImpl {
-  readonly id: ActionId;                                   // 'idle' | 'patrol' | ...
-  enter(a: AgentRef, p: ActionParams): void;              // ghi trạng thái riêng vào store.scratch[a*16 ...]
-  update(a: AgentRef, dt: number): Status;                // không cấp phát
-  exit(a: AgentRef): void;
+// NpcAi/Actions/ActionRegistry.cs  (IF-CHR-01; C# từ CR-02)
+public enum Status : byte { Running = 0, Success = 1, Failure = 2 }
+public interface IActionImpl {
+  ActionId Id { get; }                                     // Idle, Patrol, ...
+  void Enter(int a, in ActionParams p);                    // ghi trạng thái riêng vào store.Scratch[a*16 ...]
+  Status Tick(int a, float dt);                            // không cấp phát
+  void Exit(int a);
 }
-export type AgentRef = number;                            // chỉ số trong AgentStore
+// a = AgentRef: chỉ số trong AgentStore
 
-// npc-ai/nav-service.ts  (IF-CHR-02)
-export interface NavService {
-  findPath(from: Vec3, to: Vec3, agentType: AgentType, out: PathBuffer): boolean;   // PathBuffer: Float32Array(64*3) + count
-  nearestValid(p: Vec3, agentType: AgentType, out: Vec3): boolean;
-  crowdAdd(a: AgentRef, agentType: AgentType, pos: Vec3, params: CrowdParams): number;  // trả crowd idx
-  crowdRemove(idx: number): void; crowdSetTarget(idx: number, target: Vec3): void;
-  crowdUpdate(dt: number): void; crowdRead(idx: number, outPos: Vec3, outVel: Vec3): void;
+// NpcAi/Nav/NavService.cs  (IF-CHR-02)
+public sealed class NavService {
+  public bool FindPath(Vector3 from, Vector3 to, AgentType t, PathBuffer outPath);  // NavMesh.CalculatePath; PathBuffer cấp sẵn 64 điểm
+  public bool NearestValid(Vector3 p, AgentType t, out Vector3 q);                   // NavMesh.SamplePosition
+  public int CrowdAdd(int a, AgentType t, Vector3 pos, in CrowdParams prm);          // NavMeshAgent từ pool, trả crowd idx
+  public void CrowdRemove(int idx); public void CrowdSetTarget(int idx, Vector3 target);
+  public void CrowdRead(int idx, out Vector3 pos, out Vector3 vel);
+  public bool ZoneReady(int zoneIdx);                                                 // NavMesh của zone đã dựng xong (PSC-CHR-07)
 }
-export type AgentType = 'nguoi' | 'thu4_nho' | 'thu4_lon' | 'gia_cam';
+public enum AgentType : byte { Nguoi, Thu4Nho, Thu4Lon, GiaCam }                      // mỗi loại một agentTypeID của NavMesh
 
-// camera-player/player-controller.ts
-export class PlayerController {
-  constructor(ctx: EngineContext, cfg: PlayerJson);
-  update(dt: number, input: InputState): void;           // PSC-CHR-02
-  readonly pos: Vector3; readonly vel: Vector3; readonly state: PlayerMoveState;  // STM-CHR-01
-  teleport(p: Vector3, yaw: number): void;
+// CameraPlayer/PlayerController.cs
+public sealed class PlayerController {
+  public PlayerController(EngineContext ctx, PlayerJson cfg);  // tạo CharacterController (radius, height, slopeLimit, stepOffset)
+  public void Tick(float dt, in InputState input);             // PSC-CHR-02
+  public Vector3 Pos { get; } public Vector3 Vel { get; } public PlayerMoveState State { get; }  // STM-CHR-01
+  public void Teleport(Vector3 p, float yaw);
 }
 
-// characters/mixer-pool.ts
-export class MixerPool {
-  constructor(max: number /* = 12 cá thể gần */);
-  acquire(owner: AgentRef | 'player', family: FamilyId, root: Object3D): number;   // -1 khi hết
-  release(slot: number): void;
-  play(slot: number, clip: ClipName, fadeS?: number /*0.2*/, timeScale?: number): void;
+// Characters/AnimatorPool.cs
+public sealed class AnimatorPool {
+  public AnimatorPool(int max /* = 12 cá thể gần */);
+  public int Acquire(int owner /* -1 = người chơi */, FamilyId family, Transform root);  // -1 khi hết
+  public void Release(int slot);
+  public void Play(int slot, ClipName clip, float fadeS = 0.2f, float timeScale = 1f);
 }
 ```
 
@@ -103,9 +104,9 @@ Sự kiện runtime (IF-CHR-04) dùng `EventBus` (DDD-04): `EVT_AGENT_STUCK (a =
 | DTO-CHR-03 | `animal.json` (SCH-CHR-03) | `{id, species, family, model: AssetRef, behavior: 'graph:<id>', personality, speed: {walk, run}, sounds: {[behaviorState]: AudioRef[]}, minDepth? /*cá*/, adoptable?: bool, perchTags?: string[] /*chim*/, fleeRadius?, combat?}` |
 | DTO-CHR-04 | Graph hành vi (SCH-CHR-04) | `{id, extends?: graphId, initial: stateId, states: [{id, action: ActionId, params: object}], transitions: [{from: stateId \| '*', to, when: string /*biểu thức*/, priority: int, cooldownS?: number}]}` |
 | DTO-CHR-05 | Luật xuất hiện (SCH-CHR-05) | `{id, zone, region, ref: 'animal:<id>' \| 'npc:template:<id>', min, max, hours: [[from,to]], group?: {size: [a,b], leader: bool}, seed}` |
-| DTO-CHR-06 | Navmesh nhị phân (SCH-CHR-06) | `build/<id>/<zone>/nav/<agentType>.bin` = Detour `NavMesh` serialize (tile cache), kèm `nav-meta.json {agentType, radius, height, maxSlope, maxClimb, cellSize: 0.2, cellHeight: 0.1, bounds, tiles}` |
+| DTO-CHR-06 | Nguồn navmesh (SCH-CHR-06, CR-02) | `build/<id>/<zone>/nav/sources.json` = `{agentTypes: [{agentType, radius, height, maxSlope, maxClimb}], voxelSize: 0.2, tileSize: 64, bounds, tiles: [{x, z, bounds}], sources: [{kind: 'terrain'\|'placement'\|'water_deep', ref, area: 'walkable'\|'not_walkable'}]}`; player dựng `NavMeshData` từng ô bằng `NavMeshBuilder.UpdateNavMeshDataAsync` |
 | DTO-CHR-07 | `family.json` (IF-CHR-03) | `{id, bones: string[] /*tên chuẩn*/, required: string[], boneMap: {[chuẩn]: string[] /*tên nguồn hay gặp*/}, restPose: {[bone]: [qx,qy,qz,qw]}, clips: {[name]: path}, baseSpeed: {walk, run}, agent: {type: AgentType, radius, height, maxSlope, maxClimb}, defaultGraph: graphId, footBones?: [l, r], headBone?}` |
-| DTO-CHR-08 | Bố trí `AgentStore` | Dung lượng `N = budgets[tier].skinnedCharacters.npc + .animal + flockInstances`; mảng: `pos Float32Array(3N)`, `vel(3N)`, `yaw(N)`, `state Uint16Array(N)` (chỉ số trạng thái graph), `prevState(N)`, `lod Uint8Array(N)` (0 gần, 1 vừa, 2 xa, 3 ngoài tầm nhìn), `kind Uint8Array(N)` (npc/animal/bird/fish), `species Uint16Array(N)`, `graph Uint16Array(N)`, `seed Uint32Array(N)`, `rngState Uint32Array(2N)`, `lastT Float32Array(N)`, `cooldownUntil Float32Array(N·8)` (8 chuyển có cooldown mỗi agent), `scratch Float32Array(16N)`, `crowdIdx Int16Array(N)`, `mixerSlot Int16Array(N)`, `flags Uint8Array(N)` (essential, invulnerable, closeUp, visible), `alive Uint8Array(N)`; danh sách trống `freeList Int32Array(N)` |
+| DTO-CHR-08 | Bố trí `AgentStore` | Dung lượng `N = budgets[tier].skinnedCharacters.npc + .animal + flockInstances`; mảng (C# từ CR-02: `NativeArray<float/ushort/byte/…>` cùng độ dài và bố trí; tên kiểu ghi theo bản gốc): `pos Float32Array(3N)`, `vel(3N)`, `yaw(N)`, `state Uint16Array(N)` (chỉ số trạng thái graph), `prevState(N)`, `lod Uint8Array(N)` (0 gần, 1 vừa, 2 xa, 3 ngoài tầm nhìn), `kind Uint8Array(N)` (npc/animal/bird/fish), `species Uint16Array(N)`, `graph Uint16Array(N)`, `seed Uint32Array(N)`, `rngState Uint32Array(2N)`, `lastT Float32Array(N)`, `cooldownUntil Float32Array(N·8)` (8 chuyển có cooldown mỗi agent), `scratch Float32Array(16N)`, `crowdIdx Int16Array(N)`, `mixerSlot Int16Array(N)`, `flags Uint8Array(N)` (essential, invulnerable, closeUp, visible), `alive Uint8Array(N)`; danh sách trống `freeList Int32Array(N)` |
 
 ### 4.1 Tham số tính cách (SRS-05 mục 6.3)
 
@@ -122,7 +123,7 @@ Sự kiện runtime (IF-CHR-04) dùng `EventBus` (DDD-04): `EVT_AGENT_STUCK (a =
 
 | Mã | Giao thức | Đặc tả |
 |---|---|---|
-| EP-CHR-01 | Bước `navmesh` | `deps: [terrain.mesh, water, placement]`; `dataPointers: ['/entities~1animals', '/entities~1npc', '/world.json/spawns']` (chỉ để biết loại tác nhân cần); `perZone: true`, runner node (recast-navigation-js bản Node); đầu ra DTO-CHR-06 mỗi `agentType` có mặt trong zone |
+| EP-CHR-01 | Bước `navmesh` | `deps: [terrain.mesh, water, placement]`; `dataPointers: ['/entities~1animals', '/entities~1npc', '/world.json/spawns']` (chỉ để biết loại tác nhân cần); `perZone: true`, runner node; đầu ra DTO-CHR-06 cho các `agentType` có mặt trong zone (CR-02: NavMesh dựng lúc nạp trong player) |
 | EP-CHR-02 | Bước `characters-bake` | `deps: [assets]`; đầu vào: họ và clip `walk/idle/work` của mô hình đám đông; đầu ra `vat/<model>.ktx2` (RGBA16F hoặc RGBA8 mã hai kênh, OIT-CHR-02) + `vat/<model>.json {frames, fps:30, bones, clipRanges}` |
 | EP-CHR-03 | API test engine cho editor | `EditorBridge` (DDD-08) gọi engine: `resetSeed()`, `setHour(h)`, `placePatrolPoint(x,y) → {pos, valid}` (raycast địa hình + `nearestValid`) |
 
@@ -217,9 +218,8 @@ update(dt, input):
   disp = vel·dt; n = ceil(|disp| / 0.25)
   for i in 1..n:
      step = disp / n
-     hit = bvh.shapecast(capsule(pos + step))   # three-mesh-bvh
-     if hit: step -= dot(step, hit.normal) · hit.normal   (trượt)
-     pos += step
+     flags = characterController.Move(step)    # Unity Physics: quét viên nang với MeshCollider tĩnh, tự trượt dọc pháp tuyến (CR-02)
+     pos = transform.position
   ground = heightAt(pos.xz)               # DDD-02 TerrainSystem.heightAt
   if pos.y - ground ≤ stepHeightM(0,35) and vel.y ≤ 0: pos.y = ground (bước lên bậc), onGround = true
   slope = angle(normalAt(pos.xz), up); if slope > maxSlopeDeg: chặn thành phần vận tốc lên dốc → TruotDoc
@@ -232,7 +232,7 @@ update(dt, input):
 ```
 ngôi ba: anchor = pos + (0, heightM·0.9, 0) + right·0.35
   desired = anchor - forward(yaw, pitch)·3.5
-  t = sphereCast(anchor → desired, r = 0.2) ; dist = t ? t.distance - 0.05 : 3.5
+  t = Physics.SphereCast(anchor → desired, r = 0.2, mask tĩnh) ; dist = t ? t.distance - 0.05 : 3.5
   camDist = smoothDamp(camDist, dist, 0.1 s) (kéo gần ngay, ra xa mượt)
   cam.pos = anchor - forward·camDist; cam.pos.y = max(cam.pos.y, heightAt(cam.pos.xz) + 0.3)
   pitch ∈ [-60°, 70°]; nhạy cảm ứng theo cài đặt
@@ -244,11 +244,11 @@ ngôi một: cam.pos = pos + (0, heightM·0.93, 0) + bob; bob = settings.headBob
 mỗi khung cho agent có mixerSlot ≥ 0 (≤ 12 gần nhất camera):
   clip = clipFor(state, speed) ; nếu khác clip hiện tại → crossFade 0.2 s
   if clip ∈ {walk, run}: timeScale = |vel| / family.baseSpeed[clip]  (chống trượt chân)
-  mixer.update(dt)
+  graph.Evaluate(dt) (PlayableGraph thủ công, không dùng Animator Controller)
   IK chân (tier ≥ Vừa, d < 15 m): với mỗi chân: ray xuống từ hông+0.5 m → điểm đất; hai xương (đùi, cẳng) giải theo luật cosin
      a = |hip-knee|, b = |knee-ankle|, c = clamp(|hip-target|, |a-b|, a+b); gócGối = acos((a²+b²-c²)/(2ab)); hạ hông theo chân thấp nhất
   xoay đầu (NPC trong 4 m, ±70°): sau mixer, q_head = slerp(q_head, lookAt(player), 0.15) giới hạn góc
-agent không có slot: LOD1/2 dùng InstancedMesh + clip lấy mẫu sẵn (tư thế idle/walk luân phiên) hoặc VAT (> 40 m)
+agent không có slot: LOD1/2 dùng Graphics.RenderMeshInstanced + clip lấy mẫu sẵn (tư thế idle/walk luân phiên) hoặc VAT (> 40 m)
 ```
 
 ### PSC-CHR-05 Scheduler LOD hành vi (ALG-CHR-05)
@@ -282,8 +282,11 @@ envFor(a): ident(hour) = clock.hour; call(dist) = |player - pos[a]| (bình phư�
 
 ### PSC-CHR-07 Tìm đường, tránh nhau, kẹt (ALG-CHR-07)
 ```
-build navmesh (bước navmesh): recast config {cs: 0.2, ch: 0.1, walkableSlopeAngle: family.agent.maxSlope, walkableHeight: ceil(height/ch), walkableClimb: floor(maxClimb/ch), walkableRadius: ceil(radius/cs), tileSize: 64}
-  input geometry = terrain collider LOD1 + collider tĩnh placement + vùng nước sâu đánh dấu RC_NULL_AREA
+dựng navmesh (CR-02, POC-U1: dựng một lần cả zone mất 1,8 s chặn luồng chính trên A56):
+  lúc nạp zone: với mỗi agentType có trong nav/sources.json: NavMeshBuildSettings {agentRadius, agentHeight, agentSlope: maxSlope, agentClimb: maxClimb, voxelSize: 0.2, tileSize: 64 voxel}
+  nguồn = NavMeshBuildSource từ MeshCollider địa hình LOD1 + collider tĩnh placement + hộp nước sâu area = Not Walkable
+  dựng theo ô 64 m: ô chứa người chơi và ô kề trước, các ô còn lại xếp hàng; mỗi ô một UpdateNavMeshDataAsync, ≤ 1 ô đang dựng (không chặn khung)
+  NavMeshData của zone giữ trong bộ nhớ khi zone tạm gỡ (cache trong phiên, LRU 2 zone); agent của ô chưa dựng xong đứng yên ở Idle
 runtime goto(target): if !findPath(pos, target, type, path) → nearestValid(target) rồi thử lại; agent lod 0/1 → crowd; lod 2 → đi theo polyline với tốc độ hằng
 kẹt: nếu có mục tiêu và |pos - posAt(t-5 s)| < 0.2 m → nearestValid(pos) → teleport nhẹ (≤ 1 m), đặt lại path, emit EVT_AGENT_STUCK
 ```
@@ -337,10 +340,10 @@ spawnZone(z):
 ```
 
 ### PSC-CHR-15 Đám đông VAT (ALG-CHR-15)
-Build: với mỗi mô hình đám đông, lấy mẫu clip `walk/idle/work` 30 fps → ma trận xương → vị trí đỉnh đã skinning của LOD1 → texture hàng = khung, cột = đỉnh (RGBA16F; dự phòng RGBA8 hai kênh hi/lo) → KTX2. Runtime: `InstancedMesh` + `vat-material` đọc texture theo `(frame + instancePhase) mod frames`; dùng cho NPC đám đông ở khoảng > 40 m (E7).
+Build: với mỗi mô hình đám đông, lấy mẫu clip `walk/idle/work` 30 fps → ma trận xương → vị trí đỉnh đã skinning của LOD1 → texture hàng = khung, cột = đỉnh (RGBA16F; dự phòng RGBA8 hai kênh hi/lo) → KTX2. Runtime: `Graphics.RenderMeshInstanced` + shader `Vat.shadergraph` đọc texture theo `(frame + instancePhase) mod frames`; dùng cho NPC đám đông ở khoảng > 40 m (E7).
 
 ### PSC-CHR-16 Âm động vật và bước chân (ALG-CHR-16)
-Pool 8 `PannerNode` (HRTF tắt ở tier Thấp); mỗi 0,25 s: ứng viên = agent có âm cho trạng thái hiện tại trong 40 m, sắp theo khoảng cách; gán 8 gần nhất; nguồn bị thay mờ 0,2 s. Bước chân: `EVT_FOOTSTEP` → `surface` → bộ âm `footstepSet` (DTO-WLD-06, DDD-02).
+Pool 8 `AudioSource` 3D (`spatialBlend = 1`, rolloff tuyến tính; tier Thấp tắt Doppler); mỗi 0,25 s: ứng viên = agent có âm cho trạng thái hiện tại trong 40 m, sắp theo khoảng cách; gán 8 gần nhất; nguồn bị thay mờ 0,2 s. Bước chân: `EVT_FOOTSTEP` → `surface` → bộ âm `footstepSet` (DTO-WLD-06, DDD-02).
 
 ---
 
@@ -364,11 +367,11 @@ Pool 8 `PannerNode` (HRTF tắt ở tier Thấp); mỗi 0,25 s: ứng viên = ag
 |---|---|---|---|
 | CFG-CHR-01 | `budgets[tier].behaviorLod` | `nearM` 30, `farM` 80 (OI-CHR-07), `midHz` 5–10, `farHz` 1–2 | `budgets.json` (DDD-00 CFG-GEN-02) |
 | CFG-CHR-02 | Ngân sách nhân vật tier Vừa | 4 cận cảnh, 20 NPC + 30 thú skinning, đàn 200; `behaviorCpuMs` 4 | `budgets.json` |
-| CFG-CHR-03 | Mixer, IK | pool 12; IK tier ≥ Vừa trong 15 m; xoay đầu 4 m, ±70° | `characters/config.ts` |
-| CFG-CHR-04 | Controller | bước con 0,25 m; viên nang r 0,3 m; bậc 0,35 m; dốc 40° | `player.json` + `camera-player/config.ts` |
-| CFG-CHR-05 | Camera ngôi ba | 3,5 m; sphere r 0,2 m; nội suy 0,1 s; head-bob 2 cm | `camera-player/config.ts` |
-| CFG-CHR-06 | Recast | `cs` 0,2; `ch` 0,1; tile 64 | `steps/navmesh/agent-types.ts` |
-| CFG-CHR-07 | Kẹt | < 0,2 m trong 5 s | `npc-ai/config.ts` |
+| CFG-CHR-03 | Mixer, IK | pool 12; IK tier ≥ Vừa trong 15 m; xoay đầu 4 m, ±70° | `Characters/CharactersConfig.cs` |
+| CFG-CHR-04 | Controller | bước con 0,25 m; viên nang r 0,3 m; bậc 0,35 m; dốc 40° | `player.json` + `CameraPlayer/CameraPlayerConfig.cs` |
+| CFG-CHR-05 | Camera ngôi ba | 3,5 m; sphere r 0,2 m; nội suy 0,1 s; head-bob 2 cm | `CameraPlayer/CameraPlayerConfig.cs` |
+| CFG-CHR-06 | NavMesh (CR-02) | `voxelSize` 0,2; ô 64 m; tối đa 1 ô dựng cùng lúc; giữ 2 zone trong phiên | `steps/navmesh/agent-types.ts` (thông số tác nhân), `NpcAi/Nav/NavMeshZoneBuilder.cs` |
+| CFG-CHR-07 | Kẹt | < 0,2 m trong 5 s | `NpcAi/NpcAiConfig.cs` |
 
 ---
 
@@ -398,7 +401,7 @@ Pool 8 `PannerNode` (HRTF tắt ở tier Thấp); mỗi 0,25 s: ứng viên = ag
 | Mã | Câu hỏi | Đề xuất |
 |---|---|---|
 | OID-CHR-01 | Ngưỡng 30/80 m và tần số nhóm vừa/xa | Đo trên A56 ở E6 với 300 agent; Huy chốt (OI-CHR-07) |
-| OID-CHR-02 | Kích thước WASM recast | Chỉ tải khi có agent di chuyển (OIT-CHR-01); đo E6 |
+| OID-CHR-02 | Thời gian dựng NavMesh theo ô trên A56 (thay câu hỏi WASM recast, CR-02) | POC-U1 đo 1,8 s cho cả zone khi dựng một lần; đo lại bản theo ô ở E2/E6, mục tiêu không khung nào > 33 ms vì NavMesh |
 
 ---
 
@@ -448,3 +451,4 @@ Pool 8 `PannerNode` (HRTF tắt ở tier Thấp); mỗi 0,25 s: ứng viên = ag
 |---|---|---|---|
 | 0.1 | 22/11/2026 | Claude | Bản đầu từ TSD-05 v1.1 |
 | 1.0 | 23/11/2026 | Huy | Duyệt bộ DDD; thay đổi sau đây theo change request |
+| 1.1 | 26/11/2026 | Claude | CR-02 (ADR-036) và POC-U1: mục 2 runtime sang C# `engine/unity` (MOD-CHR-01…17), MOD-CHR-18 bước `navmesh` chỉ gom nguồn; mục 3 giao diện C#; DTO-CHR-06, EP-CHR-01; PSC-CHR-02 (`CharacterController`), 03, 04 (Playables), 07 (NavMesh theo ô bất đồng bộ), 15, 16; CFG-CHR-03…07; OID-CHR-02 |

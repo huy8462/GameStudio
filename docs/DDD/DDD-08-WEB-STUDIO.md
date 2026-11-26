@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | DDD-08 |
-| Phiên bản | 1.0 |
-| Ngày | 23/11/2026 |
+| Phiên bản | 1.1 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | DDD-00 `DDD-00-TONG-QUAN.md` |
-| TSD nguồn | TSD-08 v1.3 (IF-WEB-01…06, SCH-WEB-01…11, ALG-WEB-01…19, TST-WEB-01…17) |
-| SRS nguồn | SRS-08 v1.2 (FR-WEB-01…69, NFR-WEB-01…09; CR-01 làm tiếp/cập nhật/nhập game) |
+| TSD nguồn | TSD-08 v1.4 (IF-WEB-01…06, SCH-WEB-01…11, ALG-WEB-01…19, TST-WEB-01…17) |
+| SRS nguồn | SRS-08 v1.3 (FR-WEB-01…69, NFR-WEB-01…09; CR-01 làm tiếp/cập nhật/nhập game) |
 | Gói | `web/shared`, `web/api`, `web/ai-gateway`, `web/worker`, `web/app`, `web/deploy` |
 | Pha | W1…W4 |
-| Trạng thái | Đã duyệt (Huy, 23/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 23/11/2026); **v1.1 khung xem trước nhúng Unity player theo CR-02 và POC-U1**, chờ Huy xem lại |
 
 > Web Studio là công cụ **nội bộ, chỉ người được mời** (QĐ-15). Mọi ghi dữ liệu game là JSON Patch qua `@gamestudio/schema`; việc nặng chỉ chạy bằng `engine` CLI trên worker; khoá dịch vụ AI chỉ nằm trong env của `ai-gateway`.
 
@@ -48,7 +48,7 @@ Quy ước chung: khoá chính ULID (`text`, 26 ký tự) trừ bảng có khoá
 | MOD-WEB-19 | `web/api/src/events/{hub.ts, outbox.ts, listen.ts}` | `LISTEN gs_events` → SSE hub (PSC-WEB-15) |
 | MOD-WEB-20 | `web/app/src/{main.tsx, router.tsx, query-client.ts, api/client.ts, api/sse.ts}` | TanStack Router/Query, client REST có `x-request-id`, nối SSE |
 | MOD-WEB-21 | `web/app/src/editor/{store.ts, undo.ts, autosave.ts, merge.ts, selectors.ts}` | Store Zustand editor (DTO-WEB-08), hoàn tác, lưu tự động, hợp nhất khi 409 |
-| MOD-WEB-22 | `web/app/src/preview/{editor-bridge.ts, preview-frame.tsx, tier-sim.tsx, qr.tsx, stats-overlay.tsx}` | `EditorBridge` (IF-WEB-05), khung xem trước, giả lập tier, QR |
+| MOD-WEB-22 | `web/app/src/preview/{editor-bridge.ts, unity-loader.ts, preview-frame.tsx, player-loading.tsx, tier-sim.tsx, qr.tsx, stats-overlay.tsx}` | `EditorBridge` (IF-WEB-05) gọi Unity player qua `SendMessage` và nhận sự kiện `gs:*` từ `.jslib` (CR-02); nạp player một lần mỗi phiên trang, màn chờ tải player có tiến độ, khung xem trước, giả lập tier, QR |
 | MOD-WEB-23 | `web/app/src/features/workspace/{workspace.tsx, panel-registry.ts, top-bar.tsx, object-tree.tsx, gizmo-tools.tsx, json-raw.tsx}` | SCR-WEB-05/06; đăng ký panel chuyên biệt của DDD-01/02/03/05/06/07 |
 | MOD-WEB-24 | `web/app/src/features/{auth, library, account, intake, jobs, versions, share, admin, notifications, play}/**` | SCR-WEB-01…04, 07…14 |
 | MOD-WEB-25 | `web/app/src/i18n/{vi.json, t.ts}`, `src/format.ts` | Chuỗi tiếng Việt, `Intl` vi-VN, Asia/Ho_Chi_Minh |
@@ -167,15 +167,21 @@ export interface EditorBridge {
   load(manifestUrl: string, o: { zone: string; tier: Tier; mode: 'free' | 'player' | 'qa_view'; viewId?: string }): Promise<void>;
   applyRuntimePatch(ops: JsonPatchOp[]): Promise<void>;
   setCamera(m: 'free' | 'player' | { viewId: string }): void; setTimeOfDay(h: number): void; simulateTier(t: Tier): void;
-  pick(x: number, y: number): { objectId: string; pointer: string } | null; highlight(objectId: string | null): void;
+  pick(x: number, y: number): Promise<{ objectId: string; pointer: string } | null>; highlight(objectId: string | null): void;  // CR-02: kết quả về qua gs:pick
   setGizmo(kind: 'move' | 'rotate' | 'scale' | null, snap: { ground: boolean; grid: 0 | 0.5 | 1 | 5 }): void;
   on(e: 'gizmoChange', cb: (pointer: string, value: unknown) => void): () => void;
-  stats(): { fps: number; drawCalls: number; tris: number; gpuMemMB: number };
+  stats(): Promise<{ fps: number; drawCalls: number; tris: number; gpuMemMB: number; wasmHeapMB: number }>;  // CR-02: từ PerfMonitor qua gs:stats
   showProxy(pointer: string, pos: Vec3): void;          // vật đặt chờ build
   combat?: { applyBalance(rows: BalanceRow[]): void; simulateHit(a: string, w: string, t: string): { dmg: number; hits: number } };
   dispose(): void;
 }
-export async function createBridge(canvas: HTMLCanvasElement, engineVersion: string): Promise<EditorBridge>;  // import('/engine/<v>/editor.js')
+export async function createBridge(canvas: HTMLCanvasElement, engineVersion: string,
+  onProgress?: (p: { phase: 'player' | 'manifest' | 'zone'; loaded: number; total: number }) => void): Promise<EditorBridge>;
+// CR-02: kiểm WebGL2 trước (không có → ERR-RTM-01, không tải player); nạp /engine/<v>/Build/gs.loader.js rồi
+// createUnityInstance(canvas, {dataUrl, frameworkUrl, codeUrl /*.br*/, streamingAssetsUrl}, onPlayerProgress);
+// SendMessage('GameStudio','Boot', {manifestUrl, mode:'preview', liveRuntimeData:true}); mọi phương thức trên → SendMessage('GameStudio', <tên>, json);
+// pick/stats trả về qua sự kiện gs:pick, gs:stats (gs-bridge.jslib) nên bản thật là Promise; dispose() → unityInstance.Quit().
+// Player giữ lại khi đổi game hoặc build (chỉ Boot lại), vì nạp player mất 3,8–9,1 s trên A56 (POC-U1).
 ```
 
 Panel chuyên biệt đăng ký vào `panel-registry.ts`: `{id, title, icon, when: (doc) => boolean, component, pointers: string[]}` — ví dụ `combat-balance` chỉ khi `features.combat.enabled || hunting.enabled` (DDD-06).
@@ -301,7 +307,7 @@ Quy ước (IF-WEB-01): mọi route dưới `/api`, JSON UTF-8, thân ≤ 1 MB (
 | EP-WEB-39 | `GET /api/_authz/object` (Caddy `forward_auth`) | cookie phiên hoặc `?t=` preview | Header `X-Forwarded-Uri` → 204 cho phép / 401 / 403; kiểm `private/builds/<gameId>/…` cần `game.view` hoặc JWT preview đúng `gameId`,`buildId`; `private/assets/<id>/…` cần đăng nhập |
 | EP-WEB-40 | `POST /internal/llm` (ai-gateway) | token dịch vụ | `LlmCallReq` → `LlmCallRes` (mục 3.2); 429 ERR-WEB-05; 502 lỗi nhà cung cấp đã lọc |
 | EP-WEB-41 | `POST /internal/image` (ai-gateway) | token dịch vụ | `{task, userId?, gameId?, prompt, refs: ObjectKey[], size, n ≤ 4}` → `{images: [{b64, mime}], usage, costUsd}` |
-| EP-WEB-42 | `POST /internal/audio` (ai-gateway) | token dịch vụ | `{task, userId?, gameId?, text?, voiceId?, prompt?, durationS?}` → `audio/ogg` + header `x-cost-usd`, `x-usage-id` |
+| EP-WEB-42 | `POST /internal/audio` (ai-gateway) | token dịch vụ | `{task, userId?, gameId?, text?, voiceId?, prompt?, durationS?}` → `audio/mpeg` (bản gốc ElevenLabs; bước `audio` chuyển sang M4A/AAC theo ADR-037) + header `x-cost-usd`, `x-usage-id` |
 | EP-WEB-43 | `GET /internal/dialogue-profiles/{publicationId}` (api, chỉ mạng `app`) | token dịch vụ của `ai-gateway` | → `dialogue-profiles.json` (DDD-07 DTO-DLG-03); `ETag` |
 | EP-WEB-44 | `GET /api/admin/overview` (API-WEB-75) | `admin.overview` | → `AdminOverview` (DTO-WEB-13); cache 30 s (PSC-WEB-17) |
 | EP-WEB-45 | `GET /api/admin/system`, `GET /api/admin/jobs?status=&type=&before=` (API-WEB-76) | `admin.overview` | → `AdminSystem` (DTO-WEB-15); `Page<JobView & {gameName, requestedByName}>` |
@@ -931,3 +937,4 @@ Thứ tự khởi động (FR-WEB-45): `postgres` healthy → `api migrate` (vai
 | 0.2 | 23/11/2026 | Claude | Theo SRS-08 v1.1 / TSD-08 v1.2 (change request quản trị Huy duyệt 23/11/2026): MOD-WEB-34, hành động `admin.*` mới, DTO-WEB-13…15, TBL-WEB-32, 33, cột gỡ/thu hồi ở TBL-WEB-17, 18, EP-WEB-44…51, STM-WEB-05 thêm `GoBo`, PSC-WEB-16…18, ERR-WEB-13, TC-WEB-17…21, truy vết FR-WEB-51…59; đóng OIU-GEN-02, 03 của UIUX |
 | 0.3 | 23/11/2026 | Claude | CR-01 theo SRS-08 v1.2 / TSD-08 v1.3: MOD-WEB-35…37, hành động `game.status`, `game.build_stale`, `game.upgrade`, `game.import_into`, `link.retarget`, DTO-WEB-16…18, TBL-WEB-34…36, cột mới ở TBL-WEB-05, 13, 17, 18, EP-WEB-16 (`dryRun`, `stale`), EP-WEB-52…56, SEQ-WEB-07…09, STM-WEB-06, 07, PSC-WEB-19…23 (ALG-WEB-15…19), ERR-WEB-14, 15, CFG-WEB-08, TC-WEB-22…26, OID-WEB-06, 07 |
 | 1.0 | 23/11/2026 | Huy | Duyệt bộ DDD (gồm phần CR-01 và EP-WEB-56); thay đổi sau đây theo change request |
+| 1.1 | 26/11/2026 | Claude | CR-02 (ADR-036) và POC-U1: MOD-WEB-22 và `createBridge` nhúng Unity player (`createUnityInstance`, `SendMessage`, sự kiện `gs:*`), giữ player khi đổi game, màn chờ tải player; `pick`, `stats` thành bất đồng bộ; EP-WEB-42 trả `audio/mpeg`, chuyển AAC ở bước `audio` (ADR-037) |

@@ -3,8 +3,8 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | SRS-00 |
-| Phiên bản | 1.4 |
-| Ngày | 23/11/2026 |
+| Phiên bản | 1.5 |
+| Ngày | 26/11/2026 |
 | Chủ sở hữu / người duyệt | Huy (đã duyệt 22/11/2026) |
 | Người soạn | Claude |
 | BRD nguồn | BRD-00 `BRD-TONG-QUAN.md` v1.1; BRD-01…09; BRD-10 (CR-01); `GAME-ENGINE-WEB3D-BRIEF.md` bản 6 |
@@ -21,13 +21,13 @@
 | SRS-00-PL-A | [Ma trận truy vết BRD → SRS](SRS-00-PL-A-MA-TRAN-TRUY-VET.md) (sinh tự động) | BRD-00…09 | — | — |
 | SRS-01 | [Tạo game từ mô tả](SRS-01-TAO-GAME-TU-MO-TA.md) (v1.1) | BRD-01 | `INT` | 34 |
 | SRS-02 | [Thế giới, địa hình và môi trường](SRS-02-THE-GIOI-DIA-HINH-MOI-TRUONG.md) | BRD-02 | `WLD` | 40 |
-| SRS-03 | [Asset 3D, vật liệu và âm thanh](SRS-03-ASSET-VAT-LIEU-AM-THANH.md) | BRD-03 | `AST` | 40 |
-| SRS-04 | [Runtime, hiệu năng và QA](SRS-04-RUNTIME-HIEU-NANG-QA.md) (v1.3) | BRD-04 | `RTM`, `QA`, `CLI` | 45 |
-| SRS-05 | [Nhân vật người chơi, NPC và động vật](SRS-05-NHAN-VAT-NPC-DONG-VAT.md) | BRD-05 | `CHR` | 44 |
+| SRS-03 | [Asset 3D, vật liệu và âm thanh](SRS-03-ASSET-VAT-LIEU-AM-THANH.md) (v1.1) | BRD-03 | `AST` | 40 |
+| SRS-04 | [Runtime, hiệu năng và QA](SRS-04-RUNTIME-HIEU-NANG-QA.md) (v1.4) | BRD-04 | `RTM`, `QA`, `CLI` | 45 |
+| SRS-05 | [Nhân vật người chơi, NPC và động vật](SRS-05-NHAN-VAT-NPC-DONG-VAT.md) (v1.1) | BRD-05 | `CHR` | 44 |
 | SRS-06 | [Chiến đấu và săn bắt (tuỳ chọn)](SRS-06-CHIEN-DAU-SAN-BAT.md) | BRD-06 | `CBT` | 28 |
 | SRS-07 | [Hội thoại NPC (tĩnh và AI)](SRS-07-HOI-THOAI-NPC.md) | BRD-07 | `DLG` | 31 |
 | SRS-08 | [Web Studio](SRS-08-WEB-STUDIO.md) (v1.3) | BRD-08 | `WEB` | 69 |
-| SRS-09 | [Studio AI, quy trình, tiết kiệm token và bảo mật](SRS-09-STUDIO-AI-QUY-TRINH-BAO-MAT.md) (v1.2) | BRD-09 | `DEV` | 27 |
+| SRS-09 | [Studio AI, quy trình, tiết kiệm token và bảo mật](SRS-09-STUDIO-AI-QUY-TRINH-BAO-MAT.md) (v1.3) | BRD-09 | `DEV` | 27 |
 | | **Tổng** | | | **358** |
 
 ---
@@ -294,7 +294,7 @@ Sau khi xuất bản, mỗi thay đổi dữ liệu đưa game về `CanBuild` (
 Cấu trúc thư mục đầy đủ: SRS-04 mục 6.1. Mọi file có JSON Schema trong `engine/schema/` và `schemaVersion` (SRS-04 FR-RTM-01, 02).
 
 ### 5.2 Sản phẩm build
-glTF (Meshopt/Draco), KTX2 + fallback, âm thanh Opus/AAC, `manifest.json`, báo cáo JSON chung (SRS-04 mục 6.4), `publish.json` (SRS-04 FR-CLI-06).
+glTF (Meshopt/Draco), KTX2 + fallback, âm thanh AAC/M4A (ADR-037), `manifest.json`, báo cáo JSON chung (SRS-04 mục 6.4), `publish.json` (SRS-04 FR-CLI-06).
 
 ### 5.3 Dữ liệu Web Studio
 `User`, `Invitation`, `Game`, `GameMember`, `GameVersion`, `BriefVersion`, `IntakeSession`, `ChatMessage`, `ChangeProposal`, `Job`, `JobReport`, `Asset`, `AssetUsage`, `Publication`, `ShareLink`, `Quota`, `UsageRecord`, `EditLock`, `AuditLog`, `Announcement`, `ImportCheck` (v1.2) (SRS-08 mục 9).
@@ -566,3 +566,4 @@ Thuật ngữ chung ở BRD-00 mục 16. Bổ sung:
 | 1.2 | 23/11/2026 | Claude | CR-01 (Huy yêu cầu 23/11/2026: bổ sung luồng xây dựng cho game đang làm dở hoặc đã có để làm tiếp hoặc cập nhật): thêm mục 4.4 (ba trường hợp, giai đoạn tiến độ, cờ), QT-GEN-11, 12, thuật ngữ; cập nhật danh mục SRS (SRS-01 v1.1, SRS-04 v1.1, SRS-08 v1.2, SRS-09 v1.1; tổng FR 358, sửa tổng cũ 328 chưa cộng FR-WEB-51…59), bảng pha 4.3, mục 5.3, 5.4, 6.2, 7; Huy duyệt 23/11/2026 (giá trị "(đề xuất)" mới được chấp nhận làm giá trị nền). Sau khi BRD-10 (BR-119…126) được viết cho CR-01: cột "Nguồn" của 21 FR mới trỏ tới BR-119.1…126.3, phủ 126/126 BR tổng quan và 319/319 BR chi tiết |
 | 1.3 | 25/11/2026 | Claude | CR-02 (Huy yêu cầu 25/11/2026: chỉ dùng Unity thay Three.js; Huy duyệt phân tích, chọn "player chung + dữ liệu", ADR-036): mục 1.2 (engine runtime), sơ đồ 2.1 thêm Unity, bảng 2.2 (navmesh dựng lúc nạp, runtime C#), nguyên tắc 2.3 mục 2, bảng pha 4.3 (POC-U1 ở E2), 6.1 thêm Unity, NFR-GEN-02, 10, GĐ-GEN-02, OI-GEN-05 |
 | 1.4 | 26/11/2026 | Claude | POC-U1 (docs/POC/POC-U1.md): NFR-GEN-02 (lần đầu ≤ 20 s, đã cache ≤ 10 s, Unity player ≤ 10 MB Brotli), CH-03, đóng OI-GEN-05; danh mục SRS-04 v1.3; Huy chốt 26/11/2026 |
+| 1.5 | 26/11/2026 | Claude | CR-02 phần còn lại sau POC-U1: định dạng âm thanh AAC (ADR-037) ở mục định dạng; danh mục SRS-03 v1.1, SRS-04 v1.4, SRS-05 v1.1, SRS-09 v1.3 |

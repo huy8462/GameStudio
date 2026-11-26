@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | SRS-05 |
-| Phiên bản | 1.0 |
-| Ngày | 22/11/2026 |
+| Phiên bản | 1.1 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | SRS-00 `SRS-00-TONG-QUAN.md` |
 | BRD nguồn | BRD-05 v0.1; BRD-00 v0.5 mục 7.10.1–7.10.4 (BR-47…74, BR-102, BR-103) |
 | Module | `characters` (khung xương, animation, LOD, retarget), `npc-ai` (máy trạng thái, tìm đường, đàn, LOD hành vi, lịch trình), `camera-player`; bước build `navmesh` |
 | Nhóm mã | `CHR` |
 | Pha | E2 (người chơi), E4 (khung xương, mô hình, animation), E6 (hành vi, tìm đường), W3 (editor) |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.1 FR-CHR-18 theo CR-02 và POC-U1, chờ Huy xem lại |
 
 Chiến đấu ở SRS-06, hội thoại ở SRS-07.
 
@@ -121,7 +121,7 @@ Mỗi khung hình: `npc-ai` chọn cá thể đến lượt cập nhật theo LO
 | FR-CHR-15 | Thư viện hành vi cơ bản: `idle` (đứng/ngồi/làm việc tại chỗ), `patrol` (theo đường), `wander` (trong vùng), `goto` (tới điểm), `follow` (theo người chơi), `react` (quay mặt, chào, tránh đường) | BR-55, BR-55.1 | M | E6 |
 | FR-CHR-16 | Máy trạng thái khai báo trong dữ liệu (mục 6.2): trạng thái, chuyển, điều kiện (khoảng cách người chơi, giờ trong game, sự kiện, biến game, ngẫu nhiên có seed), hành động | BR-55.2 | M | E6 |
 | FR-CHR-17 | NPC xoay đầu về phía người chơi trong bán kính 4 m, giới hạn ±70° | BR-55.3 | S | E6 |
-| FR-CHR-18 | Bước build `navmesh` sinh lưới điều hướng theo zone từ địa hình, nước, vật cản (thông số tác nhân: bán kính, chiều cao, dốc tối đa theo họ); runtime tìm đường A* trên navmesh | BR-56, BR-56.1 | M | E6 |
+| FR-CHR-18 | Lưới điều hướng theo zone từ địa hình, nước, vật cản (thông số tác nhân: bán kính, chiều cao, dốc tối đa theo họ): bước build `navmesh` gom nguồn và thông số, Unity player dựng navmesh theo ô lúc nạp zone, không chặn khung hình (CR-02, POC-U1); runtime tìm đường A* trên navmesh | BR-56, BR-56.1 | M | E6 |
 | FR-CHR-19 | Tránh va chạm cục bộ giữa NPC, động vật, người chơi (RVO hoặc lực đẩy đơn giản) | BR-56.2 | M | E6 |
 | FR-CHR-20 | NPC không tiến được quá 5 s khi có mục tiêu thì dịch về điểm navmesh hợp lệ gần nhất và ghi log `stuck` (dùng cho bot playtest) | BR-56.3 | M | E6 |
 | FR-CHR-21 | Lịch trình: danh sách `{from, to, behavior, target}` theo giờ trong game (SRS-02 thời điểm); chuyển hoạt động khi sang khung giờ | BR-58, BR-58.1 | S | E6 |
@@ -322,3 +322,4 @@ Mỗi khung hình: `npc-ai` chọn cá thể đến lượt cập nhật theo LO
 |---|---|---|---|
 | 0.1 | 22/11/2026 | Claude | Bản đầu từ BRD-05 v0.1 |
 | 1.0 | 22/11/2026 | Claude | Huy duyệt; chấp nhận các giá trị "(đề xuất)" và đề xuất của Open item làm giá trị nền; đổi trạng thái sang Đã duyệt |
+| 1.1 | 26/11/2026 | Claude | CR-02 (ADR-036), POC-U1: FR-CHR-18 navmesh dựng theo ô lúc nạp zone trong Unity player, bước build chỉ gom nguồn |

@@ -3,8 +3,8 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | TSD-00 |
-| Phiên bản | 1.4 |
-| Ngày | 22/11/2026 |
+| Phiên bản | 1.5 |
+| Ngày | 26/11/2026 |
 | Chủ sở hữu / người duyệt | Huy |
 | Người soạn | Claude |
 | Nguồn | SRS-00 v0.1 và SRS-01…09 v0.1 (328 FR); BRD-00 v0.5, BRD-01…09 v0.1; `GAME-ENGINE-WEB3D-BRIEF.md` bản 6 |
@@ -25,7 +25,7 @@
 | TSD-04 | [Runtime, hiệu năng và QA](TSD-04-RUNTIME-HIEU-NANG-QA.md) | SRS-04 | `RTM`, `QA`, `CLI` | Unity player `engine/unity`, `schema`, `packager`, `qa`, `cli` |
 | TSD-05 | [Nhân vật, NPC và động vật](TSD-05-NHAN-VAT-NPC-DONG-VAT.md) | SRS-05 | `CHR` | `characters`, `npc-ai`, `navmesh` |
 | TSD-06 | [Chiến đấu và săn bắt (tuỳ chọn)](TSD-06-CHIEN-DAU-SAN-BAT.md) | SRS-06 | `CBT` | module `Combat` trong Unity player (bật bằng dữ liệu) |
-| TSD-07 | [Hội thoại NPC](TSD-07-HOI-THOAI-NPC.md) | SRS-07 | `DLG` | `interaction/dialogue`, `dialogue-ai` (chunk riêng), dịch vụ hội thoại trong cổng AI |
+| TSD-07 | [Hội thoại NPC](TSD-07-HOI-THOAI-NPC.md) | SRS-07 | `DLG` | `Interaction/Dialogue` trong Unity player; phần `dialogue-ai` và dịch vụ hội thoại bị ADR-035 bỏ, chờ CR W1 |
 | TSD-08 | [Web Studio](TSD-08-WEB-STUDIO.md) | SRS-08 | `WEB` | `web/app`, `web/api`, `web/worker`, `web/ai-gateway` |
 | TSD-09 | [Studio AI, quy trình, bảo mật dev](TSD-09-STUDIO-AI-QUY-TRINH-BAO-MAT.md) | SRS-09 | `DEV` | `.claude/`, `project.yaml`, `engine doctor`, CI |
 
@@ -421,7 +421,7 @@ Không có môi trường staging riêng ở bản đầu (TSD đề xuất, OIT
 | TST-GEN-01 | Mọi file `games/_template/data/**` và `games/*/data/**` hợp lệ schema |
 | TST-GEN-02 | PCG32 TS và Python cho cùng 1.000 giá trị với 5 seed chuẩn; `deriveSeed("42","vegetation","z1","7")` khớp giá trị ghi trong test |
 | TST-GEN-03 | `inputHash` không đổi khi thứ tự khoá JSON đổi; đổi khi phiên bản công cụ đổi |
-| TST-GEN-04 | Đồ thị gói không có vòng; `engine/runtime` không import `node:*` |
+| TST-GEN-04 | Đồ thị gói không có vòng; gói TS dùng trong trình duyệt (`web/app`, `engine/shared/*`) không import `node:*`; assembly Unity `GameStudio.*` không tham chiếu vòng (test EditMode, CR-02) |
 
 ---
 
@@ -431,15 +431,15 @@ Không có môi trường staging riêng ở bản đầu (TSD đề xuất, OIT
 |---|---|
 | E0 | ADR-016…033 đã có (TD-01…18 chốt 22/11/2026); scaffold monorepo; `tools/versions.json`; `engine doctor`; `.claude/`; baseline A56 bằng scaffold gốc (TSD-09, TSD-04 FR-QA-07) |
 | E1 | `@gamestudio/schema`, `rng`, `expr` (phần điều kiện), `intake` với `HandoffLlmClient`; bộ chạy bước + cache; `world.fetch/heightfield`, `terrain.erode/mesh/splat`; QA khung; CLI cơ bản; CI |
-| E2 | `materials`, `packager` (tier, zone, manifest), runtime `core` stream + tier + loader, `camera-player`, người chơi |
-| E3 | `water`, `vegetation` (instancing, impostor), `fx`, visual regression |
-| E4 | `asset-import`, `asset-forge`, `kit-builder`, `placement`, khung xương 6 họ, retarget |
-| E5 | `lighting.bake` Cycles CPU, mốc thời điểm, chuyển mốc |
-| E6 | `interaction`, `ui-audio`, `npc-ai` + `navmesh`, cây thoại, `dialogue-ai` + dịch vụ hội thoại trong `ai-gateway`, bot playtest; `combat` nếu game mẫu bật |
+| E2 | Unity player `engine/unity` (Unity 6000.3.29f1, URP, gói ghim theo POC-U1): `Core` (Boot, vòng hệ thống), `Loader` (glTFast + Meshopt + KTX, stream zone), `Tier`, `Input`, `CameraPlayer`, người chơi (`CharacterController`); bản C# của `rng`/`expr` + vector chung; `materials` (texture thủ tục numpy, HDRI cubemap + SH); `packager` (tier, zone, manifest cho player, glb có `scene` mặc định, texture lõi ≤ 1024 ETC1S); `engine doctor`/`versions.json` bỏ `three` thêm `unity`; skill `engine-unity-*`. Việc rút ra từ POC-U1 (mỗi việc một phiếu): âm thanh AAC (ADR-037), làm ấm shader trước "Chơi", NavMesh theo ô bất đồng bộ, máy chủ poc phục vụ https. Cổng G-E2 đo lại tải 4G 9 Mbps trên Chrome Android |
+| E3 | `water`, `vegetation` (GPU instancing Unity, impostor), `fx` (Shader Graph, URP Volume), visual regression qua player |
+| E4 | `asset-import` (turntable bằng player `?turntable=`), `asset-forge`, `kit-builder`, `placement`, khung xương 6 họ, retarget, animation Playables |
+| E5 | `lighting.bake` Cycles CPU, mốc thời điểm, chuyển mốc; shader URP `LitRgbmLightmap` đọc lightmap RGBM |
+| E6 | `interaction`, `ui-audio` (UI Toolkit, `AudioMixer`, AAC), `npc-ai` + NavMesh dựng lúc nạp zone (AI Navigation, nguồn từ bước `navmesh`), cây thoại tĩnh (ADR-035 bỏ `dialogue-ai`), bot playtest; module `Combat` nếu game mẫu bật |
 | E7–E8 | Tối ưu theo tier, animation instancing, game thứ hai |
 | W1 | Compose + Caddy, OIDC + mời, quyền, chat + intake qua `ai-gateway`, ghi sử dụng |
-| W2 | Hàng đợi + worker, xem trước, phiên bản, hạn mức, sao lưu, trang quản trị |
-| W3 | Editor (cảnh, NPC, động vật, hội thoại, bảng cân bằng), khoá sửa, đề xuất thay đổi |
+| W2 | Hàng đợi + worker, xem trước nhúng Unity player (`EditorBridge` qua `SendMessage`), phiên bản, hạn mức, sao lưu, trang quản trị |
+| W3 | Editor (cảnh, NPC, động vật, hội thoại, bảng cân bằng; gizmo, chọn, vẽ địa hình trong player C#), khoá sửa, đề xuất thay đổi |
 | W4 | Kho asset, xuất/nhập gói, chia sẻ, xuất bản, link chơi thử, JSON thô, rà soát bảo mật |
 
 ---
@@ -507,3 +507,4 @@ NFR chung (SRS-00) sang TSD:
 | 1.2 | 23/11/2026 | Huy | Duyệt phần bổ sung CR-01 |
 | 1.3 | 25/11/2026 | Claude | CR-02 (Huy yêu cầu 25/11/2026: chỉ dùng Unity thay Three.js; Huy duyệt phân tích, chọn "player chung + dữ liệu", ADR-036): danh mục TSD-04, 06; bảng tầng (runtime C#), sơ đồ xem trước, nguyên tắc 2; TD-02, 03, 04, 05, 09, 11, 12, 18 ghi phần thay bởi ADR-036; cây thư mục `engine/unity`; đồ thị gói; luật lint; ngân sách 7.2, 7.3, 7.4 |
 | 1.4 | 26/11/2026 | Claude | POC-U1 (docs/POC/POC-U1.md): §7.4 Unity player ≤ 10 MB Brotli, tới điều khiển được ≤ 20 s lần đầu, ≤ 10 s khi đã cache player; Huy chốt 26/11/2026 |
+| 1.5 | 26/11/2026 | Claude | CR-02 phần còn lại sau POC-U1: mục 11 lộ trình E2…E6, W2, W3 theo Unity player và việc rút ra từ POC-U1; TST-GEN-04; danh mục TSD-07 |

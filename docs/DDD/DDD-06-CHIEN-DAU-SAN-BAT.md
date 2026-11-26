@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | DDD-06 |
-| Phiên bản | 1.0 |
-| Ngày | 23/11/2026 |
+| Phiên bản | 1.1 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | DDD-00 `DDD-00-TONG-QUAN.md` |
 | TSD nguồn | TSD-06 v1.1 (SCH-CBT-01…04, ALG-CBT-01…10, TST-CBT-01…09) |
 | SRS nguồn | SRS-06 v1.1 (FR-CBT-01…28, NFR-CBT-01…03) |
-| Gói | Runtime `engine/runtime/src/combat/**` (entry riêng → chunk `combat-<hash>.js`, nạp bằng `Engine.enableOptional('combat')`); HUD `combat/ui/`; panel `web/app/src/features/combat/` (SCR-CBT-02), nhóm trường "Chiến đấu" trong SCR-CHR-01 |
+| Gói | Runtime trong Unity player `engine/unity/Assets/GameStudio/Combat/**` (C#, CR-02; module luôn có trong player, chỉ bật khi `manifest.modules.combat=true` bằng `Engine.EnableOptional("combat")`); HUD `Combat/UI/` (UI Toolkit); panel `web/app/src/features/combat/` (SCR-CBT-02), nhóm trường "Chiến đấu" trong SCR-CHR-01 |
 | Pha | Khi game cần, sớm nhất E6; editor W3 |
-| Trạng thái | Đã duyệt (Huy, 23/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 23/11/2026); **v1.1 runtime Unity theo CR-02**, chờ Huy xem lại |
 
 > Module **mặc định tắt** (QĐ-13). Số còn mở: ngân sách `budgets.combat.attackers/projectiles` tier Vừa **3/20** là giá trị khởi tạo của CFG-CBT-01, chốt khi có game đầu tiên bật chiến đấu (OI-CBT-05). Mã không viết cứng hai số này.
 
@@ -27,7 +27,7 @@ Nguyên tắc: game tắt cả hai cờ thì không có tệp, asset, UI hay chi
 
 | Mã | Tệp | Trách nhiệm |
 |---|---|---|
-| MOD-CBT-01 | `combat/index.ts` | Entry chunk: `export default function install(engine: Engine): CombatSystem`; đăng ký hệ thống, graph `combat`, hành động, HUD |
+| MOD-CBT-01 | `combat/index.ts` | Điểm vào module: `CombatModule.Install(Engine engine) → CombatSystem` (C#, CR-02); đăng ký hệ thống, graph `combat`, hành động, HUD |
 | MOD-CBT-02 | `combat/system.ts` | `CombatSystem` (order 50): tick giác quan, token, đòn đánh, đạn, gục/hồi sinh, tái xuất hiện |
 | MOD-CBT-03 | `combat/stats.ts` | `CombatStore` SoA (DTO-CBT-05) song song `AgentStore`, slot người chơi = chỉ số `N` |
 | MOD-CBT-04 | `combat/senses.ts`, `combat/ray-queue.ts` | Nhìn/nghe/đánh hơi (PSC-CBT-02); hàng đợi tia ≤ 2/khung |
@@ -35,32 +35,36 @@ Nguyên tắc: game tắt cả hai cờ thì không có tệp, asset, UI hay chi
 | MOD-CBT-06 | `combat/formula.ts` | Biên dịch `features.combat.formula` (PSC-CBT-04) |
 | MOD-CBT-07 | `combat/damage.ts` | Áp sát thương, giật lùi, bất tử, lọc mục tiêu hợp lệ |
 | MOD-CBT-08 | `combat/player-actions.ts`, `combat/aim-assist.ts` | Nút Tấn công, Né/Đỡ, aim assist, ngắm tầm xa (PSC-CBT-05) |
-| MOD-CBT-09 | `combat/projectiles.ts` | Pool đạn, bay tuyến tính + trọng lực, va chạm BVH/viên nang (PSC-CBT-10) |
+| MOD-CBT-09 | `combat/projectiles.ts` | Pool đạn, bay tuyến tính + trọng lực, va chạm `Physics.SphereCast`/viên nang (PSC-CBT-10, CR-02) |
 | MOD-CBT-10 | `combat/herd-flee.ts` | Sự kiện nhóm, đàn bỏ chạy (PSC-CBT-06) |
 | MOD-CBT-11 | `combat/hunting.ts`, `combat/tracks.ts`, `combat/loot.ts`, `combat/traps.ts` | Dấu vết decal, bảng rơi, bẫy/lưới (PSC-CBT-07) |
 | MOD-CBT-12 | `combat/down-respawn.ts` | Gục/hồi sinh người chơi và agent (PSC-CBT-08) |
 | MOD-CBT-13 | `combat/violence.ts`, `combat/feedback.ts` | Mức bạo lực (PSC-CBT-09), hạt trúng đòn, âm 3D, rung, số sát thương nổi |
 | MOD-CBT-14 | `combat/actions/{alert, chase, attack, flee-combat, down, trapped}.ts` | `ActionImpl` cho các trạng thái graph `combat` (IF-CHR-01) |
 | MOD-CBT-15 | `combat/graph/combat.graph.json` | Graph `combat` (DTO-CBT-06) `extends` graph gốc của thực thể |
-| MOD-CBT-16 | `combat/ui/combat-hud.ts`, `combat/ui/combat-hud.css` | SCR-CBT-01 (DOM, trong safe area) |
+| MOD-CBT-16 | `combat/ui/combat-hud.ts`, `combat/ui/combat-hud.css` | SCR-CBT-01 (UI Toolkit `CombatHud.uxml` + `.uss`, trong safe area; CR-02) |
 | MOD-CBT-17 | `engine/shared/schema/combat/{features.combat.schema.json, combat-block.schema.json, weapon.schema.json}`, `engine/shared/schema/combat/cross-check.ts` | SCH-CBT-01…03 + kiểm chéo id (ERR-CBT-01) |
 | MOD-CBT-18 | `engine/shared/combat-csv/{columns.ts, parse.ts, emit.ts}` | CSV cân bằng SCH-CBT-04, dùng chung web và CLI |
 | MOD-CBT-19 | `web/app/src/features/combat/balance-table.tsx`, `features/combat/use-balance-rows.ts`, `features/combat/csv-dialog.tsx`, `features/npc/combat-fields.tsx` | SCR-CBT-02 và nhóm trường "Chiến đấu" của SCR-CHR-01 |
-| MOD-CBT-20 | `engine/build/packager/src/optional-chunks.ts` (phần combat) | Chép/kiểm ngược chunk và asset tag `combat` (PSC-CBT-01) |
+| MOD-CBT-20 | `engine/build/packager/src/modules.ts` (phần combat, DDD-04 MOD-CLI-04) | Ghi cờ `manifest.modules.combat`, chép/kiểm ngược asset tag `combat` (PSC-CBT-01; CR-02 bỏ chunk JS) |
+
+> Từ v1.1 (CR-02, ADR-036) MOD-CBT-01…16 là C# trong Unity player; cột "Tệp" giữ tên gốc để truy vết, tệp thật đổi sang PascalCase `.cs` theo cây dưới (ví dụ `combat/ray-queue.ts` → `Combat/RayQueue.cs`, `combat/ui/combat-hud.ts` → `Combat/UI/CombatHud.cs` + `.uxml`). MOD-CBT-17…19 vẫn là TS (schema, CSV, panel web).
 
 Cây thư mục runtime:
 ```
-engine/runtime/src/combat/
-  index.ts  system.ts  stats.ts  senses.ts  ray-queue.ts  tokens.ts  formula.ts  damage.ts
-  player-actions.ts  aim-assist.ts  projectiles.ts  herd-flee.ts
-  hunting.ts  tracks.ts  loot.ts  traps.ts  down-respawn.ts  violence.ts  feedback.ts  config.ts
-  actions/  graph/combat.graph.json  ui/
+engine/unity/Assets/GameStudio/Combat/          (assembly GameStudio.Combat, chỉ GameStudio.Runtime tham chiếu)
+  CombatModule.cs  CombatSystem.cs  CombatStore.cs  Senses.cs  RayQueue.cs  Tokens.cs  Formula.cs  Damage.cs
+  PlayerActions.cs  AimAssist.cs  Projectiles.cs  HerdFlee.cs
+  Hunting.cs  Tracks.cs  Loot.cs  Traps.cs  DownRespawn.cs  Violence.cs  Feedback.cs  CombatConfig.cs
+  Actions/  Graph/combat.graph.json  UI/
 ```
-`engine/runtime/vite.config.ts` khai báo `build.lib.entry = { index: 'src/index.ts', combat: 'src/combat/index.ts', 'dialogue-ai': 'src/dialogue-ai/index.ts' }`. Mã ngoài `combat/` không được `import` tĩnh từ `combat/**` (luật ESLint `no-restricted-imports`); chỉ `Engine.enableOptional('combat')` dùng `import()`.
+Assembly `GameStudio.Combat` tách riêng (`.asmdef`); mã ngoài `Combat/` chỉ gọi qua `CombatModule.Install` từ `Engine.EnableOptional("combat")`, không tham chiếu trực tiếp lớp khác của `Combat/` (kiểm bằng test EditMode đọc tham chiếu assembly). Mã module luôn nằm trong player nên không có chunk riêng (CR-02); khi game tắt chiến đấu, hệ thống không được đăng ký và không cấp phát `CombatStore`.
 
 ---
 
 ## 3. Thiết kế lớp và giao diện
+
+Chữ ký dưới đây viết theo bản gốc TS; từ v1.1 (CR-02) cài đặt là C# cùng tên ở dạng PascalCase (`update(dt, t)` → `Tick(float dt, float t)` theo `ISystem` DDD-04 mục 3.1, `Promise<void>` → khởi tạo đồng bộ sau khi dữ liệu đã nạp, `ReadonlyVec3` → `in Vector3`).
 
 ```ts
 // combat/index.ts
@@ -143,7 +147,7 @@ Ví dụ công thức (SRS-06 FR-CBT-07): `atk` 6, kiếm `weapon` 10, sói `def
 
 | Mã | Giao thức | Đặc tả |
 |---|---|---|
-| EP-CBT-01 | Packager: chunk tuỳ chọn | `manifest.chunks.combat = {path:'engine/combat-<hash>.js', bytes, sha256}` chỉ khi `features.combat.enabled \|\| features.hunting.enabled`; bootstrap gọi `engine.enableOptional('combat')` sau `init` khi có khoá này (DDD-04 DTO-RTM-01) |
+| EP-CBT-01 | Packager: module tuỳ chọn | `manifest.modules.combat = true` chỉ khi `features.combat.enabled \|\| features.hunting.enabled`; player gọi `Engine.EnableOptional("combat")` sau `Init` khi cờ bật (DDD-04 DTO-RTM-01; CR-02 thay `manifest.chunks.combat`) |
 | EP-CBT-02 | PATCH dữ liệu game | Qua EP-WEB-14 (DDD-08): op chạm `/game.json/features/combat\|hunting\|violence` → `impact.major=true` → brief vN+1 `ChoXacNhan` (DDD-01 PSC-INT-08); op chạm khối `combat`/`weapons` → `impact.runtimeOnly=true` → áp nóng |
 | EP-CBT-03 | CSV nhập/xuất | Web: đọc/ghi tệp trên trình duyệt, nhập thành một PATCH nhiều op (toàn phần hoặc không); CLI: `gs combat export <game> [--out f.csv]`, `gs combat import <game> f.csv [--dry-run] [--json]` (thoát 4 khi ERR-CBT-03) |
 
@@ -169,7 +173,7 @@ sequenceDiagram
 ```
 
 ### SEQ-CBT-02 Bật chiến đấu sau khi game đã có
-Chat/editor → PATCH `features.combat.enabled=true` (EP-CBT-02) → `impact.major` → brief vN+1 `ChoXacNhan` → người dùng xác nhận → job build → packager PSC-CBT-01 chép chunk + asset tag `combat` → preview nạp chunk.
+Chat/editor → PATCH `features.combat.enabled=true` (EP-CBT-02) → `impact.major` → brief vN+1 `ChoXacNhan` → người dùng xác nhận → job build → packager PSC-CBT-01 bật cờ `modules.combat` + chép asset tag `combat` → preview nạp lại manifest và bật module (CR-02).
 
 ### SEQ-CBT-03 Áp nóng bảng cân bằng
 SCR-CBT-02 sửa ô → kiểm giới hạn ô (schema) → debounce 300 ms → PATCH (EP-WEB-14) → SSE `data.version` → `EditorBridge.applyRuntimePatch` → `CombatSystem.onRuntimeData`: ghi lại các cột `CombatStore` của id bị đổi, compile lại `formula` nếu đổi (lỗi → giữ công thức cũ, báo ERR-CBT-02). Không tải lại zone.
@@ -222,15 +226,15 @@ stateDiagram-v2
 ```
 on = game.features.combat.enabled || game.features.hunting.enabled
 if on:
-  copy engine/dist/combat-<hash>.js → build/engine/; manifest.chunks.combat = fileRef
+  manifest.modules.combat = true            # CR-02: mã module có sẵn trong Unity player, không chép chunk
   assets += assets where 'combat' in tags and referenced by entities/weapons|combat blocks|fx combat
 else:
-  không chép; manifest.chunks.combat = undefined
+  manifest.modules.combat = undefined
 # kiểm ngược sau khi ghi danh sách tệp
 files = list(build/**)
-if !on and (any f matches /combat-[0-9a-f]+\.js$/ or any asset.tags includes 'combat'):
+if !on and (manifest.modules.combat or any asset.tags includes 'combat'):
   fail ERR-CBT-04 {files: offending}
-report.bundleJsBytes = sum(js files không phải chunk tuỳ chọn)
+report.playerBytes = kích thước Unity player dùng chung (không đổi theo cờ combat)
 ```
 
 ### PSC-CBT-02 Giác quan (ALG-CBT-02)
@@ -377,7 +381,7 @@ Phản hồi (FR-CBT-24): `feedback.onHit` → hạt (PSC-CBT-09), `audio.play3D
 | TC-CBT-13 | Hồi sinh | Người chơi `hp` 0, 2 vùng `respawn` | Mờ 2 s, dịch tới vùng gần nhất, `hp` đầy, `dropOnDeath` đúng | ALG-CBT-08 |
 | TC-CBT-14 | Ngân sách đạn | Bắn liên tục vượt `projectiles` | Không vượt pool; đạn xa camera bị thu hồi trước | ALG-CBT-10 |
 | TC-CBT-15 | Độ trễ | Chế độ dev đo `pointerdown` → khung bắt đầu clip | ≤ 100 ms trên A56 | NFR-CBT-03 |
-| TC-CBT-16 | Bật sau | PATCH `features.combat.enabled=true` | Brief vN+1 `ChoXacNhan`; build sau xác nhận có chunk | FR-CBT-04 |
+| TC-CBT-16 | Bật sau | PATCH `features.combat.enabled=true` | Brief vN+1 `ChoXacNhan`; build sau xác nhận có `manifest.modules.combat=true` (CR-02) | FR-CBT-04 |
 
 ---
 
@@ -428,3 +432,4 @@ Phản hồi (FR-CBT-24): `feedback.onHit` → hạt (PSC-CBT-09), `audio.play3D
 | 0.1 | 22/11/2026 | Claude | Bản đầu từ TSD-06 v1.1 |
 | 0.2 | 23/11/2026 | Claude | Theo SRS-06 v1.1: đóng OID-CBT-02 (công thức mặc định `max(1, atk + weapon - def)`) |
 | 1.0 | 23/11/2026 | Huy | Duyệt bộ DDD; thay đổi sau đây theo change request |
+| 1.1 | 26/11/2026 | Claude | CR-02 (ADR-036): runtime combat thành assembly C# `GameStudio.Combat` trong Unity player (mục 2, ghi chú mục 3), bỏ chunk JS: MOD-CBT-01, 09, 16, 20, EP-CBT-01, SEQ-CBT-02, PSC-CBT-01 dùng `manifest.modules.combat` |

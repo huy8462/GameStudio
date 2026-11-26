@@ -3,13 +3,13 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | TSD-03 |
-| Phiên bản | 1.1 (đã duyệt) |
-| Ngày | 22/11/2026 |
+| Phiên bản | 1.2 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | TSD-00 `TSD-00-TONG-QUAN.md` |
 | SRS nguồn | SRS-03 v0.1 (FR-AST-01…40, NFR-AST-01…04) |
 | Gói | `engine/build/asset-import`, `engine/build/asset-forge` (primitive TS + script Blender), `engine/build/kit-builder`, `engine/build/materials` (`texture-proc`), `engine/build/audio`, lệnh `engine asset …` (API-AST-01…04); endpoint API-WEB-40…44 |
 | Pha | E2 (vật liệu), E4 (asset 3D), E6 (âm thanh), W3–W4 (web) |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026); **v1.2 theo CR-02 (Unity) sau POC-U1**, chờ Huy xem lại |
 
 ---
 
@@ -41,9 +41,9 @@ flowchart LR
 | Chuẩn hoá, LOD | glTF-Transform + `meshoptimizer` (simplify), Blender cho định dạng FBX/OBJ/BLEND → glTF | Đầu vào chấp nhận: glTF/GLB, FBX, OBJ, BLEND |
 | Generator primitive | TS thuần tạo `BufferGeometry` → glTF (chạy Node, không cần trình duyệt) | Tất định, nhanh |
 | Mesh hữu cơ | Blender: SDF/metaball/remesh voxel + sculpt script | FR-AST-09 |
-| Turntable | **Three.js headless (Playwright)** với HDRI studio cố định, để ảnh duyệt giống hệt cách runtime hiển thị (không dùng Eevee) | Ảnh 512² × 4 góc + ảnh trong cảnh 1280×720 |
-| Texture thủ tục | Node + `sharp` + shader GLSL chạy trong Playwright (noise, gạch, gỗ, vải) xuất PNG | `engine-texture-proc` |
-| Âm thanh | ffmpeg (`loudnorm`, `libopus`, `aac`), `sox` tuỳ chọn | FR-AST-24 |
+| Turntable | **Unity player cùng `engineVersion` ở chế độ `?turntable=`, chạy trong Playwright** (CR-02) với HDRI studio cố định, để ảnh duyệt giống hệt cách runtime hiển thị (không dùng Eevee); worker không cần Unity Editor | Ảnh 512² × 4 góc + ảnh trong cảnh 1280×720 |
+| Texture thủ tục | Python/numpy (`engine/build/py/texproc`, CR-02) + `sharp` (noise, gạch, gỗ, vải) xuất PNG | `engine-texture-proc` |
+| Âm thanh | ffmpeg (`loudnorm`, `aac`; ADR-037 bỏ `libopus`), `sox` tuỳ chọn | FR-AST-24 |
 
 ---
 
@@ -68,7 +68,7 @@ flowchart LR
 | SCH-AST-02 | `recipe.schema.json` | SRS-03 mục 6.2; `params` kiểm bằng `paramsSchema` của generator; `safeRanges` cho FR-AST-35 |
 | SCH-AST-03 | `provenance.schema.json` | `oneOf` theo `type` (`generator`, `cc0`, `edited`, `ai`) như SRS-03 mục 6.3; `evidence` = đường dẫn ảnh chụp trang license + hash; `derivedFrom[]` = `assetId@version` |
 | SCH-AST-04 | `cc0-sources.json` | `[{name, domain, contentKinds[], approvedBy, approvedAt, apiKind: 'polyhaven'\|'page'}]`; `license-exceptions.json` cho ngoại lệ Huy duyệt (FR-AST-02) |
-| SCH-AST-05 | Âm thanh | SRS-03 mục 6.4 + `files {opus: 'x.webm', aac: 'x.m4a'}`, `loopPoints?` |
+| SCH-AST-05 | Âm thanh | SRS-03 mục 6.4 + `files {aac: 'x.m4a'}` (ADR-037), `loopPoints?` |
 | SCH-AST-06 | Bảng `asset_reviews` | `{assetId, version, round, by, at, decision, reason, reasonCode: 'lech_phong_cach'\|'vuot_ngan_sach'\|'loi_hinh'\|'khac'}` |
 
 ---
@@ -82,12 +82,12 @@ flowchart LR
 | ALG-AST-03 | LOD và UV2 | LOD0 = min(nguồn, trần tri loại asset trong `budgets.json`) bằng `simplify` có khoá biên UV; LOD1 40%, LOD2 15% tri LOD0; vượt trần sau giảm → ERR-AST-04. UV2 cho vật tĩnh: `xatlas` (WASM) đóng gói không chồng lấn, padding 4 texel ở 1024 (FR-AST-04, 10) |
 | ALG-AST-04 | Đồng bộ vật liệu | Với mỗi vật liệu: màu nền trung bình (Lab) → màu `palette` vai trò `vat_lieu` gần nhất theo ΔE2000; dịch hue/chroma texture baseColor về màu đó giữ độ sáng tương đối (hệ số pha 0,7, TSD đề xuất); roughness kẹp theo style bible; gộp vật liệu trùng (cùng map hash); > 4 vật liệu → gộp atlas (FR-AST-05) |
 | ALG-AST-05 | Generator theo họ | Recipe → kiểm `paramsSchema` → `rng = PCG32(deriveSeed(recipe.seed, family, version))` → `build()`; generator không đọc gì ngoài `params` + `rng` (QT-WLD-02 tương tự); sinh collider: hộp AABB, viên nang cho dạng thuôn, convex hull (quickhull3d) ≤ 64 đỉnh cho dạng khác (FR-AST-07, 08, 10). `kit-builder`: spec `{bays, floors, roof, wallMaterial, doors}` → ghép module kit theo lưới gian (khẩu độ chuẩn trong kit), mái theo kiểu, merge mesh theo vật liệu (FR-AST-11). Generator họ mới: phiếu riêng, mô hình Opus (FR-AST-13, TSD-09) |
-| ALG-AST-06 | Turntable và thông số | Trang Three.js headless nạp asset, HDRI studio cố định (`studio_small_09` CC0), camera FOV 35° khung theo AABB; 4 góc 0/90/180/270°; ảnh trong cảnh dùng góc chuẩn zone đầu có `placedObjects` asset đó hoặc cảnh mẫu; thông số: tri mỗi LOD, vật liệu, texture lớn nhất, MB sau nén → so ngân sách loại asset (ALG-GEN-03) → `budgetCheck` (FR-AST-31, 32) |
+| ALG-AST-06 | Turntable và thông số | Trang nhúng Unity player (`?turntable=<asset>`, CR-02) nạp asset, HDRI studio cố định (`studio_small_09` CC0), camera FOV 35° khung theo AABB; 4 góc 0/90/180/270°; ảnh trong cảnh dùng góc chuẩn zone đầu có `placedObjects` asset đó hoặc cảnh mẫu; thông số: tri mỗi LOD, vật liệu, texture lớn nhất, MB sau nén → so ngân sách loại asset (ALG-GEN-03) → `budgetCheck` (FR-AST-31, 32) |
 | ALG-AST-07 | Credit | Packager gom provenance của mọi asset dùng trong bản build + provenance dữ liệu bản đồ + `LICENSES.md` phần thư viện; nhóm: bản đồ, mô hình CC0, vật liệu/HDRI, âm thanh, dịch vụ AI, mã MIT (threejs-game-skills); khử trùng theo (tác giả, nguồn); ghi `manifest.credits` → SCR-RTM-05 (FR-AST-30, FR-WEB-39) |
 | ALG-AST-08 | Chặn sinh hàng loạt | Lệnh/job `asset forge` với > 1 recipe hoặc sinh texture AI theo lô kiểm `game.styleBibleVersion != null` và trạng thái style bible `DaDuyet`; nếu không → mã thoát 3 / HTTP 409 (FR-INT-22) |
 | ALG-AST-09 | Vật liệu ba nguồn | `procedural`: đồ thị noise/pattern có seed → PNG 2048/4096; `cc0_scan`: tải Poly Haven ở 4K, chuẩn hoá tên map, chuyển roughness/metallic về kênh glTF (ORM: R=AO, G=roughness, B=metallic); `ai_texture`: Gemini qua `AiMediaClient`, sau đó kiểm tileable: chênh lệch trung bình mép đối diện (dải 8 px, Lab) ≤ ΔE 3 (TSD đề xuất), không đạt → làm liền bằng offset + blend chéo rồi kiểm lại (FR-AST-14, 15, 17). Hạ độ phân giải theo tier ở packager (TSD-04 ALG-CLI-02) |
-| ALG-AST-10 | HDRI | Tải `.hdr`/`.exr` Poly Haven 4K; tier Thấp/Vừa 2K, Cao/Tối đa 4K; tiền lọc PMREM ở build lưu cubeUV RGBM KTX2 để runtime không phải tính (FR-AST-18) |
-| ALG-AST-11 | Âm thanh | Chuẩn hoá −16 LUFS bằng `loudnorm` hai lượt; vòng lặp: tìm điểm cắt gần không (zero crossing) + crossfade 50 ms để không click; xuất Opus/WebM 96 kbps (âm nền 64 kbps mono) + AAC/M4A fallback (FR-AST-20…25). Gán âm nền theo `world.ambience[]` (vùng, mốc thời điểm); bước chân chọn theo `surface.png` |
+| ALG-AST-10 | HDRI | Tải `.hdr`/`.exr` Poly Haven 4K; tier Thấp/Vừa 2K, Cao/Tối đa 4K; ở build Python/numpy chiếu equirect → cubemap, tiền lọc GGX theo mip, lưu RGBM KTX2 + 9 hệ số SH để runtime không phải tính (FR-AST-18; CR-02 thay PMREM Three.js) |
+| ALG-AST-11 | Âm thanh | Chuẩn hoá −16 LUFS bằng `loudnorm` hai lượt; vòng lặp: tìm điểm cắt gần không (zero crossing) + crossfade 50 ms để không click; xuất AAC/M4A 128 kbps (âm nền và giọng 96 kbps mono), một định dạng duy nhất (ADR-037, POC-U1: Unity Web không phát Ogg/Opus) (FR-AST-20…25). Gán âm nền theo `world.ambience[]` (vùng, mốc thời điểm); bước chân chọn theo `surface.png` |
 | ALG-AST-12 | Ngưỡng chi phí lô | `estimate = Σ đơn giá dịch vụ × số mục`; `estimate > batchConfirmThreshold` (2 USD, OI-AST-04) → yêu cầu xác nhận (CLI: hỏi `y/N`; web: hộp thoại) (FR-AST-39, QT-AST-07) |
 | ALG-AST-13 | Dịch vụ AI lỗi | Lỗi tạm (429/5xx, timeout): thử lại **cùng job** (giữ `requestId`/id job của dịch vụ) tối đa 3 lần cách 30 s; hết credit (402/quota): đổi sang texture/âm thanh thủ tục, gắn `fallback: true` trong provenance và báo ERR-AST-05 (FR-AST-40) |
 | ALG-AST-14 | Duyệt | `ChoDuyet` → `DaDuyet` khi `highRisk=false` và 1 vòng duyệt, hoặc `highRisk=true` và 2 vòng (vòng 2 ở phiên bản sau chỉnh sửa hoặc xác nhận lại); từ chối bắt buộc `reasonCode` (ERR-AST-08); biến thể chỉ đổi seed/tham số trong `safeRanges` của recipe đã duyệt → duyệt theo lưới cả lô (FR-AST-31…35) |
@@ -159,3 +159,4 @@ flowchart LR
 | 0.1 | 22/11/2026 | Claude | Bản đầu từ SRS-03 v0.1 |
 | 1.0 | 22/11/2026 | Huy | Duyệt toàn bộ tài liệu |
 | 1.1 | 22/11/2026 | Claude | Chốt các số "(đề xuất)" có nguồn từ SRS sau khi Huy duyệt SRS |
+| 1.2 | 26/11/2026 | Claude | CR-02 (ADR-036), POC-U1, ADR-037: turntable bằng Unity player (ALG-AST-06), texture thủ tục numpy, HDRI cubemap + SH bằng Python (ALG-AST-10), âm thanh chỉ AAC/M4A (SCH-AST-05, ALG-AST-11) |

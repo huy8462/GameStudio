@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | DDD-09 |
-| Phiên bản | 1.0 |
-| Ngày | 23/11/2026 |
+| Phiên bản | 1.1 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | DDD-00 `DDD-00-TONG-QUAN.md` |
-| TSD nguồn | TSD-09 v1.2 (IF-DEV-01…05, SCH-DEV-01…09, ALG-DEV-01…12, TST-DEV-01…09) |
-| SRS nguồn | SRS-09 v1.1 (FR-DEV-01…27, NFR-DEV-01…03; CR-01 làm tiếp/nhập game) |
+| TSD nguồn | TSD-09 v1.3 (IF-DEV-01…05, SCH-DEV-01…09, ALG-DEV-01…12, TST-DEV-01…09) |
+| SRS nguồn | SRS-09 v1.2 (FR-DEV-01…27, NFR-DEV-01…03; CR-01 làm tiếp/nhập game) |
 | Gói | `.claude/**`, `.githooks/`, `tools/{versions.json, schema/, scripts/}`, `engine/cli/src/commands/doctor.ts`, `.github/workflows/ci.yml`, `gitleaks.toml`, `project.yaml`, `CLAUDE.md`, `UPSTREAM.md`, `LICENSES.md`, `docs/{handoff.md, tickets/, gates/, ADR/, metrics/}` |
 | Pha | E0 (đa số), E1 (CI), W1 (rigor `standard` cho web) |
-| Trạng thái | Đã duyệt (Huy, 23/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 23/11/2026); **v1.1 theo CR-02 (Unity) và ADR-037**, chờ Huy xem lại |
 
 > Ràng buộc xuyên suốt (QT-DEV-06): khoá Claude API, Gemini, ElevenLabs không bao giờ xuất hiện trong mã client, bản build, log, tài liệu, bộ nhớ dự án hay `docs/handoff.md`; mọi công cụ chỉ báo "có / không có".
 
@@ -25,9 +25,9 @@ Thiết kế chi tiết bộ công cụ làm việc với Claude Code: tệp c�
 
 | Mã | Tệp | Trách nhiệm |
 |---|---|---|
-| MOD-DEV-01 | `.claude/settings.json`, `.claude/settings.debug.json` | Khai báo hook, quyền mặc định (không `Bash(*)`, `deny` các đường dẫn bí mật); bản debug thêm MCP Three.js/Blender |
+| MOD-DEV-01 | `.claude/settings.json`, `.claude/settings.debug.json` | Khai báo hook, quyền mặc định (không `Bash(*)`, `deny` các đường dẫn bí mật); bản debug thêm MCP Unity/Blender (FR-DEV-17, CR-02) |
 | MOD-DEV-02 | `.claude/agents/{director, engine-dev, tech-artist, world-builder, gameplay-ui, asset-designer, qa, docs}.md` | 8 agent (IF-DEV-01) |
-| MOD-DEV-03 | `.claude/skills/<8 skill gốc>/`, `.claude/skills/engine-*/SKILL.md` | 8 skill bộ gốc (bỏ `threejs-3d-generator`) + 10–15 skill `engine-*` (vd. `engine-intake`, `engine-build`, `engine-asset`, `engine-world`, `engine-npc`, `engine-qa`, `engine-publish`, `engine-perf`, `engine-dialogue`, `engine-combat`) |
+| MOD-DEV-03 | `.claude/skills/{threejs-image-generator, threejs-audio-generator}/`, `.claude/skills/engine-unity-*/SKILL.md`, `.claude/skills/engine-*/SKILL.md` | 2 skill bộ gốc giữ lại (sinh ảnh, âm thanh); 6 skill gắn Three.js thay bằng `engine-unity-*` (dựng player batchmode, gameplay C#, đồ hoạ URP, hồ sơ hiệu năng, QA; CR-02, FR-DEV-02); bỏ `threejs-3d-generator`; + 10–15 skill `engine-*` (vd. `engine-intake`, `engine-build`, `engine-asset`, `engine-world`, `engine-npc`, `engine-qa`, `engine-publish`, `engine-perf`, `engine-dialogue`, `engine-combat`) |
 | MOD-DEV-04 | `.claude/commands/{start, new-game, ticket, build-zone, qa-light, qa-full, perf-snapshot, visual-diff, gate-check, asset-recipe, adr, publish-poc, handoff, resume-game, import-game}.md` | 15 lệnh (IF-DEV-04; `/resume-game`, `/import-game` thêm ở v0.2) |
 | MOD-DEV-05 | `.claude/rules/{engine-runtime, engine-build, games-data, web}.md` | Rule theo đường dẫn (frontmatter `paths:`) |
 | MOD-DEV-06 | `.claude/hooks/{h01-large-md, h02-binary-log, h03-schema, h04-secrets, h05-perf}.mjs` | 5 hook (PSC-DEV-03…05) |
@@ -108,7 +108,7 @@ CLI: `node tools/scripts/token-meter.mjs --ticket T-0042 [--projects-dir <đư�
 |---|---|---|
 | DTO-DEV-01 | `project.yaml` (SCH-DEV-01) | `{rigor: 'minimal'\|'standard'\|'full'='minimal', overrides: [{path: glob, rigor}], budgetsDefault: 'vua', targetDevice: {name:'Galaxy A56', fps: 30}, tiers: ['thap','vua','cao'], gates: string[]}`; khởi tạo `overrides` cho `web/api/**`, `web/worker/**`, `web/ai-gateway/**`, `web/shared/src/permissions.ts`, `web/api/src/plugins/auth*` = `standard` |
 | DTO-DEV-02 | Phiếu `docs/tickets/T-nnnn.md` (SCH-DEV-02) | Frontmatter YAML `{id: 'T-nnnn', title, phase, gate?, rigor, model: {name, effort}, read: glob[], write: glob[], done: string[], evidence: string[], status: 'mo'\|'dang_lam'\|'xong'\|'huy', tokens?: {input, cacheWrite, cacheRead, output, total, sessions}}`; thân: Mục tiêu, Phạm vi, Danh sách bắt buộc theo rigor, Ghi chú, Sửa ngoài danh sách (lý do) |
-| DTO-DEV-03 | `tools/versions.json` (SCH-DEV-03) | `{[tool]: {version, match: 'exact'\|'minor', check: string[] /*argv*/, parse: regex, sha256?}}` với `node, pnpm, python, uv, blender, addons.sapling, addons.ant_landscape, ktx, gltfTransform, ffmpeg, gitleaks, playwright, chromium, three, claudeCode` |
+| DTO-DEV-03 | `tools/versions.json` (SCH-DEV-03) | `{[tool]: {version, match: 'exact'\|'minor', check: string[] /*argv*/, parse: regex, sha256?}}` với `node, pnpm, python, uv, blender, addons.sapling, addons.ant_landscape, ktx, gltfTransform, ffmpeg, gitleaks, playwright, chromium, claudeCode` + vai trò `dev`: `unity` (Editor 6000.3.29f1 + Web Build Support) và các gói Unity ghim bản theo POC-U1 (`urp`, `gltfast`, `meshoptDecompress`, `ktxUnity`, `aiNavigation`, `inputSystem`), kiểm bằng `Packages/packages-lock.json`; bỏ `three` (CR-02) |
 | DTO-DEV-04 | `docs/metrics/tokens.csv` (SCH-DEV-04) | Dòng đầu `ticket,date,phase,agent,model,effort,sessions,input,cache_write,cache_read,output,total,wall_min,result`; ngày `YYYY-MM-DD`; số nguyên |
 | DTO-DEV-05 | Báo cáo cổng (SCH-DEV-05) | Frontmatter `{gate, date, autoChecks: [{id, desc, result: 'dat'\|'chua', evidence}], manualChecks: [{id, desc}], a56: {fpsAvg, fpsP5, frameMsP95, memMB, loadS}, images: string[2..4], risks: string[], proposal, huyConfirm: {by, at} \| null, status: 'chua_qua'\|'da_qua'}`; `<cổng>.conditions.json`: `[{id, desc, kind: 'auto'\|'manual', check?: 'budget'\|'qa_full'\|'provenance'\|'security'\|'a56'}]` |
 | DTO-DEV-06 | `UPSTREAM.md`, `LICENSES.md` (SCH-DEV-06) | `UPSTREAM.md`: bảng `Nguồn \| Commit \| Ngày fork`; bảng thay đổi `file \| kind (them/sua/xoa) \| reason \| ticket`; mục quy trình. `LICENSES.md`: 4 bảng (dữ liệu, thư viện sinh tự động giữa `<!-- licenses:start -->`/`end`, dịch vụ, asset CC0 theo nhóm) |
@@ -235,7 +235,7 @@ H-04:
 H-03 (PostToolUse Write|Edit): p khớp games/**/data/**/*.json
   v = require('engine/schema/dist/validators.cjs'); kind = kindByPath(p) (DDD-00)
   ok = v[kind](JSON.parse(read(p))); !ok → warn(top 10 `${instancePath} ${message}`)
-H-05: p khớp perfPaths (engine/runtime/render/**, **/*.glsl, **/materials/**, **/budgets.json) → warn('Nhắc: chạy /perf-snapshot (QT-RTM-02)')
+H-05: p khớp perfPaths (engine/unity/Assets/GameStudio/{Render,World,Characters}/**, **/*.shadergraph, **/*.hlsl, **/materials/**, **/budgets.json) (CR-02) → warn('Nhắc: chạy /perf-snapshot (QT-RTM-02)')
 ```
 
 ### PSC-DEV-06 `engine doctor` (ALG-DEV-06)
@@ -244,7 +244,8 @@ for (tool, spec) in versions.json:
   r = execFile(spec.check[0], spec.check[1..], {timeout: 10 s}) ; lỗi ENOENT → missing
   have = match(spec.parse, r.stdout); ok = spec.match=='exact' ? have==spec.version : sameMinor(have, spec.version)
 blender: blender -b --factory-startup --python blender-probe.py → JSON {version, addons:[{name, version, path}]} → sha256 gói add-on
-ffmpeg -hide_banner -encoders | grep libopus; ktx --version && ktx create --help
+ffmpeg -hide_banner -encoders | grep " aac "  (ADR-037); ktx --version && ktx create --help
+unity (role dev): đọc engine/unity/ProjectSettings/ProjectVersion.txt và Unity Hub `--headless editors -i` → có bản đúng m_EditorVersion và module WebGL; gói Unity so với packages-lock.json
 env theo role: dev → [GEMINI_API_KEY, ELEVENLABS_API_KEY] (+ ANTHROPIC_API_KEY tuỳ chọn); worker → [GS_GATEWAY_TOKEN_WORKER, DATABASE_URL]; ci → []
   check: name in env && env[name].length > 0 → have 'co'/'khong' (không in giá trị, không băm, không độ dài)
 message: ERR-DEV-04 "<thành phần>: cần <want>, đang có <have>"; ERR-DEV-05 "Thiếu biến môi trường <TÊN> (không hiển thị giá trị)."
@@ -424,3 +425,4 @@ importGame(src):
 | 0.1 | 22/11/2026 | Claude | Bản đầu từ TSD-09 v1.1 |
 | 0.2 | 23/11/2026 | Claude | CR-01 theo TSD-09 v1.2 / SRS-09 v1.1: MOD-DEV-04 15 lệnh, MOD-DEV-17, DTO-DEV-10, EP-DEV-07, 08, PSC-DEV-11, 12 (ALG-DEV-11, 12), TC-DEV-05 sửa 15 lệnh, TC-DEV-11 |
 | 1.0 | 23/11/2026 | Huy | Duyệt bộ DDD; thay đổi sau đây theo change request |
+| 1.1 | 26/11/2026 | Claude | CR-02 (ADR-036), POC-U1, ADR-037: MOD-DEV-01 (MCP Unity), MOD-DEV-03 (skill `engine-unity-*`), DTO-DEV-03 (bỏ `three`, thêm `unity` và gói Unity), H-05 đường dẫn Unity, PSC-DEV-06 (kiểm `aac`, Unity Editor) |

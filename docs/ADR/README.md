@@ -25,7 +25,7 @@
 | [ADR-021](ADR-021-du-lieu-va-schema.md) | Dữ liệu và schema | Đã chốt 22/11/2026 | TD-06 |
 | [ADR-022](ADR-022-bieu-thuc-an-toan.md) | Biểu thức an toàn | Đã chốt 22/11/2026 | TD-07 |
 | [ADR-023](ADR-023-dieu-phoi-build.md) | Điều phối build | Đã chốt 22/11/2026 | TD-08 |
-| [ADR-024](ADR-024-nen-asset.md) | Nén asset | Đã chốt 22/11/2026; một phần bị ADR-036 thay | TD-09 |
+| [ADR-024](ADR-024-nen-asset.md) | Nén asset | Đã chốt 22/11/2026; một phần bị ADR-036 thay; phần âm thanh bị ADR-037 thay | TD-09 |
 | [ADR-025](ADR-025-dia-hinh.md) | Địa hình | Đã chốt 22/11/2026 | TD-10 |
 | [ADR-026](ADR-026-bake-anh-sang.md) | Bake ánh sáng | Đã chốt 22/11/2026; một phần bị ADR-036 thay | TD-11 |
 | [ADR-027](ADR-027-frontend-web-studio.md) | Frontend Web Studio | Đã chốt 22/11/2026; một phần bị ADR-036 thay | TD-12 |
@@ -38,5 +38,6 @@
 | [ADR-034](ADR-034-blender-5-2-lts.md) | Blender 5.2 LTS thay Blender 4.5 LTS | Đã chốt 23/11/2026; thay ADR-017 (phần Blender) | Huy, E0 |
 | [ADR-035](ADR-035-web-studio-goi-claude-code-cli.md) | Web Studio gọi Claude Code qua CLI, người dùng tự đăng nhập | Đã chốt 23/11/2026; CLI trên máy người dùng qua cầu nối; NPC chỉ kịch bản tĩnh; thay ADR-031 phần Claude, ADR-014 phần AI khi chạy | Huy, QĐ-14, QĐ-15 |
 | [ADR-036](ADR-036-unity-runtime.md) | Runtime game và xem trước dùng Unity thay Three.js | Đã chốt 25/11/2026 (CR-02); player chung + dữ liệu | Huy, CR-02 |
+| [ADR-037](ADR-037-am-thanh-aac.md) | Âm thanh xuất bản dùng AAC (M4A) thay Opus | Đã chốt 26/11/2026; thay ADR-024 phần âm thanh | Huy, POC-U1 |
 
 Mẫu ADR theo TSD-09 SCH-DEV-07 (bối cảnh, quyết định, hệ quả, phương án đã loại). Muốn đổi một quyết định đã chốt thì viết ADR mới ghi trường "Thay thế", không sửa ADR cũ.

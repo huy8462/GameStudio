@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | DDD-03 |
-| Phiên bản | 1.0 |
-| Ngày | 23/11/2026 |
+| Phiên bản | 1.1 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | DDD-00 `DDD-00-TONG-QUAN.md` |
-| TSD nguồn | TSD-03 v1.1 (IF-AST-01…06, SCH-AST-01…06, ALG-AST-01…15, TST-AST-01…10) |
-| SRS nguồn | SRS-03 v1.0 (FR-AST-01…40, NFR-AST-01…04) |
+| TSD nguồn | TSD-03 v1.2 (IF-AST-01…06, SCH-AST-01…06, ALG-AST-01…15, TST-AST-01…10) |
+| SRS nguồn | SRS-03 v1.1 (FR-AST-01…40, NFR-AST-01…04) |
 | Gói | `engine/build/{asset-import, asset-forge, kit-builder, materials, audio}`, `engine/build/blender/{convert, forge}`, lệnh `engine asset …`; `web/api/src/services/{asset-registry, asset-review, asset-search}.ts`; panel `web/app/src/features/assets` |
 | Pha | E2 (vật liệu), E4 (asset 3D), E6 (âm thanh), W3–W4 |
-| Trạng thái | Đã duyệt (Huy, 23/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 23/11/2026); **v1.1 theo CR-02 (Unity), POC-U1 và ADR-037 (AAC)**, chờ Huy xem lại |
 
 ---
 
@@ -32,10 +32,10 @@ Thiết kế chi tiết pipeline asset: nhập CC0 có kiểm license và chốn
 | MOD-AST-07 | `asset-forge/src/{registry.ts, run-recipe.ts, collider.ts}`, `asset-forge/families/<family>/index.ts` | Đăng ký generator, chạy recipe, sinh collider |
 | MOD-AST-08 | `engine/build/blender/forge/forge_entry.py`, `blender/forge/families/<family>.py` | Cầu nối generator Blender (hữu cơ: SDF/metaball/remesh) |
 | MOD-AST-09 | `kit-builder/src/{kit-builder.ts, kits/<kit>.json}` | Ghép công trình từ module kit theo lưới gian |
-| MOD-AST-10 | `asset-import/src/turntable/{turntable.ts, page/index.html, page/main.ts}` | Playwright mở trang Three.js headless, chụp 4 góc + ảnh trong cảnh, đo thông số |
-| MOD-AST-11 | `materials/src/{index.ts, procedural/*.ts, cc0-scan.ts, ai-texture.ts, tileable.ts, orm.ts}` | Vật liệu ba nguồn → bộ map PBR chuẩn + `material.json` |
-| MOD-AST-12 | `materials/src/hdri.ts` | Tải HDRI, tiền lọc PMREM → cubeUV RGBM KTX2 |
-| MOD-AST-13 | `audio/src/{index.ts, loudnorm.ts, loop.ts, encode.ts, ambience.ts}` | Chuẩn hoá, vòng lặp, mã hoá Opus/AAC, gán âm nền |
+| MOD-AST-10 | `asset-import/src/turntable/{turntable.ts, page/index.html}` | Playwright mở trang nhúng Unity player cùng `engineVersion` ở chế độ `?turntable=` (CR-02), chụp 4 góc + ảnh trong cảnh, đo thông số; worker không cần Unity Editor |
+| MOD-AST-11 | `materials/src/{index.ts, cc0-scan.ts, ai-texture.ts, tileable.ts, orm.ts}`, `engine/build/py/texproc/{graph.py, nodes.py}` (texture thủ tục numpy, CR-02) | Vật liệu ba nguồn → bộ map PBR chuẩn + `material.json` |
+| MOD-AST-12 | `materials/src/hdri.ts`, `engine/build/py/hdri/{prefilter.py, sh.py}` | Tải HDRI, tiền lọc cubemap GGX theo mip + 9 hệ số SH bằng Python/numpy → KTX2 RGBM (CR-02) |
+| MOD-AST-13 | `audio/src/{index.ts, loudnorm.ts, loop.ts, encode.ts, ambience.ts}` | Chuẩn hoá, vòng lặp, mã hoá AAC/M4A (ADR-037), gán âm nền |
 | MOD-AST-14 | `engine/build/packager/src/credits.ts` | Gom provenance → `manifest.credits` (PSC-AST-07) |
 | MOD-AST-15 | `asset-import/src/ai-media-client.ts` | `AiMediaClient` (gateway / handoff skill), `estimateCost` |
 | MOD-AST-16 | `asset-import/src/batch-guard.ts` | Chặn sinh hàng loạt khi style bible chưa duyệt; ngưỡng xác nhận chi phí |
@@ -90,11 +90,11 @@ export interface AssetRegistry {
 
 | Mã | Cấu trúc | Đặc tả |
 |---|---|---|
-| DTO-AST-01 | `AssetRecord` (SCH-AST-01) | `{id: string /*<loai>-<ten>-<bien-the>*/, version: int, kind: 'model'\|'character'\|'animal'\|'material'\|'hdri'\|'audio'\|'texture', name, tags: string[], source: 'cc0'\|'generator'\|'edited'\|'ai', license: 'CC0-1.0'\|'own'\|string, family?, recipeRef?, status: AssetStatus, highRisk: bool, files: {lod0, lod1?, lod2?, collider?, thumb, turntable: string[4], inScene?, maps?, audio?: {opus, aac}}, stats: {lod0Tris, lod1Tris?, lod2Tris?, materials, maxTexture, sizeMB}, budgetCheck: {result, checks[]}, provenanceRef, createdBy, createdAt, ownerGameId?}`; `AssetStatus = 'Nhap'\|'ChoDuyet'\|'DaDuyet'\|'BiTuChoi'\|'NgungDung'` |
+| DTO-AST-01 | `AssetRecord` (SCH-AST-01) | `{id: string /*<loai>-<ten>-<bien-the>*/, version: int, kind: 'model'\|'character'\|'animal'\|'material'\|'hdri'\|'audio'\|'texture', name, tags: string[], source: 'cc0'\|'generator'\|'edited'\|'ai', license: 'CC0-1.0'\|'own'\|string, family?, recipeRef?, status: AssetStatus, highRisk: bool, files: {lod0, lod1?, lod2?, collider?, thumb, turntable: string[4], inScene?, maps?, audio?: {aac}}, stats: {lod0Tris, lod1Tris?, lod2Tris?, materials, maxTexture, sizeMB}, budgetCheck: {result, checks[]}, provenanceRef, createdBy, createdAt, ownerGameId?}`; `AssetStatus = 'Nhap'\|'ChoDuyet'\|'DaDuyet'\|'BiTuChoi'\|'NgungDung'` |
 | DTO-AST-02 | Recipe (SCH-AST-02) | `{schemaVersion, id, family, generatorVersion: '^1', seed, params: object /*kiểm bằng paramsSchema*/, variants?: {count, seedFrom, safeRanges: {[param]: [min, max]}}, materialRefs: AssetRef[], realSize?: [x,y,z], tags}` |
 | DTO-AST-03 | Provenance (SCH-AST-03) | `oneOf` theo `type`: `generator {family, generatorVersion, recipeHash, seed, engineCommit}`; `cc0 {url, author, title, license:'CC0-1.0', retrievedAt, evidence: {file, sha256}, sourceName}`; `edited {derivedFrom: AssetRef[], changes, by}`; `ai {service:'gemini'\|'elevenlabs', model, prompt, requestId, at, terms, fallback?: bool}`; chung `{schema:'provenance/1', assetId, version, createdAt}` |
 | DTO-AST-04 | `cc0-sources.json` (SCH-AST-04) | `[{name, domain, contentKinds: ('model'\|'material'\|'hdri'\|'audio')[], approvedBy, approvedAt, apiKind:'polyhaven'\|'page', licenseSelector?: string /*CSS selector cho trang*/, licensePattern?: string}]`; `license-exceptions.json = [{assetUrl, license, approvedBy, approvedAt, reason}]` |
-| DTO-AST-05 | Âm thanh (SCH-AST-05) | `{id, kind:'sfx'\|'ambience'\|'music'\|'voice', loop: bool, loopPoints?: {startS, endS}, lufs: -16, durationS, files: {opus:'x.webm', aac:'x.m4a'}, tags, surface?: SurfaceKey /*bước chân*/}` |
+| DTO-AST-05 | Âm thanh (SCH-AST-05) | `{id, kind:'sfx'\|'ambience'\|'music'\|'voice', loop: bool, loopPoints?: {startS, endS}, lufs: -16, durationS, files: {aac:'x.m4a'} /*ADR-037: bỏ Opus*/, tags, surface?: SurfaceKey /*bước chân*/}` |
 | DTO-AST-06 | `material.json` | `{id, maps: {baseColor, normal, orm, height?}, tiling: [u,v], sharp: ('baseColor'\|'normal'\|'orm')[] /*map dùng UASTC*/, paletteRole?: string, roughnessRange?: [a,b], source: MaterialSourceKind}` |
 | DTO-AST-07 | Thông số turntable | `{views: ['0.png','90.png','180.png','270.png'], inScene?: 'scene.png', stats: {lod0Tris, lod1Tris, lod2Tris, materials, maxTexture, sizeMB}, budgetCheck: Report1['checks'], hdri: 'studio_small_09', fov: 35}` |
 | DTO-AST-08 | Yêu cầu duyệt | `{decision: 'approve'\|'reject', reasonCode?: 'lech_phong_cach'\|'vuot_ngan_sach'\|'loi_hinh'\|'khac', reason?: string, scope?: 'one'\|'batch'}` |
@@ -251,11 +251,11 @@ Generator không đọc tệp, mạng, thời gian; xuất glTF với thứ tự
 ### PSC-AST-06 Turntable và thông số (ALG-AST-06)
 ```
 browser = chromium.launch(--use-gl=angle --use-angle=swiftshader) (dùng chung cho cả lô)
-page.goto(file://turntable/page/index.html?asset=...&hdri=studio_small_09)
-page: renderer 512², PMREM(hdri), camera FOV 35°, khoảng cách = radius(aabb)/sin(17.5°)·1.1, cao 25% chiều cao
-for yaw in [0, 90, 180, 270]: xoay mô hình, render, toDataURL → PNG
+page.goto(file://turntable/page/index.html?player=<engineVersion>&turntable=<asset>&hdri=studio_small_09)
+player (CR-02): canvas 512², IBL cubemap + SH của HDRI (PSC-AST-10), camera FOV 35°, khoảng cách = radius(aabb)/sin(17.5°)·1.1, cao 25% chiều cao
+for yaw in [0, 90, 180, 270]: SendMessage('GameStudio','TurntableYaw', yaw) → chờ sự kiện gs:frame → canvas.toDataURL → PNG
 inScene: nếu có placedObjects dùng asset trong zone đầu → góc chuẩn đầu tiên của zone; không → cảnh mẫu `_template`
-stats = {lod*Tris, materials, maxTexture, sizeMB (sau Meshopt + KTX2 thử)}; budgetCheck = evaluate(stats, assetCaps[kind]) (DDD-00 PSC-GEN-04)
+stats = {lod*Tris, materials, maxTexture, sizeMB (sau Meshopt + KTX2 thử)} (đọc từ glb ở Node, không phụ thuộc player); budgetCheck = evaluate(stats, assetCaps[kind]) (DDD-00 PSC-GEN-04)
 ```
 
 ### PSC-AST-07 Credit (ALG-AST-07)
@@ -272,7 +272,7 @@ credits(build):
 
 ### PSC-AST-09 Vật liệu ba nguồn (ALG-AST-09)
 ```
-procedural: đồ thị JSON {nodes: noise|voronoi|brick|wood|cloth|blend|levels, seed} → shader GLSL trong Playwright → PNG 2048/4096
+procedural: đồ thị JSON {nodes: noise|voronoi|brick|wood|cloth|blend|levels, seed} → numpy (engine/build/py/texproc, RNG Pcg32 theo seed) → PNG 2048/4096 (CR-02: bỏ shader GLSL trong Playwright)
 cc0_scan:   tải Poly Haven 4K (diff, nor_gl, rough, metal, ao) → đổi tên chuẩn → ORM = (R=ao, G=rough, B=metal) bằng sharp
 ai_texture: AiMediaClient.generateImage(task 'texture', size 2048)
   tileable(img): for 4 mép: d = meanΔE(Lab(strip 8 px mép trái), Lab(strip 8 px mép phải)) ; ok nếu max d ≤ 3 (OIT-AST-02)
@@ -281,14 +281,14 @@ normal từ height (Sobel) khi nguồn không có normal
 ```
 
 ### PSC-AST-10 HDRI (ALG-AST-10)
-Tải `.hdr`/`.exr` 4K; tier Thấp/Vừa giảm 2K; PMREM tính sẵn ở build bằng Three.js headless (`PMREMGenerator.fromEquirectangular`) → đọc render target cubeUV → mã RGBM → KTX2 UASTC; runtime gán trực tiếp `scene.environment` từ texture cubeUV (không tính PMREM lúc chạy).
+Tải `.hdr`/`.exr` 4K; tier Thấp/Vừa giảm 2K; ở build (CR-02) Python/numpy chiếu equirect → cubemap 6 mặt, tiền lọc GGX theo mip (độ nhám 0…1, 6 mip, lấy mẫu quan trọng 256 mẫu/texel, seed cố định) → mã RGBM → KTX2 UASTC; tính 9 hệ số SH bậc 2 cho ánh sáng môi trường → `hdri/<id>.sh.json`. Runtime gán cubemap cho `RenderSettings.customReflectionTexture` và SH cho `RenderSettings.ambientProbe` (không tính lọc lúc chạy).
 
 ### PSC-AST-11 Âm thanh (ALG-AST-11)
 ```
 loudnorm 2 lượt: ffmpeg -i in -af loudnorm=I=-16:TP=-1.5:LRA=11:print_format=json -f null -  → đọc measured_*
                  ffmpeg -i in -af loudnorm=I=-16:...:measured_I=..:linear=true out.wav
 loop: tìm zero-crossing gần startS/endS nhất (±20 ms); crossfade 50 ms (acrossfade) phần cuối vào đầu
-encode: opus 96 kbps (ambience 64 kbps mono): ffmpeg -c:a libopus -b:a 96k x.webm ; aac 128 kbps x.m4a
+encode (ADR-037): ffmpeg -c:a aac -b:a 128k x.m4a (ambience, voice: 96k mono -ac 1); loopPoints trừ độ trễ priming của AAC (đọc từ ffprobe start_time) rồi kiểm mép không click
 ambience: world.ambience[] {regionId|zoneId, todIds[], ref, volume} → runtime chọn theo vùng + mốc (DDD-04 audio)
 bước chân: surface tại chân → footstepSet của surface (DTO-WLD-06)
 ```
@@ -360,7 +360,7 @@ LIMIT 48 OFFSET $page*48;
 | CFG-AST-02 | `assetCaps` trong `budgets.json` | prop nhỏ 3k, prop vừa 8k, nhà 15k, cây 8k, nhân vật 12k, động vật 8k tri LOD0 (DDD đề xuất) | `games/<id>/data/budgets.json` |
 | CFG-AST-03 | Tải | 500 MB, 60 s, chỉ HTTPS | `safe-fetch.ts` |
 | CFG-AST-04 | `batchConfirmThreshold` | 2 USD (OI-AST-04) | `ai_config` / `tools/ai-prices.json` |
-| CFG-AST-05 | Âm thanh | −16 LUFS, Opus 96 kbps, nền 64 kbps mono, AAC 128 kbps | `audio/src/encode.ts` |
+| CFG-AST-05 | Âm thanh | −16 LUFS, AAC/M4A 128 kbps stereo, nền và giọng 96 kbps mono (ADR-037) | `audio/src/encode.ts` |
 | CFG-AST-06 | Đồng bộ màu | hệ số pha 0,7 (TSD đề xuất), tileable ΔE ≤ 3 | `material-sync.ts`, `tileable.ts` |
 
 ---
@@ -433,3 +433,4 @@ LIMIT 48 OFFSET $page*48;
 |---|---|---|---|
 | 0.1 | 22/11/2026 | Claude | Bản đầu từ TSD-03 v1.1 |
 | 1.0 | 23/11/2026 | Huy | Duyệt bộ DDD; thay đổi sau đây theo change request |
+| 1.1 | 26/11/2026 | Claude | CR-02 (ADR-036), POC-U1, ADR-037: MOD-AST-10 và PSC-AST-06 turntable bằng Unity player `?turntable=`; MOD-AST-11, PSC-AST-09 texture thủ tục bằng numpy; MOD-AST-12, PSC-AST-10 HDRI cubemap + SH bằng Python; MOD-AST-13, PSC-AST-11, DTO-AST-01, 05, CFG-AST-05 âm thanh chỉ AAC/M4A |

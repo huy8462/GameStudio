@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | UIUX-03 |
-| Phiên bản | 1.0 |
-| Ngày | 23/11/2026 |
+| Phiên bản | 1.1 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | UIUX-00 `UIUX-00-TONG-QUAN.md` |
 | SRS nguồn | SRS-08 FR-WEB-21…30, 62 (v1.2); SRS-01 v1.1 mục 7 (SCR-INT-01, 02), FR-INT-33; SRS-02 mục 7 (SCR-WLD-01, 02); SRS-03 mục 7 (SCR-AST-01, 02); SRS-05 mục 7 (SCR-CHR-01…03); SRS-06 v1.1 mục 7 (SCR-CBT-02); SRS-07 mục 7 (SCR-DLG-01) |
-| DDD nguồn | DDD-08 mục 3.4 (`panel-registry`, `EditorBridge`), DDD-01/02/03/05/06/07 (DTO của dữ liệu tương ứng) |
+| DDD nguồn | DDD-08 v1.1 mục 3.4 (`panel-registry`, `EditorBridge` gọi Unity player, CR-02), DDD-01/02/03/05/06/07 (DTO của dữ liệu tương ứng) |
 | Mã nguồn | `web/app/src/features/workspace/**` và thư mục panel của từng nhóm, đăng ký qua `panel-registry.ts` (MOD-WEB-23) |
 | Pha | W1 (SCR-INT-02), W3 (đa số), W4 (SCR-WLD-01, SCR-AST-02, JSON thô) |
-| Trạng thái | Đã duyệt (Huy, 23/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 23/11/2026); **v1.1 khung xem trước nhúng Unity player theo CR-02 và POC-U1**, chờ Huy xem lại |
 
 ---
 
@@ -137,7 +137,7 @@ Hết hạn:       ⊘ Game đã đổi sau khi đề xuất được tạo. [T�
 |---|---|---|
 | Trường | CMP-GEN-02 với mặc định, min–max, đơn vị; nút ↺ "Về mặc định" từng trường | FR-WLD-36 |
 | Huy hiệu ảnh hưởng | Từ `x-impact` của schema; `build:<bước>` hiện tên bước khi rê chuột và ước lượng phút | FR-WLD-38 |
-| Thanh trượt áp nóng | Kéo cập nhật xem trước liên tục (giới hạn 10 lần/giây), lưu một `OpGroup` khi thả | FR-WEB-17, UXR-WLD-01 |
+| Thanh trượt áp nóng | Kéo cập nhật xem trước liên tục (giới hạn 10 lần/giây, mỗi lần một `SendMessage` tới Unity player; CR-02), lưu một `OpGroup` khi thả | FR-WEB-17, UXR-WLD-01 |
 | Mốc thời điểm | Tối đa 6; thêm mốc → cần bake | SRS-02 mục 7.2 |
 
 ### WF-WLD-02 Bản đồ vùng (SCR-WLD-02, mở rộng)
@@ -429,3 +429,4 @@ Mỗi panel có ba trạng thái CMP-GEN-14. Trạng thái rỗng: NPC "Game ch�
 | 0.2 | 23/11/2026 | Claude | Đổi phiên bản cùng bộ UIUX v0.2, nội dung không đổi |
 | 0.3 | 23/11/2026 | Claude | WF-INT-01: mục "Cập nhật brief" khi đề xuất mở rộng phạm vi (FR-INT-33) và trạng thái khi mở lại game (FR-WEB-62) |
 | 1.0 | 23/11/2026 | Huy | Duyệt bộ UIUX (gồm đề xuất trong các mục Open item, luồng làm tiếp/cập nhật game và prototype trong `prototype/`); thay đổi sau đây theo change request |
+| 1.1 | 26/11/2026 | Claude | CR-02 (ADR-036): nguồn DDD-08 v1.1; thao tác trên khung xem trước (vẽ, chọn, gizmo, áp nóng) chạy trong Unity player qua `EditorBridge`; hành vi người dùng không đổi |

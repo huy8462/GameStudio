@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | UIUX-02 |
-| Phiên bản | 1.0 |
-| Ngày | 23/11/2026 |
+| Phiên bản | 1.1 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | UIUX-00 `UIUX-00-TONG-QUAN.md` |
 | SRS nguồn | SRS-08 v1.2 (UC-WEB-02…07, 10…12, FR-WEB-02…41, 46, 50, 60…69, SCR-WEB-01…09, 14, 19, MSG-WEB-01…06, ERR-WEB-01…15, QT-WEB-10, 11); SRS-01 v1.1 (UC-INT-01…04, 07, FR-INT-01…08, 13…19, 31…34); SRS-00 v1.2 mục 4.4 (giai đoạn và cờ tiến độ); SRS-04 v1.1 mục 6.6 (báo cáo tiến độ) |
-| DDD nguồn | DDD-08 v1.0 (EP-WEB-01…32, 38, 52…56; DTO-WEB-03…09, 16…18; MOD-WEB-20…25, 37; SEQ-WEB-01…05, 07…09; PSC-WEB-13, 14, 19…23; STM-WEB-06, 07); DDD-04 v1.0 (DTO-CLI-06, DTO-CLI-07); DDD-00 v1.0 (DTO-GEN-08) |
+| DDD nguồn | DDD-08 v1.1 (EP-WEB-01…32, 38, 52…56; DTO-WEB-03…09, 16…18; MOD-WEB-20…25, 37; SEQ-WEB-01…05, 07…09; PSC-WEB-13, 14, 19…23; STM-WEB-06, 07); DDD-04 v1.0 (DTO-CLI-06, DTO-CLI-07); DDD-00 v1.0 (DTO-GEN-08) |
 | Mã nguồn | `web/app/src/features/{auth, library, account, intake, workspace, jobs, versions, share, notifications, play, progress, import, upgrade}/**`, `web/app/src/preview/**` |
 | Pha | W1…W4 (theo pha của từng SCR) |
-| Trạng thái | Đã duyệt (Huy, 23/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 23/11/2026); **v1.1 khung xem trước nhúng Unity player theo CR-02 và POC-U1**, chờ Huy xem lại |
 
 ---
 
@@ -46,7 +46,7 @@ Lần đầu đăng nhập thành công: thư viện rỗng hiện lời chào v
 | 3 | SCR-WEB-04 bước Làm rõ | Trả lời ≤ 5 câu/vòng, ≤ 2 vòng, hoặc "Dùng mặc định cho tất cả" (trừ câu mâu thuẫn) | EP-WEB-05 | 2–5 phút |
 | 4 | SCR-WEB-04 bước Brief | Đọc brief một trang; Xác nhận / Sửa / Huỷ | EP-WEB-06 tạo game + job đường nhanh "Build zone đầu tiên" | 2–5 phút |
 | 5 | SCR-WEB-05 | Thấy thẻ job trong chat và chỉ báo trên thanh trên; có thể đọc brief, trả lời style bible trong lúc chờ | Job build + QA nhẹ, bỏ bake | ≤ 15 phút (NFR-GEN-05) |
-| 6 | SCR-WEB-05 | Khung xem trước nạp zone đầu tiên, camera người chơi; toast "Bản xem trước đã sẵn sàng" | SSE `job.done` → `EditorBridge.load` | ≤ 10 s (NFR-WEB-07) |
+| 6 | SCR-WEB-05 | Khung xem trước nạp zone đầu tiên, camera người chơi; toast "Bản xem trước đã sẵn sàng" | SSE `job.done` → `EditorBridge.load`; lần đầu trong phiên nạp Unity player trước (CMP-GEN-33) | ≤ 10 s (NFR-WEB-07) khi player đã nạp trong phiên; lần đầu cộng thời gian nạp player ≤ 20 s (NFR-RTM-01, POC-U1) |
 
 Tổng ≤ 30 phút (NFR-WEB-08). Trong bước 5 hệ thống gợi ý duyệt style bible (SCR-INT-02) bằng tin nhắn hệ thống trong chat; không bắt buộc để xem bản đầu.
 
@@ -370,7 +370,7 @@ Bố cục theo SRS-08 mục 7.1 (OIU-GEN-01): cột trái 360 px (tab Chat · C
 | Trạng thái khoá | CMP-GEN-16; vào game tự xin khoá (EP-WEB-15), nhịp 60 s; không thao tác 15 phút → nhả, hiện băng "Bạn đã rời quyền sửa do không thao tác. [Sửa tiếp]" (TXT-WEB-13) | FR-WEB-24, UC-WEB-04 |
 | Cột trái | 360 px; nút `«` thu thành thanh 48 px chỉ có biểu tượng tab và chấm tin mới; ba tab Chat, Cây (CMP-GEN-21), Asset (WF-AST-02 dạng thu gọn) | SRS-08 mục 7.1, OIU-GEN-01 |
 | Chat | CMP-GEN-07; cuộn vô hạn lên trên (EP-WEB-11 `before`); ô tìm trong lịch sử (biểu tượng 🔎 đầu tab, `q`); thẻ đề xuất (WF-INT-01), thẻ job (CMP-GEN-09), tin hệ thống (asset chờ duyệt → nút "Mở duyệt asset", FR-WEB-15) | FR-WEB-10, FR-WEB-12, FR-WEB-14, FR-WEB-15 |
-| Khung xem trước | Canvas của `EditorBridge`; thanh công cụ CMP-GEN-18; lớp phủ CMP-GEN-19; viền chọn màu `--gs-select`; thanh gizmo nổi dưới đáy khi có đối tượng chọn (WF-WEB-06) | FR-WEB-16, FR-WEB-18, FR-WEB-20 |
+| Khung xem trước | Canvas của Unity player qua `EditorBridge` (CR-02; player nạp một lần mỗi phiên trang, giữ khi đổi game hoặc có build mới); thanh công cụ CMP-GEN-18; lớp phủ CMP-GEN-19; viền chọn màu `--gs-select`; thanh gizmo nổi dưới đáy khi có đối tượng chọn (WF-WEB-06) | FR-WEB-16, FR-WEB-18, FR-WEB-20 |
 | Bảng phải | 400 px; dải tab panel (đăng ký từ `panel-registry`, chỉ hiện panel có `when(doc)` đúng, ví dụ Cân bằng khi bật chiến đấu/săn); mặc định "Thuộc tính" (CMP-GEN-22); lỗi schema dưới trường | FR-WEB-30, FR-WEB-28 |
 | Chỉ xem | Bảng phải chỉ đọc (ô nhập thành chữ), không gizmo, ô chat chỉ hỏi; băng mỏng đầu khung xem trước "Chỉ xem" | SRS-08 mục 3.2 |
 | Hết hạn mức AI | Ô chat vô hiệu + câu ERR-WEB-05 | SRS-08 mục 7.2 |
@@ -383,9 +383,11 @@ Trạng thái riêng:
 | Trạng thái | Hiển thị |
 |---|---|
 | Chưa có bản build | Khung xem trước: minh hoạ + "Game chưa có bản xem trước." + nút `primary` **Build zone đầu tiên** (vô hiệu khi brief chưa xác nhận) (SRS-08 mục 7.2) |
-| Đang nạp bản build | Thanh tiến độ trong khung, "Đang nạp zone z1… 60%"; > 10 s ghi log chỉ số NFR-WEB-07 |
+| Đang nạp trình chạy game (lần đầu trong phiên, CR-02) | CMP-GEN-33 pha 1 "Đang tải trình chạy game… 4,2/9,2 MB"; lần đầu chưa cache thêm TXT-WEB-35; > 20 s → TXT-WEB-36 + Thử lại |
+| Đang nạp bản build | CMP-GEN-33 pha 2 "Đang nạp zone z1… 60%"; > 10 s ghi log chỉ số NFR-WEB-07 |
 | Bản build cũ hơn dữ liệu | Chấm vàng trên nút Build + nhãn ở góc khung "Bản xem trước là #38, dữ liệu là #42" (TXT-WEB-14) |
-| Lỗi nạp engine | Khung: "Không mở được bản xem trước (WebGL2?)" + Thử lại + liên kết hướng dẫn trình duyệt (NFR-GEN-10) |
+| Trình duyệt không hỗ trợ (CR-02) | Kiểm WebGL2 trước khi tải player; không có → khung hiện TXT-WEB-37 + liên kết hướng dẫn trình duyệt, không tải player (ERR-RTM-01, NFR-GEN-10) |
+| Lỗi nạp player | Khung: TXT-WEB-36 + Thử lại; lỗi lặp lại → gợi ý tải lại trang (xoá player hỏng khỏi bộ nhớ trang) |
 | Xung đột 409 | Hợp nhất tự động (MOD-WEB-21 `merge.ts`); không hợp nhất được → CMP-GEN-27 |
 | Game ở thùng rác / lưu trữ | Băng "Game đang lưu trữ – chỉ xem. [Đưa về Đang làm]" (chủ game) |
 
@@ -731,6 +733,9 @@ Câu của SRS dùng nguyên văn: MSG-WEB-01…04, ERR-WEB-01…12. Câu bổ s
 | TXT-WEB-32 | Báo cáo nhập: thiếu brief | "Chưa có brief. Studio sẽ soạn brief nháp từ dữ liệu để bạn xác nhận trước khi build." |
 | TXT-WEB-33 | Xuất bản bản mới | "Bản #{cu} giữ nguyên. Người đang giữ link cố định vẫn chơi bản #{cu} cho tới khi bạn chuyển link." |
 | TXT-WEB-34 | Ứng viên nâng cấp đã cũ | "Game đã đổi sau khi chạy nâng cấp. Hãy chạy lại để nâng cấp bản mới nhất." |
+| TXT-WEB-35 | Dòng phụ khi tải player lần đầu (v1.1) | "Lần đầu mở có thể mất khoảng 20 giây. Những lần sau nhanh hơn." |
+| TXT-WEB-36 | Tải player chậm hoặc lỗi (v1.1) | "Trình chạy game tải lâu hơn bình thường. Kiểm tra mạng rồi bấm Thử lại." |
+| TXT-WEB-37 | Trình duyệt không hỗ trợ (v1.1) | "Trình duyệt này không chạy được bản xem trước 3D (cần WebGL2). Hãy mở bằng Chrome hoặc Samsung Internet bản mới." |
 
 ---
 
@@ -844,3 +849,4 @@ Câu của SRS dùng nguyên văn: MSG-WEB-01…04, ERR-WEB-01…12. Câu bổ s
 | 0.2 | 23/11/2026 | Claude | Theo SRS-08 v1.1: thông báo MSG-WEB-05 (quản trị thu hồi link/gỡ bản xuất bản) và chuyển chủ game trong WF-WEB-16 |
 | 0.3 | 23/11/2026 | Claude | Luồng xây dựng cho game đang làm dở hoặc đã có (Huy yêu cầu 23/11/2026; theo SRS-08 v1.2, SRS-01 v1.1, TSD-08 v1.3, DDD-08 v1.0 phần CR-01): mục 2.1, UF-WEB-11…14, WF-WEB-19 (bảng Tiến độ, hộp Build phần thay đổi, hộp Duyệt nâng cấp), WF-WEB-02 thêm lọc Đang dở, Làm tiếp, thẻ Bản nháp, hộp Nhập game; WF-WEB-05 chip giai đoạn, MSG-WEB-06, mở lại game; WF-WEB-09 xuất bản bản mới, chế độ link; UXR-WEB-09…11, TXT-WEB-24…34, UT-WEB-09…11; chốt OIU-WEB-05, thêm OIU-WEB-06, 07 |
 | 1.0 | 23/11/2026 | Huy | Duyệt bộ UIUX (gồm đề xuất trong các mục Open item, luồng làm tiếp/cập nhật game và prototype trong `prototype/`); thay đổi sau đây theo change request |
+| 1.1 | 26/11/2026 | Claude | CR-02 (ADR-036), POC-U1: luồng tạo game bước 6 (nạp player lần đầu), khung xem trước nhúng Unity player, trạng thái nạp player / trình duyệt không hỗ trợ / lỗi nạp player (CMP-GEN-33), TXT-WEB-35…37 |

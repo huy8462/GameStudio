@@ -287,10 +287,10 @@ Tập gồm mọi FR, NFR, UC, SCR, ERR, MSG của SRS-08 và mọi màn hình k
 |---|---|---|---|---|---|---|
 | WF | 0 | 0 | 13 | 12 | 8 | 33 |
 | UF | 0 | 0 | 14 | 4 | 5 | 23 |
-| CMP | 0 | 32 | 0 | 0 | 0 | 32 |
+| CMP | 0 | 33 | 0 | 0 | 0 | 33 |
 | TOK | 0 | 8 | 0 | 0 | 0 | 8 |
 | UXR | 7 | 13 | 11 | 5 | 5 | 41 |
-| TXT | 0 | 8 | 34 | 6 | 9 | 57 |
+| TXT | 0 | 8 | 37 | 6 | 9 | 60 |
 | UT | 0 | 5 | 11 | 4 | 5 | 25 |
 | OIU | 7 | 0 | 7 | 2 | 4 | 20 |
 | SCR-ADM | 0 | 0 | 0 | 0 | 4 | 4 |
@@ -300,5 +300,5 @@ Tập gồm mọi FR, NFR, UC, SCR, ERR, MSG của SRS-08 và mọi màn hình k
 
 - Mã bắt buộc: 141; đã phủ: 141; chưa phủ: 0
 - Mã SRS khác được phủ: 101
-- Mã UIUX định nghĩa: 254; trùng: 0
+- Mã UIUX định nghĩa: 258; trùng: 0
 - Vấn đề: 0

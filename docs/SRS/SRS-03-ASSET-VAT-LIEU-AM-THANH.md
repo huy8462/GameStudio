@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | SRS-03 |
-| Phiên bản | 1.0 |
-| Ngày | 22/11/2026 |
+| Phiên bản | 1.1 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | SRS-00 `SRS-00-TONG-QUAN.md` |
 | BRD nguồn | BRD-03 v0.1; BRD-00 v0.5 (BR-15…21, BR-62 phần nguồn, BR-67, BR-96, BR-109, BR-113) |
 | Module | `asset-import`, `asset-forge`, `kit-builder`, `materials`, phần âm thanh của `ui-audio`; skill `engine-cc0`, `engine-texture-proc`, `engine-asset-forge`, `engine-materials`, `threejs-image-generator`, `threejs-audio-generator`; lệnh `/asset-recipe` |
 | Nhóm mã | `AST` |
 | Pha | E2 (vật liệu), E4 (asset 3D), E6 (âm thanh), W3 (duyệt trên web), W4 (kho asset, credit) |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.1 âm thanh AAC theo ADR-037 (POC-U1, CR-02), chờ Huy xem lại |
 
 ---
 
@@ -154,7 +154,7 @@ Ngoại lệ: nguồn ngoài danh sách trắng → ERR-AST-01; license không p
 | FR-AST-21 | Hiệu ứng: bước chân theo loại bề mặt (SRS-02 mục 6.4), tương tác, UI | BR-19.2 | S | E6 |
 | FR-AST-22 | Tiếng động vật theo loài và hành vi (SRS-05 FR-CHR-28) | BR-67, BR-67.1 | S | E6 |
 | FR-AST-23 | Nguồn âm thanh: ElevenLabs (QĐ-09) hoặc CC0; cùng quy tắc provenance | BR-19, BR-19.3 | M | E6 |
-| FR-AST-24 | Âm thanh nén Opus/WebM (fallback AAC/M4A), chuẩn hoá âm lượng −16 LUFS (đề xuất), âm nền cắt lặp không có tiếng click ở mép | BR-19.4 | M | E6 |
+| FR-AST-24 | Âm thanh nén AAC/M4A, một định dạng (ADR-037; POC-U1: Unity Web không phát Ogg/Opus), chuẩn hoá âm lượng −16 LUFS (đề xuất), âm nền cắt lặp không có tiếng click ở mép | BR-19.4 | M | E6 |
 | FR-AST-25 | Nhạc nền theo mô tả; nguồn CC0 hoặc dịch vụ được phép (OI-AST-02) | BR-19.5 | C | E6 |
 
 ### 4.5 Provenance và credit
@@ -358,3 +358,4 @@ Endpoint web: API-WEB-40…44 (SRS-08 mục 8).
 |---|---|---|---|
 | 0.1 | 22/11/2026 | Claude | Bản đầu từ BRD-03 v0.1 |
 | 1.0 | 22/11/2026 | Claude | Huy duyệt; chấp nhận các giá trị "(đề xuất)" và đề xuất của Open item làm giá trị nền; đổi trạng thái sang Đã duyệt |
+| 1.1 | 26/11/2026 | Claude | ADR-037 (POC-U1, CR-02): FR-AST-24 âm thanh chỉ AAC/M4A, bỏ Opus/WebM |

@@ -149,4 +149,16 @@ Script truy vết: `srs-trace.py`, `tsd-trace.py`, `ddd-trace.py` đều exit 0 
 
 POC-U1 xong 26/11/2026: docs/POC/POC-U1.md (ngân sách tải Huy chốt 26/11/2026).
 
-Còn lại (sau POC-U1, theo mục 8): TSD/DDD-02, 03, 05, 08 (render địa hình/thực vật, turntable, BVH/recast → Unity Physics/AI Navigation, EditorBridge), TSD/DDD-01, 07, 09 (tên skill, MCP), UIUX-01…03, ngân sách SRS-04 §6.3; phiếu mã doctor/versions và skill `.claude`.
+Cập nhật tài liệu chi tiết sau POC-U1 (26/11/2026, Huy đồng ý làm):
+
+| Tài liệu | Phiên bản mới | Nội dung |
+|---|---|---|
+| ADR-037, ADR README | — | Âm thanh AAC/M4A thay Opus (thay ADR-024 phần âm thanh; POC-U1 Q7) |
+| SRS-00 / 03 / 04 / 05 / 09 | 1.5 / 1.1 / 1.4 / 1.1 / 1.3 | Định dạng âm thanh; FR-AST-24; §6.3 `playerMB`, `coreZoneMB`, `coreTextureMax`, §6.5 `modules`, QT-RTM-02; FR-CHR-18 NavMesh lúc nạp; FR-DEV-04, H-05 |
+| TSD-00 | 1.5 | §11 lộ trình E2…E6, W2, W3; TST-GEN-04 |
+| TSD-02 / 03 / 05 / 06 / 07 / 08 / 09 | 1.2 / 1.2 / 1.2 / 1.2 / 1.2 / 1.4 / 1.3 | Collider, instancing, IBL, Shader Graph; turntable bằng player, texture numpy, HDRI cubemap + SH, AAC; AI Navigation, `CharacterController`; combat trong player; giọng M4A; xem trước nhúng player; versions/doctor/MCP |
+| DDD-00 / 02 / 03 / 04 / 05 / 06 / 07 / 08 / 09 | 1.2 / 1.1 / 1.1 / 1.2 / 1.1 / 1.1 / 1.1 / 1.1 / 1.1 | Runtime C# `engine/unity`, NavMesh theo ô, làm ấm shader, texture lõi ≤ 1024, glb `scene`, `manifest.modules`, `EditorBridge` qua `SendMessage` |
+| UIUX-01 / 02 / 03 | 1.1 | CMP-GEN-33 màn chờ tải player, trạng thái trình duyệt không hỗ trợ, TXT-WEB-35…37 |
+| HANDOFF-API | — | §3 ADR-036, 037, POC-U1; §6 kế hoạch E2 |
+
+Còn lại: phiếu mã doctor/versions và skill `.claude` (E2); phần AI khi chạy của SRS/TSD/DDD-07 chờ change request W1 theo ADR-035.

@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | TSD-08 |
-| Phiên bản | 1.3 (đã duyệt) |
-| Ngày | 22/11/2026 |
+| Phiên bản | 1.4 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | TSD-00 `TSD-00-TONG-QUAN.md` |
 | SRS nguồn | SRS-08 v1.1 (FR-WEB-01…59, NFR-WEB-01…09) |
 | Quyết định | QĐ-15: Web Studio tự xây, chỉ người được mời; TD-12 (frontend), TD-13 (backend), TD-14 (kho đối tượng), TD-15 (xác thực), TD-16 (dịch vụ AI), TD-17 (triển khai) ở TSD-00 mục 3 |
 | Gói | `web/app` (SPA), `web/api` (Fastify), `web/worker` (nhận job, gọi `engine`), `web/ai-gateway` (giữ khoá), `web/shared` (DTO, mã lỗi, ma trận quyền), `web/deploy` |
 | Pha | W1…W4 (song song engine từ sau G-E1, OI-WEB-09) |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026; bản 1.3 gồm CR-01 duyệt 23/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026; bản 1.3 gồm CR-01 duyệt 23/11/2026); **v1.4 xem trước nhúng Unity player theo CR-02**, chờ Huy xem lại |
 
 ---
 
@@ -31,7 +31,7 @@ Số lấy từ SRS đã chốt (Huy duyệt SRS 22/11/2026); số có nhãn **(
 flowchart LR
     subgraph Browser[Trình duyệt]
         SPA[web/app SPA React]
-        ENG[@gamestudio/engine nhúng trong khung xem trước]
+        ENG[Unity player nhúng trong khung xem trước]
         PLAY[Trang chơi /p/:token]
     end
     subgraph Server[Máy chủ Linux - Docker Compose]
@@ -83,7 +83,7 @@ web/
   deploy/   compose.yaml  Caddyfile  Dockerfile.node  Dockerfile.worker  backup/
 ```
 
-Luật phụ thuộc (TSD-00 mục 4.2): `web/app` chỉ import `web/shared`, `@gamestudio/engine`, `@gamestudio/schema` (bộ kiểm, `applyPatch`); không import `web/api`, `web/ai-gateway`.
+Luật phụ thuộc (TSD-00 mục 4.2): `web/app` chỉ import `web/shared`, `@gamestudio/schema` (bộ kiểm, `applyPatch`); Unity player nạp lúc chạy qua `createUnityInstance`, không import (CR-02); không import `web/api`, `web/ai-gateway`.
 
 ---
 
@@ -115,7 +115,9 @@ Store Zustand giữ `{gameId, baseVersion, doc (bản JSON đang sửa), pending
 - Lưu tự động: bộ đếm 2 s sau thao tác cuối gửi `pending` qua API-WEB-24 (FR-WEB-27); thành công → `baseVersion` mới; 409 → ALG-WEB-04 bước hợp nhất.
 
 ### 3.4 Khung xem trước và cầu nối engine (IF-WEB-05)
-Khung xem trước là `<canvas>` do `@gamestudio/engine` cùng `engineVersion` với bản xuất bản quản lý (FR-WEB-16), nạp động từ `/engine/<semver>/` theo `publish.json`/`manifest.json` của bản build mới nhất. SPA chỉ nói chuyện với engine qua `EditorBridge` (mục 4.1).
+Khung xem trước là `<canvas>` do **Unity player** cùng `engineVersion` với bản xuất bản quản lý (FR-WEB-16; CR-02, ADR-036), nạp bằng `createUnityInstance` từ `/engine/<semver>/Build/` (Brotli, ≤ 10 MB theo TSD-00 §7.4) theo `publish.json`/`manifest.json` của bản build mới nhất. SPA chỉ nói chuyện với player qua `EditorBridge` (mục 4.1): gọi `SendMessage`, nhận sự kiện `gs:*` từ `.jslib`.
+
+CR-02, POC-U1: player chỉ nạp **một lần mỗi phiên trang** và giữ khi đổi game, đổi zone hay có build mới (chỉ `Boot` lại với manifest mới), vì nạp player trên A56 mất 9,1 s lần đầu và 3,8 s khi đã cache. Trước khi nạp, SPA kiểm WebGL2 (không có → thông báo lỗi trình duyệt, ERR-RTM-01, NFR-GEN-10). Trong lúc nạp, khung hiện màn chờ có thanh tiến độ hai pha (tải player, rồi tải zone) thay cho skeleton (UIUX-02). Gizmo, chọn, vẽ địa hình làm trong player (C#).
 
 ### 3.5 Tiếng Việt và định dạng
 - Chuỗi giao diện trong `src/i18n/vi.json` (khoá phẳng `scr.web05.build.tooltip`), hàm `t()` tự viết, không thư viện i18n nặng; chỉ một ngôn ngữ ở bản đầu nhưng không viết cứng chuỗi trong JSX (lint `no-literal-string` trên `src/features/**`) (NFR-GEN-13, NFR-WEB-04).
@@ -145,7 +147,7 @@ Mỗi màn hình có ba trạng thái chuẩn (đang tải skeleton, rỗng có 
 | IF-WEB-02 | SSE | `GET /api/events?game=<id>` (một kết nối cho mỗi tab) và `GET /api/jobs/{id}/events` (API-WEB-31). Sự kiện: `job.progress {jobId, step, status, pct, etaS}`, `job.done {jobId, result, reportRefs}`, `data.version {gameId, version, author, impact}`, `lock.changed {gameId, holder}`, `proposal.created`, `asset.pending`, `notify {id, kind}`, `quota.warn {kind, pct}`. Nguồn: `LISTEN gs_events` của PostgreSQL; heartbeat 20 s; `Last-Event-ID` để nối lại (đọc bù từ bảng `events_outbox` 1 giờ) |
 | IF-WEB-03 | API nội bộ `ai-gateway` | Mạng Docker nội bộ, xác thực bằng token dịch vụ (`Authorization: Bearer`, mỗi dịch vụ gọi một token, so sánh hằng thời gian). `POST /internal/llm {task, userId, gameId, messages, schema?, maxTokens?}` → `{output, stopReason, usage, costUsd, model}`; `POST /internal/image {task, prompt, refs[], size}`; `POST /internal/audio {task, text, voiceId \| prompt}`; trước khi gọi kiểm hạn mức (ALG-WEB-05), sau khi gọi ghi `usage_records` + `llm_calls`. API-DLG-01…03 cho game ở TSD-07 |
 | IF-WEB-04 | Hợp đồng job (api ↔ worker) | pg-boss hàng `job.<loại>`; dữ liệu `{jobId, gameId, type, params, dataVersion, snapshotRef, requestedBy, attempt}`; worker báo tiến độ bằng `UPDATE jobs` + `NOTIFY gs_events`; kết quả: báo cáo JSON `report/1` (TSD-04 SCH-RTM-05) lưu `job_reports`, tệp đầu ra lên `builds/<gameId>/<buildId>/`. Mã kết quả `ok \| fail_data \| fail_env \| cancelled` (chỉ `fail_env` được thử lại) |
-| IF-WEB-05 | `EditorBridge` (SPA ↔ engine) | `load(manifestUrl, {zone, tier, mode})`, `applyRuntimePatch(ops)` (chỉ nhóm "chỉ runtime", SRS-04 mục 6.2), `setCamera(mode \| viewId)`, `setTimeOfDay(h)`, `simulateTier(tier)`, `pick(x, y) → {objectId, pointer}`, `highlight(objectId)`, `setGizmo(kind, snap)`, sự kiện `gizmoChange(pointer, value)`, `stats() → {fps, drawCalls, tris, gpuMemMB}`; engine phơi các hàm này qua `@gamestudio/engine/editor` (chỉ có trong gói dev, không có trong bản xuất bản) |
+| IF-WEB-05 | `EditorBridge` (SPA ↔ engine) | `load(manifestUrl, {zone, tier, mode})`, `applyRuntimePatch(ops)` (chỉ nhóm "chỉ runtime", SRS-04 mục 6.2), `setCamera(mode \| viewId)`, `setTimeOfDay(h)`, `simulateTier(tier)`, `pick(x, y) → {objectId, pointer}`, `highlight(objectId)`, `setGizmo(kind, snap)`, sự kiện `gizmoChange(pointer, value)`, `stats() → {fps, drawCalls, tris, gpuMemMB, wasmHeapMB}`; `pick`, `stats` trả qua sự kiện nên là bất đồng bộ; player chỉ bật các lệnh này khi `mode='preview'` (CR-02: không còn gói `@gamestudio/engine/editor`; chế độ editor có sẵn trong player, tắt ở bản chơi) |
 | IF-WEB-06 | Ánh xạ API | Bảng mục 4.3: mỗi API-WEB-* → route, hành động quyền (SCH-WEB-10), kiểm hạn mức, sự kiện kiểm toán |
 
 ### 4.2 Dữ liệu
@@ -403,3 +405,4 @@ Như TSD-00 mục 9.3; migration chỉ mở rộng trong một bản phát hành
 | 1.2 | 23/11/2026 | Claude | Theo SRS-08 v1.1: sửa sơ đồ mục 3.2 khớp SRS (chat cột trái), thêm mục 8.5 quản trị mở rộng, truy vết FR-WEB-51…59 |
 | 1.3 | 23/11/2026 | Claude | CR-01 (SRS-08 v1.2): mục 3.7, SCH-WEB-11, ánh xạ API-WEB-83…86, mục 5.1 ALG-WEB-15…19, TST-WEB-13…17, nguồn `upgrade`, job `upgrade`, truy vết FR-WEB-60…69 |
 | 1.3 | 23/11/2026 | Huy | Duyệt phần bổ sung CR-01 |
+| 1.4 | 26/11/2026 | Claude | CR-02 (ADR-036) sau POC-U1: sơ đồ, mục 3.4 khung xem trước nhúng Unity player (nạp một lần mỗi phiên, kiểm WebGL2, màn chờ hai pha), IF-WEB-05 qua `SendMessage`/`.jslib` |

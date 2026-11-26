@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | SRS-04 |
-| Phiên bản | 1.3 |
-| Ngày | 23/11/2026 |
+| Phiên bản | 1.4 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | SRS-00 `SRS-00-TONG-QUAN.md` |
 | BRD nguồn | BRD-04 v0.1; BRD-00 v0.5 (BR-06…09, BR-22…31, BR-40, BR-111 phần bản build); BRD-10 (BR-119, 122…125, v1.1) |
 | Module | Runtime: `core`, `camera-player` (phần chung), `ui-audio`, `interaction` (phần chung); Build: `packager`; `qa`; `cli` |
 | Nhóm mã | `RTM` (runtime, dữ liệu, ngân sách), `QA` (kiểm thử tự động), `CLI` (dòng lệnh, đóng gói, xuất bản) |
 | Pha | E0 (baseline), E1 (core, schema, QA khung, CLI), E2 (tier, zone, điều khiển), E3 (visual regression), E6 (bot playtest, vòng chơi) |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.1 bổ sung luồng làm tiếp và cập nhật game theo CR-01, Huy duyệt 23/11/2026; **v1.2 runtime Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại; v1.3 ngân sách tải theo POC-U1, Huy chốt 26/11/2026 |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.1 bổ sung luồng làm tiếp và cập nhật game theo CR-01, Huy duyệt 23/11/2026; **v1.2 runtime Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại; v1.3 ngân sách tải theo POC-U1, Huy chốt 26/11/2026; v1.4 mục 6.3, 6.5 và QT-RTM-02 theo POC-U1, chờ Huy xem lại |
 
 ---
 
@@ -203,7 +203,7 @@ Ví dụ FR-RTM-14: ngân sách draw call tier Vừa 120. Đo 100 → Pass; 112 
 | Mã | Quy tắc | Điều kiện, cách xử lý | Kết quả, ghi chú |
 |---|---|---|---|
 | QT-RTM-01 | Không qua cổng khi Fail tier Vừa | KHI báo cáo ngân sách mới nhất của bất kỳ zone nào có Fail ở tier Vừa THÌ `/gate-check` báo "Chưa đạt" | Nguồn QT-04-01 |
-| QT-RTM-02 | Đổi đồ hoạ kèm báo cáo hiệu năng | KHI phiếu sửa `engine/runtime/render/**`, shader, vật liệu, `budgets.json` THÌ phải đính kèm báo cáo `perf` | Hook nhắc (SRS-09). Nguồn QT-04-02 |
+| QT-RTM-02 | Đổi đồ hoạ kèm báo cáo hiệu năng | KHI phiếu sửa mã render của Unity player (`engine/unity/Assets/GameStudio/{Render,World,Characters}/**`, CR-02), shader, vật liệu, `budgets.json` THÌ phải đính kèm báo cáo `perf` | Hook nhắc (SRS-09). Nguồn QT-04-02 |
 | QT-RTM-03 | Thay đổi hiển thị kèm ảnh | KHI thay đổi nhìn thấy được với người chơi THÌ có ảnh chụp từ game đang chạy | Nguồn QT-04-03 |
 | QT-RTM-04 | Ưu tiên đọc số | Claude đọc `summary` trước; xem ảnh khi chỉ số báo khác biệt hoặc khi qua cổng, tối đa 4 ảnh | Nguồn QT-04-04 |
 | QT-RTM-05 | Cập nhật baseline có chủ ý | Như FR-QA-09 | Nguồn QT-04-05 |
@@ -263,6 +263,9 @@ Thay đổi **chỉ runtime** (không làm đổi hash bước nào, áp nóng t
 | `maxTexture` | 2048 | 2048 | 4096 | 4096 | BR-22 |
 | `memoryMB` | 350 | 500 | 800 | 1.200 | Đề xuất |
 | `zoneDownloadMB` | 35 | 50 | 80 | 120 | CH-03 (đề xuất) |
+| `coreZoneMB` (lõi zone xuất phát) | 8 | 8 | 8 | 8 | POC-U1, Huy chốt 26/11/2026 |
+| `playerMB` (Unity player, Brotli, dùng chung mọi tier) | 10 | 10 | 10 | 10 | POC-U1 (đo 9,18 MB), Huy chốt 26/11/2026 |
+| `coreTextureMax` (texture trong phần lõi, ETC1S) | 1024 | 1024 | 1024 | 1024 | POC-U1 (đề xuất): KTX2 2048 UASTC mất 8,0 s chuyển mã lần đầu trên A56 |
 | `skinnedCharacters` | 10 | 20 người + 30 thú | 35 + 50 | 50 + 80 | CH-15 (đề xuất) |
 | `closeUpCharacters` | 2 | 4 | 6 | 8 | CH-15 |
 | `flockInstances` | 100 | 200 | 400 | 600 | CH-15 |
@@ -272,6 +275,8 @@ Thay đổi **chỉ runtime** (không làm đổi hash bước nào, áp nóng t
 | `combat.attackers`, `combat.projectiles` | 2, 10 | 3, 20 | 4, 40 | 6, 60 | SRS-06 (đề xuất) |
 
 Tất cả số ngoài cột Vừa của draw call, vật liệu, texture là đề xuất, chốt sau đo baseline E0 (OI-RTM-01).
+
+CR-02, POC-U1 (26/11/2026): baseline E0 đo bằng scaffold Three.js không còn đại diện cho runtime. Cảnh nặng S1 trên Unity player đạt ~57 fps trung bình, p1 ≥ 45 fps với 57 draw call và ~0,96 triệu tri mỗi khung (gồm pass bóng), heap WASM ≤ 117 MB. Các số `trisStatic`, `trisTotal`, `drawCalls`, `memoryMB` giữ nguyên tới khi đo cảnh game thật ở G-E2 bằng Unity player; `memoryMB` tính cả heap WASM.
 
 ### 6.4 Báo cáo JSON chung
 
@@ -299,7 +304,7 @@ Tất cả số ngoài cột Vừa của draw call, vật liệu, texture là đ
 ```
 
 ### 6.5 `manifest.json` (rút gọn)
-`{gameId, publishVersion, engineVersion, schemaVersion, dataHash, tiers[], startZone, zones[{id, bounds, neighbors[], files{tier:[…]}, bytes{tier}}], fallbacks{}, runtimeData{entities, dialogue, interactions, state}, credits}`.
+`{gameId, publishVersion, engineVersion, schemaVersion, dataHash, tiers[], startZone, zones[{id, bounds, neighbors[], files{tier:[…]}, bytes{tier}}], modules{combat?, dialogueAi?}, fallbacks{}, runtimeData{entities, dialogue, interactions, state}, credits}`. `engineVersion` chọn Unity player dùng chung `/engine/<semver>/` (CR-02); `modules` bật module có sẵn trong player thay cho chunk JS.
 
 ### 6.6 Báo cáo tiến độ game (v1.1, CR-01)
 Đầu ra của `engine status --json` và API-WEB-83. Giai đoạn và cờ định nghĩa ở SRS-00 mục 4.4; báo cáo luôn tính lại từ dữ liệu, không lưu (SRS-08 QT-WEB-11).
@@ -446,3 +451,4 @@ Tất cả số ngoài cột Vừa của draw call, vật liệu, texture là đ
 | 1.1 | 23/11/2026 | Claude | CR-01 (Huy yêu cầu 23/11/2026: luồng xây dựng cho game đang làm dở hoặc đã có): thêm UC-CLI-03, 04, FR-CLI-08…12 (`status`, `build --stale`, `upgrade`, `import`, xuất bản bản mới), QT-RTM-08, mục 6.6 báo cáo tiến độ, ERR-CLI-02, 03, NFR-CLI-02, AC-CR01-04…06; Huy duyệt 23/11/2026 (giá trị "(đề xuất)" mới được chấp nhận làm giá trị nền) |
 | 1.2 | 25/11/2026 | Claude | CR-02 (runtime Unity, QĐ-16, ADR-036; Huy duyệt phân tích 25/11/2026): FR-RTM-03 (Unity player thay gói npm), FR-RTM-04 (logic qua dữ liệu, bỏ script TS riêng game), luồng khởi động bước 2, đo heap WASM, bước `navmesh` (NavMesh dựng lúc nạp), cây thư mục game, NFR-RTM-01, 03 |
 | 1.3 | 26/11/2026 | Claude | POC-U1 (docs/POC/POC-U1.md): NFR-RTM-01 đổi thành lần đầu ≤ 20 s, đã cache Unity player ≤ 10 s trên 4G 9 Mbps tier Vừa; Huy chốt 26/11/2026 |
+| 1.4 | 26/11/2026 | Claude | CR-02 sau POC-U1: mục 6.3 thêm `coreZoneMB`, `playerMB` (Huy chốt), `coreTextureMax` (đề xuất) và ghi chú số đo Unity; mục 6.5 thêm `modules`; QT-RTM-02 đường dẫn mã render Unity |

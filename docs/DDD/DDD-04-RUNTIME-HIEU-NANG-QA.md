@@ -3,8 +3,8 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | DDD-04 |
-| Phiên bản | 1.1 |
-| Ngày | 23/11/2026 |
+| Phiên bản | 1.2 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | DDD-00 `DDD-00-TONG-QUAN.md` |
 | TSD nguồn | TSD-04 v1.2 (IF-RTM-01…05, SCH-RTM-01…10, ALG-RTM-01…07, IF-CLI-01…04, ALG-CLI-01…08, ALG-QA-01…06, TST-RTM-01…08, TST-QA-01…04, TST-CLI-01…08); TSD-00 v1.2 (ALG-GEN-05, SCH-GEN-07) |
 | SRS nguồn | SRS-04 v1.1 (FR-RTM-01…23, FR-QA-01…10, FR-CLI-01…12, NFR-RTM-01…03, NFR-QA-01…02, NFR-CLI-01, 02; CR-01 làm tiếp/cập nhật game) |
@@ -181,7 +181,7 @@ export function diffPublish(prev: GameDataFiles, cur: GameDataFiles, max = 200):
 
 | Mã | Cấu trúc | Đặc tả |
 |---|---|---|
-| DTO-RTM-01 | `manifest.json` (SCH-RTM-04) | `{schema:'manifest/1', gameId, publishVersion?, engineVersion, schemaVersion, dataHash, tiers: Tier[], startZone, spawn: {zone, pos:[x,y,z], yaw}, zones: [{id, bounds: {min:[x,z], max:[x,z]}, neighbors: string[], parts: {[tier]: {core: FileRef[], full: FileRef[]}}, bytes: {[tier]: {core, full}}, lightmaps: {[todId]: {[tier]: FileRef[]}}, nav?: {[agentType]: FileRef}}], chunks: {combat?: FileRef, dialogueAi?: FileRef, recast?: FileRef}, fallbacks: {texture: 'png'\|'jpg'}, surfaceMap: FileRef, runtimeData: RuntimeData, credits: CreditGroup[]}`; `FileRef = {path, bytes, sha256}` |
+| DTO-RTM-01 | `manifest.json` (SCH-RTM-04) | `{schema:'manifest/1', gameId, publishVersion?, engineVersion, schemaVersion, dataHash, tiers: Tier[], startZone, spawn: {zone, pos:[x,y,z], yaw}, zones: [{id, bounds: {min:[x,z], max:[x,z]}, neighbors: string[], parts: {[tier]: {core: FileRef[], full: FileRef[]}}, bytes: {[tier]: {core, full}}, lightmaps: {[todId]: {[tier]: FileRef[]}}, nav?: {[agentType]: FileRef}}], modules: {combat?: true, dialogueAi?: true} /*CR-02 thay chunks*/, player: {semver, loaderUrl, bytes} /*Unity player dùng chung, POC-U1 ≤ 10 MB Brotli*/, fallbacks: {texture: 'png'\|'jpg'}, surfaceMap: FileRef, runtimeData: RuntimeData, credits: CreditGroup[]}`; `FileRef = {path, bytes, sha256}` |
 | DTO-RTM-02 | `RuntimeData` / `RuntimeDataDiff` (IF-RTM-04) | `RuntimeData = {entities: {npc, animals, interactions, player}, dialogue, behaviors, state, atmosphere, postFx, timeOfDay, spawns, ambience}` (phần "chỉ runtime" của dữ liệu); `RuntimeDataDiff = {version: number, ops: JsonPatchOp[] /*tương đối RuntimeData*/}` |
 | DTO-RTM-03 | `publish.json` (SCH-RTM-06) | `{schema:'publish/1', gameId, publishVersion, publishedAt, engineVersion, schemaVersion, dataHash, tiers, qa: {result, reportRef}, notMet: bool, dev: bool, dialogueAi: bool, credits: FileRef}`; v0.2 (CR-01, FR-CLI-12) thêm `previousVersion?: number, dataVersion: number, changes: {kind: 'them'\|'sua'\|'xoa', file, objectId, fields: string[]}[] /*≤200*/, changesMore?: number` |
 | DTO-RTM-04 | `tier-table.json` (SCH-RTM-08) | `{rules: [{gpuRegex, tier, note}], defaults: {cao: {deviceMemoryMin: 12}, vua: {deviceMemoryMin: 8, minScreenPx: 1080}}, dprMax: {thap: 1.0, vua: 1.5, cao: 2.0, toi_da: 2.5}}` |
@@ -366,6 +366,7 @@ detect():
   r = tierTable.rules.find(r => new RegExp(r.gpuRegex,'i').test(gpu)); if r → r.tier
   else mem >= 12 → 'cao'; mem >= 8 and px >= 1080 → 'vua'; else 'thap'
   fmt = SystemInfo.SupportsTextureFormat (KTX for Unity chọn đích chuyển mã): astc ? 'astc' : etc2 ? 'etc2' : bc7 ? 'bc7' : 'fallback' (dùng manifest.fallbacks)
+trước "Chơi" (POC-U1: khựng ~2 s khi biên dịch shader lần đầu): ShaderVariantCollection.WarmUp() cho bộ biến thể của tier đã chọn (Render/ShaderWarmup.cs), chia ≤ 8 biến thể/khung, xong mới bật nút "Chơi"
 sau start(): đo 3 s; avg < 0.85 × fpsTarget → applyTier(tier - 1) trước khi tắt màn tải mờ dần
 ```
 
@@ -439,17 +440,18 @@ runBuild(o):
 ### PSC-CLI-02 Packager (ALG-CLI-02)
 ```
 pack(ctx) cho mỗi tier trong game.tiers:
-  1 thu: chunks địa hình, instances veg/placement, asset glb dùng tới, nhân vật, âm thanh, lightmap mốc baked, navmesh
+  1 thu: chunks địa hình, instances veg/placement, asset glb dùng tới, nhân vật, âm thanh M4A (ADR-037), lightmap mốc baked, nguồn navmesh (`nav/sources.json`, DDD-05 DTO-CHR-06)
   2 checkAssets: mọi AssetRef: provenance hợp lệ + license ∈ cho phép + status DaDuyet (trừ prototypes/**) → thiếu: ERR-AST-03 (fail, liệt kê)
   3 merge tĩnh: theo chunk 64 m, nhóm theo vật liệu: glTF-Transform dedup → weld → join → flatten; vật lặp ≥ 4 lần → EXT_mesh_gpu_instancing
   4 vật liệu: gộp trùng hash; nếu > budgets.materials → texture-atlas (sharp, padding 8 px) cho nhóm vật liệu đơn giản
   5 texture: resize ≤ maxTexture[tier]; map 'sharp' → ktx create --encode uastc --uastc-quality 2 --zstd 18; còn lại --encode basis-lz (ETC1S) --qlevel 128;
+     phần core (bước 7): mọi map ≤ 1024² và ETC1S, kể cả map 'sharp' (POC-U1: 8 KTX2 2048² UASTC mất 8,0 s chuyển mã trên A56 lần đầu)
      kèm fallback PNG (map có alpha) / JPG q85 ở độ phân giải ½
-  6 hình học: Meshopt (EXT_meshopt_compression) + quantize (vị trí 14 bit, normal 8, uv 12)
+  6 hình học: Meshopt (EXT_meshopt_compression) + quantize (vị trí 14 bit, normal 8, uv 12); mọi glb ghi `scene: 0` mặc định (POC-U1: glTFast cần cảnh mặc định, `terrain.mesh` cũ thiếu)
   7 tách core/full: core = địa hình LOD2–3 + collider + vật trong 60 m quanh spawn (zone xuất phát) + mip thấp (texture ½ hoặc ¼); full = phần còn lại
   8 module tuỳ chọn (CR-02): ghi manifest.modules.combat=true khi features.combat.enabled||hunting.enabled; mã module luôn nằm trong Unity player; không còn chunk JS, recast.wasm (NavMesh dựng lúc nạp zone)
-     kiểm ngược: cờ tắt mà danh sách tệp có combat-*.js hoặc asset tag 'combat' → fail ERR-CBT-04 (DDD-06 PSC-CBT-01)
-  9 metrics: drawCalls = Σ(mesh sau gộp × số vật liệu) + số InstancedMesh + ước lượng veg (loài × LOD × chunk thấy được tối đa); tris, materials, maxTexture, zoneDownloadMB
+     kiểm ngược: cờ tắt mà manifest có modules.combat hoặc asset tag 'combat' → fail ERR-CBT-04 (DDD-06 PSC-CBT-01)
+  9 metrics: drawCalls = Σ(mesh sau gộp × số vật liệu) + số lô instancing (Graphics.RenderMeshInstanced) + ước lượng veg (loài × LOD × chunk thấy được tối đa); tris, materials, maxTexture, zoneDownloadMB
      report = evaluate(metrics, budgets[tier]) (DDD-00 PSC-GEN-04); checks[].source = top 5 nguồn đóng góp (lớp veg, rule, asset)
   10 manifest.json (DTO-RTM-01) + credits (DDD-03 PSC-AST-07); dialogue-profiles.json tách riêng (DDD-07 PSC-DLG-10)
 ```
@@ -560,7 +562,7 @@ accept: --accept-baseline v1,v2 --reason "…" → chép ảnh, cập nhật bas
 for bot in qa/bot: rng = Pcg32(bot.seed); t = 0
   for step in bot.steps: goto → __gsTest.moveTo(target); interact → interact(id); wait → step(s·30); random_walk → điểm ngẫu nhiên trong radius trên navmesh
   mỗi 0,5 s (15 bước cố định): ghi pos; stuck nếu có lệnh đi và |Δpos| < 0,5 m trong 5 s; out_of_bounds nếu ngoài playArea;
-     penetration nếu tâm viên nang trong collider tĩnh (truy vấn BVH); gom events agent.stuck (NPC) ; errors()
+     penetration nếu tâm viên nang trong collider tĩnh (`__gsTest.overlapCapsule` → `Physics.CheckCapsule`, CR-02); gom events agent.stuck (NPC) ; errors()
   dừng ở maxS
 result: fail nếu có stuck người chơi/penetration/lỗi console; warn nếu có agent.stuck NPC < 5 s
 ```
@@ -700,3 +702,4 @@ Bản test thêm `addInitScript` bọc `WebGL2RenderingContext.prototype.{drawEl
 | 0.2 | 23/11/2026 | Claude | CR-01 theo TSD-04 v1.2 / SRS-04 v1.1: MOD-CLI-06…10, mục 3.4, DTO-RTM-03 mở rộng, DTO-CLI-05…07, EP-CLI-03, SEQ-CLI-02, 03, STM-CLI-01, PSC-CLI-04…08 (ALG-CLI-04…08), ERR-CLI-02, 03, CFG-CLI-02, TC-CLI-05…09 |
 | 1.0 | 23/11/2026 | Huy | Duyệt bộ DDD; thay đổi sau đây theo change request |
 | 1.1 | 25/11/2026 | Claude | CR-02 (runtime Unity, ADR-036; Huy duyệt phân tích 25/11/2026): viết lại mục 2.1 (MOD-RTM-01…17 sang C# `engine/unity`), 3.1 (giao diện C#), SEQ-RTM-01, 02, PSC-RTM-01, PSC-CLI-02 bước 8 (module thay chunk), TC-RTM-04; MOD-QA-04 giữ bọc WebGL2 |
+| 1.2 | 26/11/2026 | Claude | CR-02 sau POC-U1: PSC-RTM-01 làm ấm shader trước "Chơi"; PSC-CLI-02 bước 1 (M4A, nguồn navmesh), 5 (texture core ≤ 1024 ETC1S), 6 (glb có `scene` mặc định), 8, 9; PSC-QA bot dùng `Physics.CheckCapsule` thay BVH |

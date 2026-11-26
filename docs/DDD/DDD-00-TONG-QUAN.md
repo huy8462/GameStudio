@@ -3,8 +3,8 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | DDD-00 |
-| Phiên bản | 1.1 |
-| Ngày | 23/11/2026 |
+| Phiên bản | 1.2 |
+| Ngày | 26/11/2026 |
 | Chủ sở hữu / người duyệt | Huy |
 | Người soạn | Claude |
 | Nguồn | TSD-00…09 v1.1, riêng TSD-00, 01, 04, 09 v1.2 và TSD-08 v1.3 (đã duyệt, CR-01); SRS-00…09 v1.0, riêng SRS-00 v1.2, SRS-01, 04, 09 v1.1, SRS-06 v1.1, SRS-08 v1.2 (đã duyệt); ADR-016…033 (đã chốt), BRD-00 v0.5 |
@@ -20,12 +20,12 @@
 | DDD-00 | DDD tổng quan (tài liệu này) | TSD-00 | `GEN` | Quy ước chung, gói `rng`, `schema` (phần lõi), `status` (tiến độ game, CR-01), hash, impact, ngân sách, cấu hình, triển khai, lỗi |
 | DDD-00-PL-A | [Ma trận truy vết TSD/SRS → DDD](DDD-00-PL-A-MA-TRAN-TRUY-VET.md) (sinh tự động) | TSD-00…09 | — | — |
 | DDD-01 | [Tạo game từ mô tả](DDD-01-TAO-GAME-TU-MO-TA.md) | TSD-01 | `INT` | `engine/intake/**` |
-| DDD-02 | [Thế giới, địa hình và môi trường](DDD-02-THE-GIOI-DIA-HINH-MOI-TRUONG.md) | TSD-02 | `WLD` | `engine/build/steps/{world-*,terrain-*,water,vegetation,placement,lighting-bake}`, `engine/build/py/heightfield`, `engine/runtime/src/{render/terrain,render/water,render/vegetation,fx}` |
-| DDD-03 | [Asset 3D, vật liệu và âm thanh](DDD-03-ASSET-VAT-LIEU-AM-THANH.md) | TSD-03 | `AST` | `engine/build/{asset-import,asset-forge,kit-builder,materials,audio}` |
-| DDD-04 | [Runtime, hiệu năng và QA](DDD-04-RUNTIME-HIEU-NANG-QA.md) | TSD-04 | `RTM`, `QA`, `CLI` | `engine/runtime/src/{core,loader,render,tier,input,interaction,ui,audio,save,perf,api}`, `engine/shared/expr`, `engine/build/packager`, `engine/qa`, `engine/cli` |
-| DDD-05 | [Nhân vật, NPC và động vật](DDD-05-NHAN-VAT-NPC-DONG-VAT.md) | TSD-05 | `CHR` | `engine/runtime/src/{camera-player,characters,npc-ai}`, `engine/families/**`, bước `navmesh`, `characters-bake` |
-| DDD-06 | [Chiến đấu và săn bắt (tuỳ chọn)](DDD-06-CHIEN-DAU-SAN-BAT.md) | TSD-06 | `CBT` | `engine/runtime/src/combat/**` (chunk riêng) |
-| DDD-07 | [Hội thoại NPC](DDD-07-HOI-THOAI-NPC.md) | TSD-07 | `DLG` | `engine/runtime/src/{interaction/dialogue,dialogue-ai}`, bước `dialogue-check`, `web/ai-gateway/src/dlg/**` |
+| DDD-02 | [Thế giới, địa hình và môi trường](DDD-02-THE-GIOI-DIA-HINH-MOI-TRUONG.md) | TSD-02 | `WLD` | `engine/build/steps/{world-*,terrain-*,water,vegetation,placement,lighting-bake}`, `engine/build/py/heightfield`, `engine/unity/Assets/GameStudio/{World,Fx}` |
+| DDD-03 | [Asset 3D, vật liệu và âm thanh](DDD-03-ASSET-VAT-LIEU-AM-THANH.md) | TSD-03 | `AST` | `engine/build/{asset-import,asset-forge,kit-builder,materials,audio}`, `engine/build/py/{texproc,hdri}` |
+| DDD-04 | [Runtime, hiệu năng và QA](DDD-04-RUNTIME-HIEU-NANG-QA.md) | TSD-04 | `RTM`, `QA`, `CLI` | `engine/unity/Assets/GameStudio/{Core,Loader,Render,Tier,Input,Interaction,UI,Audio,Save,Perf,Bridge,Test}` (Unity player, CR-02), `engine/shared/expr`, `engine/build/packager`, `engine/qa`, `engine/cli` |
+| DDD-05 | [Nhân vật, NPC và động vật](DDD-05-NHAN-VAT-NPC-DONG-VAT.md) | TSD-05 | `CHR` | `engine/unity/Assets/GameStudio/{CameraPlayer,Characters,NpcAi}`, `engine/families/**`, bước `navmesh` (gom nguồn), `characters-bake` |
+| DDD-06 | [Chiến đấu và săn bắt (tuỳ chọn)](DDD-06-CHIEN-DAU-SAN-BAT.md) | TSD-06 | `CBT` | `engine/unity/Assets/GameStudio/Combat/**` (assembly riêng, bật theo `manifest.modules.combat`) |
+| DDD-07 | [Hội thoại NPC](DDD-07-HOI-THOAI-NPC.md) | TSD-07 | `DLG` | `engine/unity/Assets/GameStudio/{Interaction/Dialogue,DialogueAi}`, bước `dialogue-check`, `web/ai-gateway/src/dlg/**` |
 | DDD-08 | [Web Studio](DDD-08-WEB-STUDIO.md) | TSD-08 | `WEB` | `web/{shared,api,ai-gateway,worker,app,deploy}/**` |
 | DDD-09 | [Studio AI, quy trình, bảo mật dev](DDD-09-STUDIO-AI-QUY-TRINH-BAO-MAT.md) | TSD-09 | `DEV` | `.claude/**`, `.githooks/**`, `tools/**`, `.github/workflows/**` |
 
@@ -330,7 +330,7 @@ Cấu hình `.dependency-cruiser.cjs`: (1) `no-circular`; (2) `engine/unity/**` 
 | CFG-GEN-01 | `tools/versions.json` | Phiên bản công cụ (TSD-09 SCH-DEV-03) | Theo E0 | Nguồn cho `engine doctor` và `toolVersions` trong `inputHash` |
 | CFG-GEN-02 | `games/<id>/data/budgets.json` | Ngân sách theo tier (SRS-04 mục 6.3) | Sao từ `games/_template` | `combat.attackers`/`combat.projectiles` Vừa 3/20 (OI-CBT-05); `behaviorLod.nearM`/`farM` 30/80 (OI-CHR-07) đặt trong `$defs.tierBudget` để chỉnh không sửa code |
 | CFG-GEN-03 | Biến môi trường dịch vụ web | `DATABASE_URL`, `OBJECT_ROOT=/srv/gs-objects`, `PUBLIC_ORIGIN`, `GATEWAY_URL=http://ai-gateway:8081`, `GS_GATEWAY_TOKEN_<SVC>`, `JWT_KEYS_FILE`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `LOG_LEVEL=info` | — | Chi tiết theo dịch vụ ở DDD-08 CFG-WEB-01…04; khoá AI chỉ có ở `ai-gateway` |
-| CFG-GEN-04 | `engine/runtime/src/tier/tier-table.json` | Bảng dò thiết bị (TSD-04 SCH-RTM-08) | A56 → `vua` | Cập nhật theo số đo |
+| CFG-GEN-04 | `engine/unity/Assets/GameStudio/Tier/tier-table.json` | Bảng dò thiết bị (TSD-04 SCH-RTM-08) | A56 → `vua` | Cập nhật theo số đo |
 | CFG-GEN-05 | `project.yaml` | `rigor`, `overrides`, `targetDevice`, `tiers`, `gates` (TSD-09 SCH-DEV-01) | `minimal` | DDD-09 |
 | CFG-GEN-06 | `engine/status/src/default-durations.json` | Ước lượng thời gian mặc định mỗi bước (giây) khi `cache/index.json` chưa có lịch sử | Theo E1 | Dùng cho `estimateMinutes`; thay bằng trung vị `durationS` thật khi có ≥ 3 lần chạy |
 
@@ -488,3 +488,4 @@ DDD-01…09 có mục "Truy vết" ánh xạ FR/NFR và thành phần TSD sang t
 | 0.2 | 23/11/2026 | Claude | CR-01 (Huy yêu cầu 23/11/2026: luồng làm tiếp/cập nhật game đang làm dở hoặc đã có), theo SRS-00 v1.2 và TSD-00 v1.2: mục 3.7 gói `@gamestudio/status` (MOD-GEN-20, 21, DTO-GEN-08, 09, STM-GEN-01, PSC-GEN-05, CFG-GEN-06, TC-GEN-07, 08); DDD-01, 04, 08, 09 bổ sung phần CR-01 |
 | 1.0 | 23/11/2026 | Huy | Duyệt bộ DDD; thay đổi sau đây theo change request |
 | 1.1 | 25/11/2026 | Claude | CR-02 (runtime Unity, ADR-036): MOD-GEN-14 thành Unity player `engine/unity`; luật dependency-cruiser (2), (3); dòng NFR-GEN-10 |
+| 1.2 | 26/11/2026 | Claude | CR-02 phần còn lại sau POC-U1: cột "Gói" của danh mục DDD-02…07 trỏ vào `engine/unity`, CFG-GEN-04 |

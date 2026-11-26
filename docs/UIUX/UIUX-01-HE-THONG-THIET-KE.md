@@ -3,12 +3,12 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | UIUX-01 |
-| Phiên bản | 1.0 |
-| Ngày | 23/11/2026 |
+| Phiên bản | 1.1 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | UIUX-00 `UIUX-00-TONG-QUAN.md` |
 | Nguồn | TSD-08 mục 3 (frontend, tiếng Việt, trạng thái rỗng/lỗi/tải), ADR-027 (Tailwind + Radix UI), DDD-08 MOD-WEB-20…25, 37, SRS-08 NFR-WEB-01, 02, 04, FR-WEB-46, 60, 61; SRS-00 mục 4.4 (giai đoạn tiến độ) |
 | Mã nguồn | `web/app/src/ui/**` (thành phần), `web/app/tailwind.config.ts` (token), `web/app/src/i18n/vi.json` (câu chữ) |
-| Trạng thái | Đã duyệt (Huy, 23/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 23/11/2026); **v1.1 khung xem trước nhúng Unity player theo CR-02 và POC-U1**, chờ Huy xem lại |
 
 ---
 
@@ -115,7 +115,7 @@ Mỗi thành phần ghi: biến thể, trạng thái, quy tắc, nguồn yêu c�
 | CMP-GEN-16 | Trạng thái khoá `LockStatus` | Huy hiệu ở thanh trên: "Bạn đang sửa" (accent), "Đang được sửa bởi Lan – chỉ xem" (warn), "Chỉ xem" (muted); nút "Lấy quyền sửa" (chủ game) hoặc "Thử lấy quyền sửa" khi khoá đã nhả | Đổi ngay theo SSE `lock.changed`; khi mất khoá do bị lấy: hộp thông báo MSG-WEB-04 | FR-WEB-24, AC-08-04 |
 | CMP-GEN-17 | Chỉ báo lưu `SaveIndicator` | "Có thay đổi chưa lưu" · "Đang lưu…" · "Đã lưu · #42" · "Lưu lỗi – Thử lại" | Hiện liên tục trong không gian làm việc; bấm "Đã lưu · #42" mở SCR-WEB-08 tại mốc đó; rời trang khi còn `pending` → `store.flush(true)`, trình duyệt hỏi "Rời trang?" chỉ khi flush lỗi | FR-WEB-27, TXT-WEB-01…04 |
 | CMP-GEN-18 | Thanh công cụ xem trước `PreviewToolbar` | Nổi ở cạnh trên khung xem trước: chế độ (Bay tự do / Người chơi / Góc chuẩn ▾) · zone ▾ · giờ (thanh trượt 0–24 + mốc đã bake) · tier giả lập ▾ (Thấp, Vừa, Cao, Tối đa) · khung điện thoại (công tắc) · chỉ số (công tắc) · QR · toàn màn hình | Mỗi nút có tooltip + phím tắt (UXR-WEB-05); trạng thái lưu theo game trong `localStorage` | FR-WEB-18, FR-WEB-19, FR-WEB-20 |
-| CMP-GEN-19 | Lớp phủ chỉ số `StatsOverlay` | Góc trên trái khung xem trước, chữ mono 12 px: fps · draw call · tri · bộ nhớ GPU, mỗi dòng "giá trị / ngân sách tier" | Cập nhật 500 ms (PSC-WEB-14); vượt ngân sách: chữ `danger` + biểu tượng ⚠; nền mờ 70% để đọc được trên cảnh | FR-WEB-20 |
+| CMP-GEN-19 | Lớp phủ chỉ số `StatsOverlay` | Góc trên trái khung xem trước, chữ mono 12 px: fps · draw call · tri · bộ nhớ GPU · heap WASM (Unity player, CR-02), mỗi dòng "giá trị / ngân sách tier" | Cập nhật 500 ms (PSC-WEB-14); vượt ngân sách: chữ `danger` + biểu tượng ⚠; nền mờ 70% để đọc được trên cảnh | FR-WEB-20 |
 | CMP-GEN-20 | Thẻ QR và link `QrLinkCard` | Mã QR 192 px, URL rút gọn có nút Sao chép, hạn dùng, tuỳ chọn "Gửi số đo hiệu năng" (link đo) | Sao chép → toast "Đã sao chép"; link chỉ trả một lần (link chơi thử) → thẻ ghi "Lưu link này, sau khi đóng sẽ không xem lại được" | FR-WEB-19, FR-WEB-36 |
 | CMP-GEN-21 | Cây đối tượng `ObjectTree` | Nhóm theo zone → loại (Công trình, Đối tượng đặt tay, NPC, Đàn động vật, Vùng, Đèn); mỗi nút: biểu tượng loại, tên đọc được, huy hiệu "Cần build"; ô lọc tên | Chọn trên cây ↔ chọn trong xem trước đồng bộ; mũi tên lên/xuống/trái/phải điều hướng; `Delete` xoá (hoàn tác được); kéo thả để đổi nhóm không hỗ trợ ở bản đầu | FR-WEB-21 |
 | CMP-GEN-22 | Bảng thuộc tính `PropertyPanel` | Sinh từ JSON Schema của loại đối tượng: nhóm trường gập được (Vị trí, Hình thức, Hành vi…), mỗi trường là CMP-GEN-02; đầu bảng: tên, loại, nút "Xem trong JSON" | Sửa trường → một `OpGroup` (DDD-08 DTO-WEB-08) → hoàn tác được; trường có `x-impact` hiện huy hiệu ảnh hưởng | FR-WEB-21, FR-WEB-28, QT-WEB-04 |
@@ -128,6 +128,7 @@ Mỗi thành phần ghi: biến thể, trạng thái, quy tắc, nguồn yêu c�
 | CMP-GEN-29 | Ô tìm và chọn người dùng `UserPicker` | Ô gõ tên/email, gợi ý từ người dùng trong hệ thống (ảnh, tên, email, vai trò) | Không mời được người ngoài hệ thống từ đây (chia sẻ chỉ cho người đã có tài khoản, FR-WEB-35); gợi ý câu "Người này chưa có tài khoản, nhờ quản trị mời" | FR-WEB-35 |
 | CMP-GEN-30 | Vùng thả tệp `DropZone` | Khung viền đứt, biểu tượng, "Kéo ảnh vào đây hoặc chọn tệp", giới hạn | Kiểm loại/kích thước ở client trước khi tải (vẫn kiểm ở server); lỗi từng tệp theo ERR-INT-02 / ERR-WEB-12; tải theo phần có thanh tiến độ cho gói game | FR-INT-02, FR-WEB-34 |
 | CMP-GEN-31 | Thanh giai đoạn `StageBar` (v0.3) | Dạng dọc (bảng Tiến độ): 8 dòng cao 28 px, biểu tượng ✓/◐/○ + tên giai đoạn + chữ phụ phải; dạng chip (thanh trên, thẻ game): một huy hiệu giai đoạn (CMP-GEN-03 nhóm Giai đoạn) | Bước hiện tại nhấn `--gs-accent` và đậm; bước đã qua màu `--gs-success`; chưa tới `--gs-text-muted`; có `aria-current="step"`; chip bấm được mở tab Tiến độ | FR-WEB-60, FR-WEB-61 |
+| CMP-GEN-33 | Màn chờ tải player `PlayerLoader` (v1.1, CR-02) | Phủ kín khung xem trước, nền `--gs-surface-2`: logo nhỏ, dòng trạng thái theo pha, thanh tiến độ xác định, dòng phụ chữ `sm` màu phụ. Pha 1 "Đang tải trình chạy game… {mb}/{tong} MB" (chỉ lần đầu trong phiên, Unity player ≤ 10 MB); pha 2 "Đang nạp zone {zone}… {pt}%". Lần đầu (chưa cache) hiện thêm dòng phụ TXT-WEB-35 | Không chặn phần còn lại của không gian làm việc (chat, cây, bảng phải dùng được trong lúc tải); thanh tiến độ có `role="progressbar"` + `aria-valuenow`; quá 20 s ở pha 1 (NFR-RTM-01) → dòng phụ đổi thành TXT-WEB-36 kèm nút `ghost` "Thử lại"; giảm chuyển động: bỏ hiệu ứng sọc chạy | FR-WEB-16, NFR-RTM-01, NFR-WEB-07 |
 | CMP-GEN-32 | Danh sách việc còn treo `PendingList` (v0.3) | Dòng: biểu tượng mức (chặn ▲ danger, lỗi ✕ danger, nhắc ● info), câu ngắn có số, nút lối tắt `ghost` `sm` bên phải; tiêu đề "Việc còn treo (n)" | Sắp: chặn → lỗi → nhắc; rỗng thì ẩn cả khối; mỗi dòng là một nút đơn cho trình đọc màn hình ("1 đề xuất chờ duyệt, Mở") | FR-WEB-61 |
 
 ### 3.1 Bộ trạng thái của `StatusBadge` (CMP-GEN-03)
@@ -247,3 +248,4 @@ Xem UIUX-00 OIU-GEN-04 (chủ đề), OIU-GEN-05 (phông), OIU-GEN-06 (biểu t�
 | 0.2 | 23/11/2026 | Claude | Cập nhật CMP-GEN-28 theo SRS-08 v1.1 (SCR-WEB-15…18) |
 | 0.3 | 23/11/2026 | Claude | Luồng làm tiếp/cập nhật game (SRS-08 v1.2): CMP-GEN-31 `StageBar`, CMP-GEN-32 `PendingList`; trạng thái giai đoạn tiến độ, chế độ link, kết quả kiểm nhập trong mục 3.1 |
 | 1.0 | 23/11/2026 | Huy | Duyệt bộ UIUX (gồm đề xuất trong các mục Open item, luồng làm tiếp/cập nhật game và prototype trong `prototype/`); thay đổi sau đây theo change request |
+| 1.1 | 26/11/2026 | Claude | CR-02 (ADR-036), POC-U1: CMP-GEN-19 thêm heap WASM; CMP-GEN-33 `PlayerLoader` màn chờ tải Unity player hai pha |

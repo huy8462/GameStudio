@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | TSD-07 |
-| Phiên bản | 1.1 (đã duyệt) |
-| Ngày | 22/11/2026 |
+| Phiên bản | 1.2 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | TSD-00 `TSD-00-TONG-QUAN.md` |
 | SRS nguồn | SRS-07 v0.1 (FR-DLG-01…31, NFR-DLG-01…04) |
 | Quyết định | QĐ-14: hội thoại mặc định **tĩnh**; AI khi chạy là tuỳ chọn theo game/NPC và **chỉ** gọi qua cổng AI phía server giữ khoá |
 | Gói | Runtime `interaction/dialogue/` (luôn có), chunk `dialogue-ai/` (chỉ khi có NPC `ai`/`hybrid`); bước build `dialogue.check`; `web/ai-gateway/src/dialogue/` (API-DLG-01…03); SCR-DLG-01 trong `web/app` |
 | Pha | E6; editor W3 |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026); **v1.2 theo CR-02 (Unity) sau POC-U1**, chờ Huy xem lại |
 
 ---
 
@@ -87,7 +87,7 @@ flowchart LR
 | ALG-DLG-05 | Dựng prompt và gọi | Thành phần theo SRS-07 mục 6.3: (1) luật chung cố định của engine + (2) giọng điệu game + (3) hồ sơ NPC — ba phần này là **tiền tố ổn định**, đặt trong `system`, bật prompt caching; (4) `facts` lọc theo mốc ≤ mốc hiện tại (kiểm `milestoneState` client gửi với cấu trúc mốc trong SCH-DLG-03; trạng thái không hợp lệ → coi như mốc thấp nhất) (FR-DLG-10); (5) ngữ cảnh rút gọn ≤ 1.500 ký tự (khu vực, giờ, nhiệm vụ liên quan, 3–5 lượt) (FR-DLG-08); (6) câu người chơi. Gọi `claude-haiku-5-5` (mặc định, `modelTier: small`); `modelTier: large` chỉ khi quản trị cho phép → mô hình lớn cấu hình ở cổng (FR-DLG-24); `max_tokens` = `maxOutputTokens` 150 (FR-DLG-22); effort `low`; đầu ra JSON `{text, suggestions[≤3], action?}` bằng structured outputs; kiểm `stop_reason` (`refusal`, `max_tokens`) trước khi đọc nội dung → coi như lỗi, trả dự phòng |
 | ALG-DLG-06 | Lọc vào/ra | Vào: chuẩn hoá Unicode NFC, cắt 200 ký tự (gõ tự do, FR-DLG-13), che email/số điện thoại bằng regex (FR-DLG-26), phát hiện khai thác bằng luật (cụm "bỏ vai", "system prompt", "hướng dẫn hệ thống", "ignore previous"…, danh sách cấu hình) → `blocked: input`, NPC trả câu từ chối trong vai có sẵn (ERR-DLG-05). Ra: kiểm JSON hợp lệ, độ dài ≤ `maxChars`, ngôn ngữ (bộ phát hiện `franc-min`), không chứa đoạn trùng system prompt (n-gram 8 từ), từ khoá cấm theo `ageRating`/`forbidden`; `action` phải thuộc `allowedActions` và không bao giờ là `quest_*`/`give_item` (FR-DLG-09); lỗi → `fallback: true` (ERR-DLG-06) (FR-DLG-21). Bộ kiểm thử NPC (FR-DLG-11): chấm luật như trên + mô hình chấm `claude-haiku-5-5` với rubric "giữ vai / không lộ / đúng mốc"; 100% câu `pha_vai` phải bị từ chối trong vai (NFR-DLG-04) |
 | ALG-DLG-07 | Dự phòng phía client | Gửi yêu cầu; 300 ms chưa có → hiện "đang suy nghĩ" (FR-DLG-19); 3.000 ms, lỗi mạng, 4xx/5xx, `fallback`/`blocked` → huỷ yêu cầu, chọn câu dự phòng bằng RNG có seed của NPC, ghi sự kiện, hội thoại tiếp tục với lựa chọn tĩnh (FR-DLG-18). `action` chỉ áp sau khi nhận đủ phản hồi và `GameState` kiểm điều kiện (FR-DLG-20). 403 → NPC chuyển `static` hết phiên; 429 quota → dự phòng hết phiên |
-| ALG-DLG-08 | Giọng nói | Tĩnh: bước build `dialogue.voice` (khi NPC bật `voice`) gọi ElevenLabs qua `AiMediaClient` cho mỗi câu, lưu Opus như asset âm thanh có provenance (FR-DLG-27). AI: API-DLG-03 stream Opus từ ElevenLabs qua cổng, cùng hạn mức/log; lỗi → chỉ hiện chữ (FR-DLG-28) |
+| ALG-DLG-08 | Giọng nói | Tĩnh: bước build `dialogue.voice` (khi NPC bật `voice`) gọi ElevenLabs qua `AiMediaClient` cho mỗi câu, lưu AAC/M4A (ADR-037) như asset âm thanh có provenance (FR-DLG-27). AI: API-DLG-03 trả trọn câu M4A từ ElevenLabs qua cổng (Unity Web không phát luồng theo khối; phần AI đã bị ADR-035 bỏ, chờ CR W1), cùng hạn mức/log; lỗi → chỉ hiện chữ (FR-DLG-28) |
 | ALG-DLG-09 | Câu bâng quơ | Mỗi 1 s kiểm NPC trong bán kính 5 m có `barks` thoả điều kiện; mỗi NPC ≥ 30 s giữa hai câu; hiện bong bóng chữ trên đầu (FR-DLG-03) |
 
 ---
@@ -170,3 +170,4 @@ flowchart LR
 | 0.1 | 22/11/2026 | Claude | Bản đầu từ SRS-07 v0.1 |
 | 1.0 | 22/11/2026 | Huy | Duyệt toàn bộ tài liệu |
 | 1.1 | 22/11/2026 | Claude | Chốt các số "(đề xuất)" có nguồn từ SRS sau khi Huy duyệt SRS |
+| 1.2 | 26/11/2026 | Claude | ADR-037 (âm thanh AAC, POC-U1) và CR-02: ALG-DLG-08 giọng nói M4A |

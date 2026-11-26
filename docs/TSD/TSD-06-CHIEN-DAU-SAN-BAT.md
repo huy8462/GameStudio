@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | TSD-06 |
-| Phiên bản | 1.1 (đã duyệt) |
-| Ngày | 22/11/2026 |
+| Phiên bản | 1.2 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | TSD-00 `TSD-00-TONG-QUAN.md` |
 | SRS nguồn | SRS-06 v0.1 (FR-CBT-01…28, NFR-CBT-01…03) |
 | Quyết định | QĐ-13: chỉ có khi mô tả yêu cầu; **mặc định tắt**; tắt thì không mã, không asset, không UI, không chi phí |
-| Gói | `engine/runtime/src/combat/` (chunk `combat.js`, nạp bằng `import()`), mở rộng graph `npc-ai`, HUD chiến đấu trong `ui/`; SCR-CBT-02 trong `web/app` |
+| Gói | `engine/unity/Assets/GameStudio/Combat/` (assembly C# riêng trong Unity player, bật bằng `manifest.modules.combat`; CR-02), mở rộng graph `npc-ai`, HUD chiến đấu UI Toolkit; SCR-CBT-02 trong `web/app` |
 | Pha | Khi game cần, sớm nhất E6; editor W3 |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026); **v1.2 theo CR-02 (Unity) sau POC-U1**, chờ Huy xem lại |
 
 ---
 
@@ -61,8 +61,8 @@ flowchart LR
 
 | Mã | Thuật toán | Mô tả |
 |---|---|---|
-| ALG-CBT-01 | Đóng gói có điều kiện | Vite build engine với `combat/index.ts` là entry riêng → `combat-<hash>.js`; packager chép vào bản build và ghi `manifest.chunks.combat` chỉ khi cờ bật; asset có tag `combat` (vũ khí, âm thanh, hạt) chỉ được gom khi bật. Kiểm ngược: sau đóng gói, nếu cờ tắt mà danh sách file chứa `combat-*.js` hoặc asset tag `combat` → Fail ERR-CBT-04 (FR-CBT-03, NFR-CBT-02) |
-| ALG-CBT-02 | Giác quan | Mỗi lần agent đến lượt (LOD hành vi TSD-05 ALG-CHR-05): nhìn = khoảng cách ≤ `sightM` × hệ số cảnh giác và góc ≤ `sightDeg/2` và tia không bị chặn (BVH, tối đa 2 tia/khung toàn hệ thống, xếp hàng); nghe = khoảng cách ≤ `hearM` × hệ số tốc độ người chơi (đứng 0, đi 1, chạy 2,5); đánh hơi = ≤ `smellM`, nhân (1 + 0,5·cos(góc giữa gió và hướng người chơi→thú)) khi có gió. Hệ số cảnh giác `nhay/vua/cham` = 1,5/1,0/0,6; người chơi ngồi ×0,5, đi chậm ×0,7 (FR-CBT-13, 17) |
+| ALG-CBT-01 | Đóng gói có điều kiện | Mã combat luôn nằm trong Unity player (CR-02); packager ghi `manifest.modules.combat = true` chỉ khi cờ bật; asset có tag `combat` (vũ khí, âm thanh, hạt) chỉ được gom khi bật. Kiểm ngược: sau đóng gói, nếu cờ tắt mà manifest có `modules.combat` hoặc danh sách file có asset tag `combat` → Fail ERR-CBT-04 (FR-CBT-03, NFR-CBT-02) |
+| ALG-CBT-02 | Giác quan | Mỗi lần agent đến lượt (LOD hành vi TSD-05 ALG-CHR-05): nhìn = khoảng cách ≤ `sightM` × hệ số cảnh giác và góc ≤ `sightDeg/2` và tia không bị chặn (`Physics.Raycast` với collider tĩnh, CR-02; tối đa 2 tia/khung toàn hệ thống, xếp hàng); nghe = khoảng cách ≤ `hearM` × hệ số tốc độ người chơi (đứng 0, đi 1, chạy 2,5); đánh hơi = ≤ `smellM`, nhân (1 + 0,5·cos(góc giữa gió và hướng người chơi→thú)) khi có gió. Hệ số cảnh giác `nhay/vua/cham` = 1,5/1,0/0,6; người chơi ngồi ×0,5, đi chậm ×0,7 (FR-CBT-13, 17) |
 | ALG-CBT-03 | Token tấn công | Hàng đợi ưu tiên theo khoảng cách; tối đa `budgets.combat.attackers` (Vừa 3, OI-CBT-05: chốt khi có game bật) agent giữ token; agent không có token chọn điểm vây trên vòng tròn 3–5 m (góc phân bổ đều, có seed) và chờ; token trả lại khi agent rời `TanCong` (FR-CBT-14) |
 | ALG-CBT-04 | Sát thương | `dmg = formula(atk, def, weapon)` (mặc định `max(1, atk + weapon - def)`), làm tròn số nguyên; mục tiêu `invulnerable` hoặc không thuộc `targets`/`species` → bỏ qua (QT-CBT-02, FR-CBT-22); trúng: giật lùi 0,3 m theo hướng đòn, clip `hit`, bất tử 0,5 s (FR-CBT-07, 11) |
 | ALG-CBT-05 | Aim assist | Ứng viên trong nón 60° trước mặt người chơi, tầm ≤ `range` + 1 m, hợp lệ theo ALG-CBT-04; chọn điểm = góc lệch chuẩn hoá × 0,6 + khoảng cách chuẩn hoá × 0,4, nhỏ nhất thắng; tầm xa: giữ nút → vuốt ngắm, hoặc chạm mục tiêu để khoá (raycast từ điểm chạm) (FR-CBT-09, 10) |
@@ -141,3 +141,4 @@ Phản hồi (FR-CBT-24): pool hạt trúng đòn, âm thanh 3D, `navigator.vibr
 | 0.1 | 22/11/2026 | Claude | Bản đầu từ SRS-06 v0.1 |
 | 1.0 | 22/11/2026 | Huy | Duyệt toàn bộ tài liệu |
 | 1.1 | 22/11/2026 | Claude | Chốt các số "(đề xuất)" có nguồn từ SRS sau khi Huy duyệt SRS |
+| 1.2 | 26/11/2026 | Claude | CR-02 (ADR-036): ALG-CBT-02 tia nhìn dùng Unity Physics thay BVH; gói và ALG-CBT-01: module combat nằm trong Unity player, bật bằng `manifest.modules.combat` |

@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | DDD-02 |
-| Phiên bản | 1.0 |
-| Ngày | 23/11/2026 |
+| Phiên bản | 1.1 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | DDD-00 `DDD-00-TONG-QUAN.md` |
-| TSD nguồn | TSD-02 v1.1 (SCH-WLD-01…05, ALG-WLD-01…16, TST-WLD-01…08) |
+| TSD nguồn | TSD-02 v1.2 (SCH-WLD-01…05, ALG-WLD-01…16, TST-WLD-01…08) |
 | SRS nguồn | SRS-02 v1.0 (FR-WLD-01…40, NFR-WLD-01…05) |
-| Gói | Bước build `engine/build/steps/{world-fetch, world-heightfield, terrain-erode, terrain-mesh, terrain-splat, water, vegetation, placement, lighting-bake}`; Python `engine/build/py/{heightfield, geo}`; Blender `engine/build/blender/{ant, sapling, impostor, bake}`; runtime `engine/runtime/src/{render/terrain, render/water, render/vegetation, fx}`; panel web `web/app/src/features/world` |
+| Gói | Bước build `engine/build/steps/{world-fetch, world-heightfield, terrain-erode, terrain-mesh, terrain-splat, water, vegetation, placement, lighting-bake}`; Python `engine/build/py/{heightfield, geo}`; Blender `engine/build/blender/{ant, sapling, impostor, bake}`; runtime trong Unity player `engine/unity/Assets/GameStudio/{World/Terrain, World/Water, World/Vegetation, Fx}` (C#, CR-02); panel web `web/app/src/features/world` |
 | Pha | E1 (địa hình), E3 (nước, thực vật, fx), E4 (bố trí), E5 (bake); W3–W4 |
-| Trạng thái | Đã duyệt (Huy, 23/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 23/11/2026); **v1.1 runtime Unity theo CR-02 và POC-U1**, chờ Huy xem lại |
 
 ---
 
@@ -29,16 +29,16 @@ Thiết kế chi tiết các bước build dựng không gian chơi và phần r
 | MOD-WLD-04 | `steps/world-heightfield/{step.json, main.py, reproject.py, vector_mask.py, carve.py, procedural.py, noise.py, mixed.py, ant_bridge.py}` | Chiếu UTM, raster hoá vector, khắc đường/sông, địa hình thủ tục 5 preset + `ant`, trộn `mixed`, xuất heightfield bundle + `preview/top.png` |
 | MOD-WLD-05 | `engine/build/blender/ant/ant_generate.py` | A.N.T. Landscape headless theo seed → lưới → lấy mẫu lại |
 | MOD-WLD-06 | `steps/terrain-erode/{step.json, main.py, droplet.py, thermal.py}` | Xói mòn thuỷ lực dạng hạt + nhiệt, `numba` một luồng |
-| MOD-WLD-07 | `steps/terrain-mesh/{step.json, index.ts, chunker.ts, lod.ts, skirt.ts, uv.ts, collider.ts}` | Chunk 64 m, LOD0–3, skirt, UV0/UV2, collider heightfield + BVH |
+| MOD-WLD-07 | `steps/terrain-mesh/{step.json, index.ts, chunker.ts, lod.ts, skirt.ts, uv.ts, collider.ts}` | Chunk 64 m, LOD0–3, skirt, UV0/UV2, collider heightfield (player dựng `MeshCollider` từ LOD1 lúc nạp, CR-02; bỏ `bvh.bin`) |
 | MOD-WLD-08 | `steps/terrain-splat/{step.json, main.py, rules.py, surface.py}` | Trọng số lớp, giữ 4/8 lớp, `surface.png` |
 | MOD-WLD-09 | `steps/water/{step.json, index.ts, triangulate.ts, sdf.ts}` | Mesh nước, SDF bờ + độ sâu, `water-mask.png` |
 | MOD-WLD-10 | `steps/vegetation/{step.json, index.ts, poisson.ts, species.ts, tree-recipes.ts}`, `engine/build/blender/sapling/tree_gen.py`, `engine/build/blender/impostor/octa_bake.py` | Rải cây/bụi, sinh cây Sapling theo recipe, nướng impostor |
 | MOD-WLD-11 | `steps/placement/{step.json, index.ts, rules.ts, occupancy.ts, align.ts}` | Bố trí theo luật, lưới chiếm chỗ dùng chung |
 | MOD-WLD-12 | `steps/lighting-bake/{step.json}`, `engine/build/blender/bake/{bake_zone.py, rgbm.py, atlas.py}` | Bake lightmap + AO, mã RGBM, KTX2 |
-| MOD-WLD-13 | `engine/runtime/src/render/terrain/{terrain-system.ts, chunk-pool.ts, terrain-material.ts, terrain.glsl.ts}` | Quản lý chunk/LOD, vật liệu splat, triplanar (tier ≥ Cao) |
-| MOD-WLD-14 | `engine/runtime/src/render/water/{water-system.ts, water-material.ts, reflection.ts}` | Shader nước theo tier, phản chiếu tier Cao |
-| MOD-WLD-15 | `engine/runtime/src/render/vegetation/{vegetation-system.ts, instanced-species.ts, impostor-material.ts, grass-field.ts, wind.glsl.ts}` | Instancing theo (loài, LOD, chunk), impostor cross-fade, cỏ GPU, gió |
-| MOD-WLD-16 | `engine/runtime/src/fx/{fx-system.ts, sky.ts, fog.ts, weather.ts, time-of-day.ts, dynamic-lights.ts, postfx.ts}` | Hệ thống `fx` (order 70): trời, sương, mưa, mây, chuyển mốc thời điểm, đèn động, hậu kỳ |
+| MOD-WLD-13 | `engine/unity/Assets/GameStudio/World/Terrain/{TerrainSystem.cs, ChunkPool.cs, TerrainMaterial.cs, TerrainCollider.cs}`, `Shaders/TerrainSplat.shadergraph` | Quản lý chunk/LOD, vật liệu splat URP, triplanar (tier ≥ Cao), `MeshCollider` LOD1 |
+| MOD-WLD-14 | `engine/unity/Assets/GameStudio/World/Water/{WaterSystem.cs, WaterMaterial.cs, Reflection.cs}`, `Shaders/Water.shadergraph` | Shader nước URP theo tier, phản chiếu (planar/reflection probe) tier Cao |
+| MOD-WLD-15 | `engine/unity/Assets/GameStudio/World/Vegetation/{VegetationSystem.cs, InstancedSpecies.cs, ImpostorMaterial.cs, GrassField.cs}`, `Shaders/{Impostor, Grass, Wind}.shadergraph` | Instancing (`Graphics.RenderMeshInstanced`) theo (loài, LOD, chunk), impostor cross-fade, cỏ GPU, gió |
+| MOD-WLD-16 | `engine/unity/Assets/GameStudio/Fx/{FxSystem.cs, Sky.cs, Fog.cs, Weather.cs, TimeOfDay.cs, DynamicLights.cs, PostFx.cs}` | Hệ thống `fx` (order 70): trời, sương, mưa, mây, chuyển mốc thời điểm, đèn động, hậu kỳ |
 | MOD-WLD-17 | `web/app/src/features/world/{world-form-panel.tsx, region-editor-panel.tsx, polygon-tools.ts}` | SCR-WLD-01 (form sinh từ `world-fields.json`), SCR-WLD-02 (vẽ đa giác) |
 | MOD-WLD-18 | `engine/schema/editor/world-fields.json`, `engine/schema/surface-types.json`, `engine/build/steps/world-heightfield/road-widths.json`, `engine/build/data-sources.json` | Dữ liệu cấu hình tĩnh (DTO-WLD-05…08) |
 
@@ -49,24 +49,27 @@ Thiết kế chi tiết các bước build dựng không gian chơi và phần r
 ```ts
 // Bước Node: steps/<id>/index.ts
 export async function run(ctx: StepCtx): Promise<StepResult>     // StepCtx, StepResult: DDD-04 DTO-CLI-01, DTO-CLI-02
+```
 
-// runtime/src/render/terrain/terrain-system.ts
-export class TerrainSystem implements System {                    // id 'terrain', order 80 (thuộc render), init theo zone
-  onZoneLoaded(z: LoadedZone): void          // tạo ChunkEntry cho mọi chunk của zone, gắn lightmap mốc hiện tại
-  onZoneUnloaded(z: LoadedZone): void        // trả geometry về ChunkPool
-  update(dt: number): void                   // mỗi 0,25 s: chọn LOD theo khoảng cách camera (CFG-WLD-02), frustum theo AABB chunk
-  heightAt(x: number, z: number): number     // O(1) từ collider Float32Array (dùng cho người chơi, NPC, đặt tạm)
-  surfaceAt(x: number, z: number): SurfaceId // tra surface.png 1 m/px
+Runtime trong Unity player (C#, CR-02; giao diện hệ thống theo DDD-04 mục 3.1):
+```csharp
+// World/Terrain/TerrainSystem.cs
+public sealed class TerrainSystem : ISystem {   // Id "terrain", Order 80 (thuộc render), init theo zone
+  public void OnZoneLoaded(LoadedZone z);       // tạo ChunkEntry cho mọi chunk (glTFast), gắn lightmap mốc hiện tại, dựng MeshCollider LOD1
+  public void OnZoneUnloaded(LoadedZone z);     // trả Mesh về ChunkPool, huỷ collider
+  public void Tick(float dt, float t);          // mỗi 0,25 s: chọn LOD theo khoảng cách camera (CFG-WLD-02), frustum theo AABB chunk
+  public float HeightAt(float x, float z);      // O(1) từ NativeArray<float> của height-lod1.r32 (người chơi, NPC, đặt tạm)
+  public SurfaceId SurfaceAt(float x, float z); // tra surface.png 1 m/px
 }
-// runtime/src/fx/time-of-day.ts
-export class TimeOfDayController {
-  constructor(ctx: EngineContext, stops: TimeOfDayStop[])
-  setHour(h: number, opts?: { immediate?: boolean }): void
-  update(dt: number): void                   // STM-WLD-01
-  readonly blend: { a: string; b: string; t: number }   // mốc lightmap đang trộn (đọc bởi terrain/static material)
+// Fx/TimeOfDay.cs
+public sealed class TimeOfDayController {
+  public TimeOfDayController(EngineContext ctx, TimeOfDayStop[] stops);
+  public void SetHour(float h, bool immediate = false);
+  public void Tick(float dt, float t);          // STM-WLD-01
+  public (string a, string b, float t) Blend { get; }   // mốc lightmap đang trộn (đọc bởi shader LitRgbmLightmap)
 }
-// runtime/src/fx/dynamic-lights.ts
-export class DynamicLightManager { register(l: LightDef): void; update(dt: number, cam: Camera): void }
+// Fx/DynamicLights.cs
+public sealed class DynamicLightManager { public void Register(LightDef l); public void Tick(float dt, Camera cam); }
 ```
 
 Python bước build dùng mẫu chung:
@@ -93,7 +96,7 @@ def main(ctx_path: str) -> int:           # đọc ctx.json, ghi outDir/*, repor
 | DTO-WLD-07 | `fetch.provenance.json` | `{type:'map', sources: [{name:'Copernicus GLO-30', url, tiles[], version, license, attribution}, {name:'OpenStreetMap', url, query, timestamp, license:'ODbL-1.0', attribution:'© OpenStreetMap contributors'}], fetchedAt, cacheKey}` |
 | DTO-WLD-08 | `data-sources.json` | `{allowHosts: ['overpass-api.de', 'download.geofabrik.de', 'copernicus-dem-30m.s3.amazonaws.com', 'api.polyhaven.com', 'dl.polyhaven.org'], overpass: {url, timeoutS: 300}, geofabrik: {region: 'asia/vietnam'}}` |
 | DTO-WLD-09 | `VegLayer`, `PlacementRule` | `VegLayer = {id, mask: Polygon[] \| 'forest'\|'farm', species: [{ref: AssetRef, weight}], densityPerHa, minSpacing, maxSlope, scale:[a,b], seed, impostorDistance, grass?: {densityPerM2, heightM, colorJitter}}`; `PlacementRule = {id, ref: AssetRef, region: Polygon \| regionId, count?: [a,b], densityPerHa?, minSpacing, maxSlope, alignToNormal: bool, onWater: bool, avoidRoadM, avoidWaterM, seed}` |
-| DTO-WLD-10 | Đầu ra bước | `terrain.mesh`: `chunks/<cx>_<cz>/lod{0..3}.glb`, `collider/height-lod1.r32`, `collider/bvh.bin`; `terrain.splat`: `splat-0.png` (`splat-1.png` khi 8 lớp), `surface.png`, `layers.json`; `water`: `water/<id>.glb`, `water-mask.png`, `water-data.png` (R = SDF bờ, G = độ sâu × 10); `vegetation`: `veg/instances-<layer>.bin`, `veg/impostors/<species>.ktx2`; `placement`: `placement/instances.bin`, `placement/report.json`; `lighting.bake`: `lightmaps/<tod>/<atlas>.ktx2`, `ao/<atlas>.ktx2`, `lightmaps/uv2-atlas.json` |
+| DTO-WLD-10 | Đầu ra bước | `terrain.mesh`: `chunks/<cx>_<cz>/lod{0..3}.glb`, `collider/height-lod1.r32`; `terrain.splat`: `splat-0.png` (`splat-1.png` khi 8 lớp), `surface.png`, `layers.json`; `water`: `water/<id>.glb`, `water-mask.png`, `water-data.png` (R = SDF bờ, G = độ sâu × 10); `vegetation`: `veg/instances-<layer>.bin`, `veg/impostors/<species>.ktx2`; `placement`: `placement/instances.bin`, `placement/report.json`; `lighting.bake`: `lightmaps/<tod>/<atlas>.ktx2`, `ao/<atlas>.ktx2`, `lightmaps/uv2-atlas.json` |
 
 ---
 
@@ -266,7 +269,7 @@ for (cx, cz) in chunks(playArea, 64 m):
     skirt: nhân đôi đỉnh biên, y -= 2 m, nối thành dải tam giác hướng xuống
     uv0 = (x, z) / tiling; uv2 = atlasRect(cx,cz) ánh xạ [0,1]² chunk vào ô atlas lightmap (lightmaps/uv2-atlas.json)
     ghi chunks/cx_cz/lod.glb (Meshopt, quantize 14 bit vị trí)
-collider: height-lod1.r32 (lưới LOD1) + bvh.bin (three-mesh-bvh serialize của LOD1)
+collider: height-lod1.r32 (lưới LOD1); player dựng MeshCollider từ lod1.glb lúc nạp chunk (Physics.BakeMesh chia lát theo khung), không còn bvh.bin (CR-02)
 runtime: lod = d < 80 ? 0 : d < 200 ? 1 : d < 450 ? 2 : 3 (tier Vừa, TSD đề xuất, CFG-WLD-02); đổi LOD có trễ ±5 m để không nhấp nháy
 ```
 
@@ -315,7 +318,7 @@ tree(recipe): key = sha256(recipe + versions.blender + versions.sapling); cache 
   blender -b --factory-startup -P sapling/tree_gen.py -- --recipe r.json --seed s → tree_lod0.glb (thân + thẻ lá), tree_lod1.glb
   impostor: octa_bake.py: 8×8 hướng trên bán cầu octahedral, khung 256 px, albedo+alpha và normal → atlas 2048² → ktx create ETC1S
 runtime: d > impostorDistance → impostor; vùng [D-5, D] cross-fade bằng dither (bayer 4×4) 0,5 s
-  một InstancedMesh mỗi (loài, LOD, chunk); impostor gộp mọi loài của chunk vào một InstancedMesh với atlas mảng
+  một lô Graphics.RenderMeshInstanced mỗi (loài, LOD, chunk); impostor gộp mọi loài của chunk vào một lô với Texture2DArray (CR-02)
 gió (vertex): w = weather.wind; phase = dot(instancePos.xz, (0.13, 0.07)); sway = sin(time·1.7 + phase)·w·heightFactor²
   heightFactor = vertex.y / treeHeight (thân), màu đỉnh G cho lá (rung thêm sin(time·4 + phase·3)·0.05·w); tier Thấp: tắt
 ```
@@ -363,19 +366,19 @@ setHour(h): (a, b) = hai mốc kề h trong timeOfDay đã sắp theo hour (vòn
 mỗi 0,25 s: cands = lights trong frustum, sắp theo khoảng cách² tới camera
   bật N = budgets.dynamicLights[tier] gần nhất (Thấp 0, Vừa 2, Cao 4, Tối đa 8)
   đèn rời danh sách: intensity → 0 trong 0,3 s rồi visible=false; đèn mới: 0 → giá trị trong 0,3 s
-  dùng pool PointLight cố định N cái (không tạo mới, tránh biên dịch lại shader)
+  dùng pool `Light` (Point) cố định N cái (không tạo mới, tránh biên dịch lại shader)
 ```
 
 ### PSC-WLD-16 Trời, khí quyển, hậu kỳ (ALG-WLD-16)
 | Hiệu ứng | Cài đặt | Thấp | Vừa | Cao/Tối đa |
 |---|---|---|---|---|
-| IBL | HDRI tiền lọc PMREM ở build (DDD-03 PSC-AST-10) | Có | Có | Có |
-| Trời thủ tục | `Sky` (three/examples) khi không HDRI | Có | Có | Có |
-| Sương | `FogExp2` + sương theo độ cao trong chunk shader chung `fog_height` | Exp2 | + độ cao | + độ cao |
+| IBL | Cubemap KTX2 tiền lọc + hệ số SH tính sẵn ở build (DDD-03 PSC-AST-10, CR-02), gán `RenderSettings.customReflectionTexture` + ambient SH | Có | Có | Có |
+| Trời thủ tục | Shader Graph trời Preetham khi không HDRI (CR-02) | Có | Có | Có |
+| Sương | `RenderSettings.fog` Exp2 + sương theo độ cao trong sub-graph dùng chung `FogHeight` | Exp2 | + độ cao | + độ cao |
 | Mây | Dome texture cuộn UV | Tắt | Có | Có |
 | Mưa | Hạt instanced trong hộp 30 m quanh camera, pool theo `particles` | 300 | 1.500 | 4.000 |
 | Sương sớm | Lớp quad bán trong suốt theo độ cao | Tắt | Có | Có |
-| Hậu kỳ | `postprocessing`: tone mapping, bloom, LUT (style bible), FXAA | Tone mapping | + FXAA + LUT | + bloom |
+| Hậu kỳ | URP Volume: tone mapping, bloom, LUT (style bible), FXAA | Tone mapping | + FXAA + LUT | + bloom |
 
 ---
 
@@ -398,11 +401,11 @@ mỗi 0,25 s: cands = lights trong frustum, sắp theo khoảng cách² tới ca
 | Mã | Khoá | Mặc định | Nơi |
 |---|---|---|---|
 | CFG-WLD-01 | `cellM` heightfield | 2 m (≤ 4 km²); 1 m cho zone ≤ 0,25 km² khi `world.highRes=true` (OIT-WLD-01) | `world.json` / `step.json params` |
-| CFG-WLD-02 | Khoảng LOD địa hình theo tier | Thấp 60/150/350; Vừa 80/200/450; Cao 120/300/700 m (TSD đề xuất cho Vừa; Thấp/Cao DDD đề xuất) | `engine/runtime/src/render/terrain/lod-table.json` |
+| CFG-WLD-02 | Khoảng LOD địa hình theo tier | Thấp 60/150/350; Vừa 80/200/450; Cao 120/300/700 m (TSD đề xuất cho Vừa; Thấp/Cao DDD đề xuất) | `engine/unity/Assets/GameStudio/World/Terrain/lod-table.json` |
 | CFG-WLD-03 | Bán kính cỏ | Thấp 20, Vừa 35, Cao 60 m (TSD đề xuất); Tối đa 80 m (DDD đề xuất) | `fx`/`vegetation` tier table |
 | CFG-WLD-04 | Xói mòn | quán tính 0,05; sức mang 4; lắng 0,3; bốc hơi 0,01; bán kính 3; talus 35° | `steps/terrain-erode/params.json` |
 | CFG-WLD-05 | Bake | 128 mẫu, OIDN, atlas Vừa 2048 (OIT-WLD-02), timeout 4 giờ | `steps/lighting-bake/step.json params` |
-| CFG-WLD-06 | Chuyển mốc | 3 s trộn; giải phóng mốc cũ sau 1 s; chờ lightmap tối đa 10 s | `fx/time-of-day.ts` |
+| CFG-WLD-06 | Chuyển mốc | 3 s trộn; giải phóng mốc cũ sau 1 s; chờ lightmap tối đa 10 s | `Fx/TimeOfDay.cs` |
 | CFG-WLD-07 | Impostor | 8×8 khung, 256 px, cross-fade 0,5 s, trễ 5 m | `steps/vegetation/params.json` |
 
 ---
@@ -466,3 +469,4 @@ mỗi 0,25 s: cands = lights trong frustum, sắp theo khoảng cách² tới ca
 |---|---|---|---|
 | 0.1 | 22/11/2026 | Claude | Bản đầu từ TSD-02 v1.1 |
 | 1.0 | 23/11/2026 | Huy | Duyệt bộ DDD; thay đổi sau đây theo change request |
+| 1.1 | 26/11/2026 | Claude | CR-02 (ADR-036) và POC-U1: MOD-WLD-07 bỏ `bvh.bin` (MeshCollider LOD1 trong player), MOD-WLD-13…16 sang C# `engine/unity`, mục 3 giao diện C#, PSC-WLD-07, 11, 16 (instancing Unity, IBL cubemap + SH, trời Shader Graph, URP Volume), DTO-WLD-10, CFG-WLD-02 |

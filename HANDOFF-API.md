@@ -27,11 +27,12 @@ Script truy vết (chạy sau mỗi lần sửa tài liệu, exit 0 là đạt):
 
 Trên Windows PowerShell phải bật UTF-8 trước, nếu không script sẽ dừng với `UnicodeEncodeError` (exit 1) vì console không in được tiếng Việt: `$env:PYTHONIOENCODING='utf-8'`. Kết quả ngày 23/11/2026: cả 4 script exit 0 (358 FR; 406 mã TSD; DDD không có tham chiếu hỏng; UIUX phủ 141/141 FR bắt buộc). Script tự ghi lại các tệp phụ lục `*-PL-A-MA-TRAN-TRUY-VET.md`.
 
-## 3. Quyết định công nghệ đã chốt (ADR-016…033)
+## 3. Quyết định công nghệ đã chốt (ADR-016…037)
 - Monorepo pnpm workspaces (TS) + uv (Python); chạy song song `pnpm -r`; không Turborepo/Nx bản đầu (016).
 - Node 24 LTS, TypeScript 5.x strict, Python 3.12; phiên bản ghi ở `tools/versions.json` (017). **Blender 5.2 LTS** + Sapling Tree Gen 1.2.0 + A.N.T. Landscape 0.2.0 (**ADR-034**, 23/11/2026, thay phần Blender 4.5 của ADR-017; mọi chỗ "Blender 4.5" trong TSD/DDD hiểu là 5.2).
-- Runtime đồ hoạ Three.js bản cố định tại E0 (018); kiến trúc runtime, va chạm/điều hướng, dữ liệu/schema, biểu thức an toàn, điều phối build, nén asset, địa hình, bake ánh sáng (019–026).
-- Web Studio: React 19 + Vite + TS, TanStack Query, Zustand, Tailwind + Radix, @xyflow/react, Monaco; xem trước nhúng thẳng `@gamestudio/engine` (027).
+- **Runtime là Unity (ADR-036, CR-02, Huy chốt 25/11/2026), thay Three.js (018):** một Unity player Web chung cho mỗi `engineVersion` (Unity 6000.3.29f1, URP, WebGL2, C# trong `engine/unity/`, license Personal), game là gói dữ liệu nạp lúc chạy (glTFast + Meshopt + KTX for Unity); va chạm Unity Physics, NavMesh AI Navigation dựng lúc nạp zone; pipeline build TS/Python giữ nguyên, worker không cần Unity. Dữ liệu/schema, biểu thức an toàn (thêm bản C#), điều phối build, nén asset, địa hình, bake ánh sáng Blender (019–026, phần runtime theo ADR-036).
+- **POC-U1 (26/11/2026, `docs/POC/POC-U1.md`):** A56 lần đầu 17,5 s, đã cache 8,3 s, ~57 fps với ~0,96 triệu tri. Ngân sách Huy chốt: lần đầu ≤ 20 s, đã cache ≤ 10 s, player ≤ 10 MB Brotli, lõi zone ≤ 8 MB. **Âm thanh chỉ AAC/M4A (ADR-037)** vì Unity Web không phát Ogg/Opus.
+- Web Studio: React 19 + Vite + TS, TanStack Query, Zustand, Tailwind + Radix, @xyflow/react, Monaco; xem trước nhúng **Unity player** qua `EditorBridge` (`SendMessage` + `.jslib`; ADR-036 thay phần xem trước của 027).
 - Backend: Fastify (Node 24) cho `web/api` và `web/ai-gateway`; PostgreSQL 17 + Drizzle; pg-boss; SSE qua LISTEN/NOTIFY (028).
 - Kho đối tượng (029); xác thực Google OIDC, phiên opaque trong PostgreSQL, JWT chỉ cho token ngắn hạn (030).
 - AI (031, **sửa bởi ADR-035, 23/11/2026**): việc soạn game của Web Studio (tiếp nhận, đề xuất, nháp kịch bản) chạy bằng **Claude Code CLI** (`claude -p --output-format json --json-schema …`), **mỗi người dùng tự đăng nhập** bằng tài khoản/khoá của họ; máy chủ không giữ thông tin đăng nhập Claude của ai; không dùng gói Max của Huy cho người khác. Claude Code chạy trên máy người dùng qua cầu nối cục bộ. Gemini (`@google/genai`), ElevenLabs (REST) vẫn qua `ai-gateway` giữ khoá. Hội thoại NPC khi chơi chỉ kịch bản tĩnh (không còn `claude-haiku-5-5`).
@@ -91,7 +92,8 @@ Bốn thư mục Blender 5.2.4, ktx, ffmpeg, gitleaks đã được thêm vào *
 - **W2:** hàng đợi + worker, xem trước, phiên bản, hạn mức, sao lưu, trang quản trị.
 - **W3:** editor (cảnh, NPC, động vật, hội thoại, bảng cân bằng), khoá sửa, đề xuất thay đổi.
 - **W4:** kho asset, xuất/nhập gói, chia sẻ, xuất bản, link chơi thử, JSON thô, rà soát bảo mật.
-- **Engine E1→E8:** schema/rng/expr/intake → materials/packager/runtime → water/vegetation/fx → asset/khung xương → bake ánh sáng → tương tác/NPC/hội thoại/chiến đấu → tối ưu/game thứ hai. W1–W4 chạy song song sau cổng G-E1.
+- **Engine E1→E8:** schema/rng/expr/intake → materials/packager/**Unity player** → water/vegetation/fx → asset/khung xương → bake ánh sáng → tương tác/NPC/hội thoại tĩnh/chiến đấu → tối ưu/game thứ hai. W1–W4 chạy song song sau cổng G-E1.
+- **E2 sau CR-02 và POC-U1** (TSD-00 §11, chưa cắt phiếu): khung Unity player `engine/unity` (Boot, Loader, Tier, Input, CameraPlayer); bản C# của `rng`/`expr` + vector chung; packager ra manifest cho player (glb có `scene` mặc định, texture lõi ≤ 1024 ETC1S); `engine doctor`/`versions.json` bỏ `three` thêm `unity`; skill `engine-unity-*`. Việc rút từ POC-U1, mỗi việc một phiếu: âm thanh AAC (ADR-037), làm ấm shader trước "Chơi", NavMesh theo ô bất đồng bộ, poc phục vụ https. Build/test Unity chạy trên máy Huy (Remote Control).
 
 ### 6.1 E0 (đã qua G-E0 ngày 24/11/2026)
 Điều kiện qua G-E0 (SRS-00 §4.3; BRD-00 §9): ADR-001…015 đã viết; `engine doctor` đạt; scaffold gốc chạy trên A56 và baseline ghi vào `budgets.json`; hook, template, `project.yaml`, `CLAUDE.md` sẵn sàng. Phạm vi FR: SRS-09 toàn bộ FR-DEV trừ 06, 25; SRS-04 FR-RTM-12, 13, FR-QA-07.

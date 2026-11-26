@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | DDD-07 |
-| Phiên bản | 1.0 |
-| Ngày | 23/11/2026 |
+| Phiên bản | 1.1 |
+| Ngày | 26/11/2026 |
 | Tài liệu cha | DDD-00 `DDD-00-TONG-QUAN.md` |
-| TSD nguồn | TSD-07 v1.1 (IF-DLG-01…05, SCH-DLG-01…07, ALG-DLG-01…09, TST-DLG-01…08) |
+| TSD nguồn | TSD-07 v1.2 (IF-DLG-01…05, SCH-DLG-01…07, ALG-DLG-01…09, TST-DLG-01…08) |
 | SRS nguồn | SRS-07 v1.0 (FR-DLG-01…31, NFR-DLG-01…04) |
-| Gói | Runtime `engine/runtime/src/interaction/dialogue/` (luôn có) và `engine/runtime/src/dialogue-ai/` (chunk riêng); bước build `engine/build/steps/{dialogue-check, dialogue-voice}`; `web/ai-gateway/src/dlg/**`; `web/api/src/routes/dialogue-test.ts`; panel `web/app/src/features/dialogue/` |
+| Gói | Runtime trong Unity player `engine/unity/Assets/GameStudio/Interaction/Dialogue/` (C#, luôn có) và `engine/unity/Assets/GameStudio/DialogueAi/` (module bật theo `manifest.modules.dialogueAi`; CR-02 bỏ chunk riêng); bước build `engine/build/steps/{dialogue-check, dialogue-voice}`; `web/ai-gateway/src/dlg/**`; `web/api/src/routes/dialogue-test.ts`; panel `web/app/src/features/dialogue/` |
 | Pha | E6; editor W3 |
-| Trạng thái | Đã duyệt (Huy, 23/11/2026) |
+| Trạng thái | Đã duyệt (Huy, 23/11/2026); **v1.1 runtime Unity theo CR-02, âm thanh AAC theo ADR-037**, chờ Huy xem lại |
 
 > Hội thoại mặc định **tĩnh** (QĐ-14). AI khi chạy là tuỳ chọn theo game/NPC và chỉ đi qua `ai-gateway` giữ khoá; trình duyệt không bao giờ có khoá hay hồ sơ AI.
 
@@ -23,15 +23,17 @@ Thiết kế chi tiết ba chế độ `static`/`ai`/`hybrid`: trình chạy câ
 
 ## 2. Bố trí mã nguồn
 
+> Từ v1.1 (CR-02, ADR-036) MOD-DLG-01…07 là C# trong Unity player; cột "Tệp" giữ tên gốc để truy vết, tệp thật ở dạng PascalCase `.cs` (ví dụ `interaction/dialogue/runner.ts` → `Interaction/Dialogue/DialogueRunner.cs`). Phần AI khi chạy (MOD-DLG-06, 07, 11–19, EP-DLG-01…03) đã bị ADR-035 bỏ (NPC chỉ kịch bản tĩnh), chờ change request W1; v1.1 chỉ đổi phần chạm Unity, không thiết kế lại phần AI.
+
 | Mã | Tệp | Trách nhiệm |
 |---|---|---|
 | MOD-DLG-01 | `interaction/dialogue/runner.ts` | `DialogueRunner` (IF-DLG-01): chọn nút bắt đầu, duyệt nút, thực thi `do[]` qua `GameState` |
 | MOD-DLG-02 | `interaction/dialogue/tree-loader.ts`, `interaction/dialogue/compile.ts` | Nạp `dialogue/*.json`, biên dịch `if` bằng `@gamestudio/expr` một lần khi nạp |
-| MOD-DLG-03 | `interaction/dialogue/ui/dialogue-panel.ts`, `ui/dialogue-panel.css` | SCR-DLG-02 (DOM): khung thoại, lựa chọn ≥ 48 px, gợi ý AI, ô gõ, chỉ báo "đang suy nghĩ" |
+| MOD-DLG-03 | `interaction/dialogue/ui/dialogue-panel.ts`, `ui/dialogue-panel.css` | SCR-DLG-02 (UI Toolkit `DialoguePanel.uxml` + `.uss`, CR-02): khung thoại, lựa chọn ≥ 48 px, gợi ý AI, ô gõ, chỉ báo "đang suy nghĩ" |
 | MOD-DLG-04 | `interaction/dialogue/barks.ts` | Câu bâng quơ (PSC-DLG-09), bong bóng chữ pool 4 |
 | MOD-DLG-05 | `interaction/dialogue/fallback.ts` | Chọn câu dự phòng bằng RNG seed NPC; câu từ chối trong vai |
-| MOD-DLG-06 | `dialogue-ai/index.ts`, `dialogue-ai/client.ts`, `dialogue-ai/session.ts` | Chunk `dialogue-ai`: `DialogueAiClient` (IF-DLG-02), giữ token phiên trong bộ nhớ |
-| MOD-DLG-07 | `dialogue-ai/voice-player.ts` | Phát luồng Opus từ EP-DLG-03 qua `AudioService` (MediaSource/decodeAudioData theo khối) |
+| MOD-DLG-06 | `dialogue-ai/index.ts`, `dialogue-ai/client.ts`, `dialogue-ai/session.ts` | Module `dialogueAi`: `DialogueAiClient` (IF-DLG-02; gọi mạng bằng `UnityWebRequest`), giữ token phiên trong bộ nhớ |
+| MOD-DLG-07 | `dialogue-ai/voice-player.ts` | Phát giọng từ EP-DLG-03 qua `AudioService`: tải trọn câu M4A (AAC, ADR-037) bằng `UnityWebRequestMultimedia.GetAudioClip` rồi phát; Unity Web không phát luồng theo khối (CR-02) |
 | MOD-DLG-08 | `engine/shared/dialogue-check/{graph.ts, check.ts, report.ts}` | PSC-DLG-01, dùng chung bước build, web/app và `gs validate` |
 | MOD-DLG-09 | `engine/build/steps/dialogue-check/{step.json, index.ts}` | Bước `dialogue.check` (EP-DLG-05) |
 | MOD-DLG-10 | `engine/build/steps/dialogue-voice/{step.json, index.ts}` | Bước `dialogue.voice` (PSC-DLG-08 phần tĩnh) |
@@ -42,7 +44,7 @@ Thiết kế chi tiết ba chế độ `static`/`ai`/`hybrid`: trình chạy câ
 | MOD-DLG-15 | `web/ai-gateway/src/dlg/filters/{input.ts, output.ts, patterns.ts, lang.ts}` | Lọc vào/ra (PSC-DLG-06) |
 | MOD-DLG-16 | `web/ai-gateway/src/dlg/prompt.ts`, `dlg/profiles.ts` | Dựng prompt (PSC-DLG-05); lấy `dialogue-profiles.json` qua `web/api` EP-WEB-43 (cổng không mount kho đối tượng, TSD-08 mục 2.1), cache LRU 32 bản xuất bản |
 | MOD-DLG-17 | `web/ai-gateway/src/dlg/cache.ts` | Cache câu gợi ý (TBL-DLG-02) |
-| MOD-DLG-18 | `web/ai-gateway/src/dlg/tts.ts` | Proxy ElevenLabs luồng Opus |
+| MOD-DLG-18 | `web/ai-gateway/src/dlg/tts.ts` | Proxy ElevenLabs, chuyển mã sang M4A (AAC, ADR-037) |
 | MOD-DLG-19 | `web/ai-gateway/src/dlg/log.ts` | Ghi TBL-DLG-01, `usage_records` |
 | MOD-DLG-20 | `web/api/src/routes/dialogue-test.ts` | EP-DLG-04 "Thử nói chuyện" (dữ liệu bản hiện tại) |
 | MOD-DLG-21 | `web/app/src/features/dialogue/{tree-editor.tsx, node-inspector.tsx, ai-profile-form.tsx, test-chat.tsx, qa-tab.tsx, use-dialogue-check.ts}` | SCR-DLG-01 |
@@ -122,7 +124,7 @@ Quyền DB: vai `gs_gateway` (DDD-00) `INSERT` TBL-DLG-01, DML TBL-DLG-02; `gs_a
 |---|---|---|
 | EP-DLG-01 | `POST /api/dialogue/session` (API-DLG-01) | Vào `{publishId, linkToken?}`; ra 200 `{sessionToken, expiresAt, quota: {turnsLeft}}`; 403 `{code:'ERR-DLG-02'}`; 429 `{code:'ERR-DLG-03', retryAfter}` |
 | EP-DLG-02 | `POST /api/dialogue/reply` (API-DLG-02) | Header `Authorization: Bearer <jwt>`; vào `ReplyReq` (giới hạn thân 8 KB, `history` ≤ 5, `playerText` ≤ 200); ra 200 `ReplyRes`; lỗi 401/403/429/502/504 thân `{code, retryAfter?}` |
-| EP-DLG-03 | `POST /api/dialogue/tts` (API-DLG-03) | Vào `{npcId, text ≤ 400}`; ra `200 audio/ogg; codecs=opus` dạng chunked; NPC không có `voice` → 404; cùng hạn mức/log với EP-DLG-02 |
+| EP-DLG-03 | `POST /api/dialogue/tts` (API-DLG-03) | Vào `{npcId, text ≤ 400}`; ra `200 audio/mp4` (AAC, ADR-037), trọn câu; NPC không có `voice` → 404; cùng hạn mức/log với EP-DLG-02 |
 | EP-DLG-04 | `POST /api/games/{id}/dialogue/test` | Phiên Web Studio (cookie), quyền `editor`; vào `{npcId, history, playerText?, suggestionId?, milestoneState}`; `web/api` dựng hồ sơ từ bản dữ liệu hiện tại → gọi EP-WEB-40 với `task='dialogue_test'` → cùng PSC-DLG-05/06; `usage_records.kind='dialogue_test'` tính vào hạn mức người dùng |
 | EP-DLG-05 | Bước `dialogue.check` (IF-DLG-04) | `deps: []`; `dataPointers: ['/dialogue', '/entities~1npc', '/game.json/state']`; runner node; đầu ra `report/1 {checks: [{node, tree, code, message}]}`; lỗi → Fail ERR-DLG-08 |
 | EP-DLG-06 | `engine qa --dialogue` (IF-DLG-05) | Đọc `qa/dialogue/*.json`; gọi `ai-gateway` bằng `GS_GATEWAY_TOKEN_QA` với `task='dialogue_qa'`; ghi `qa/report/dialogue.json {npc, total, pass, fail: [{id, reason}]}`; thoát 1 khi có câu `pha_vai` không bị từ chối |
@@ -288,7 +290,7 @@ ask(input):
 ```
 
 ### PSC-DLG-08 Giọng nói (ALG-DLG-08)
-Tĩnh: bước `dialogue.voice` (MOD-DLG-10) duyệt câu của NPC có `voice.static`, khoá `sha256(voiceId|text)`; chưa có → gọi EP-WEB-42 (`/internal/audio`, ElevenLabs) → `audio/voice/<hash>.opus` + provenance (DDD-03 DTO-AST-01), tái dùng giữa các build. AI: sau khi có `text`, client gọi EP-DLG-03; cổng stream Opus; lỗi/không hỗ trợ → chỉ hiện chữ.
+Tĩnh: bước `dialogue.voice` (MOD-DLG-10) duyệt câu của NPC có `voice.static`, khoá `sha256(voiceId|text)`; chưa có → gọi EP-WEB-42 (`/internal/audio`, ElevenLabs) → `audio/voice/<hash>.m4a` (AAC, ADR-037) + provenance (DDD-03 DTO-AST-01), tái dùng giữa các build. AI: sau khi có `text`, client gọi EP-DLG-03; cổng trả trọn câu M4A; lỗi/không hỗ trợ → chỉ hiện chữ.
 
 ### PSC-DLG-09 Câu bâng quơ (ALG-DLG-09)
 ```
@@ -304,7 +306,7 @@ for npc in entities/npc: d = npc.dialogue
   npcOut.dialogue = {mode: d.mode, treeRef: d.treeRef, allowFreeText: d.allowFreeText, voice: d.voice && {static: d.voice.static}}
 write build/private/dialogue-profiles.json (không chép vào build/publish/**)
 kiểm ngược: grep 'aiProfile'|'knowledge'|'forbidden' trong build/publish/** → Fail ERR-DLG-08 ('profile_leak')
-manifest.chunks.dialogueAi chỉ khi profiles.npcs không rỗng
+manifest.modules.dialogueAi = true chỉ khi profiles.npcs không rỗng (CR-02)
 ```
 
 ---
@@ -330,13 +332,13 @@ Người chơi không thấy mã lỗi.
 
 | Mã | Khoá | Mặc định | Nơi |
 |---|---|---|---|
-| CFG-DLG-01 | Thời gian client | `timeoutMs` 3000; `thinkingMs` 300 | `dialogue-ai/config.ts` |
+| CFG-DLG-01 | Thời gian client | `timeoutMs` 3000; `thinkingMs` 300 | `DialogueAi/DialogueAiConfig.cs` |
 | CFG-DLG-02 | Tần suất | phiên 10 lượt/phút; IP 60 lượt/phút; token JWT 900 s | `ai_config.dlg` (DDD-08 TBL-WEB-24) |
 | CFG-DLG-03 | Hạn mức | 20.000 token/phiên; `dialogue_usd_day` theo game (Huy đặt); `turnsPerSession` 60 | `ai_config.dlg`, `game_quotas` |
 | CFG-DLG-04 | Mô hình | `dialogueModel` `claude-haiku-5-5`; `dialogueModelLarge` (quản trị đặt); `allowLargeDialogue` false; `maxOutputTokens` 150; effort `low` | `ai_config.dlg` |
 | CFG-DLG-05 | Lọc | `dlgPatterns` (danh sách cụm khai thác vi/en); n-gram 8; email/phone regex | `ai_config.dlg` + `filters/patterns.ts` (mặc định) |
 | CFG-DLG-06 | Cache, log | `dialogue_cache` TTL 7 ngày; `content` log 7 ngày khi debug | `ai_config.dlg` |
-| CFG-DLG-07 | Câu bâng quơ | bán kính 5 m; 30 s/NPC; quét 1 s | `interaction/dialogue/config.ts` |
+| CFG-DLG-07 | Câu bâng quơ | bán kính 5 m; 30 s/NPC; quét 1 s | `Interaction/Dialogue/DialogueConfig.cs` |
 
 ---
 
@@ -368,7 +370,7 @@ Kiểm thử đơn vị cổng dùng `FakeAnthropic` (tiêm qua `Deps`), không 
 | Mã | Câu hỏi | Đề xuất |
 |---|---|---|
 | OID-DLG-01 | Bộ lọc khai thác chỉ bằng luật có đủ | Theo OIT-DLG-01: luật + lọc ra; thêm phân loại bằng mô hình nhỏ khi TC-DLG-14 báo lọt |
-| OID-DLG-02 | Bản tĩnh trên máy chủ poc không có cổng | Theo OIT-DLG-02: `manifest.chunks.dialogueAi` không ghi, NPC chạy dự phòng; `publish.json.dialogueAi=false` |
+| OID-DLG-02 | Bản tĩnh trên máy chủ poc không có cổng | Theo OIT-DLG-02: `manifest.modules.dialogueAi` không ghi, NPC chạy dự phòng; `publish.json.dialogueAi=false` |
 | OID-DLG-03 | Hạn mức `dialogue_usd_day` mỗi game | Huy đặt khi bật NPC AI đầu tiên (NFR-DLG-02); ước tính ≈ 0,01 USD/phiên 15 phút |
 
 ---
@@ -414,3 +416,4 @@ Kiểm thử đơn vị cổng dùng `FakeAnthropic` (tiêm qua `Deps`), không 
 |---|---|---|---|
 | 0.1 | 22/11/2026 | Claude | Bản đầu từ TSD-07 v1.1 |
 | 1.0 | 23/11/2026 | Huy | Duyệt bộ DDD; thay đổi sau đây theo change request |
+| 1.1 | 26/11/2026 | Claude | CR-02 (ADR-036) và ADR-037: runtime hội thoại sang C# trong Unity player (ghi chú mục 2), MOD-DLG-03 UI Toolkit, MOD-DLG-06, 07, 18, EP-DLG-03, PSC-DLG-08 giọng AAC/M4A tải trọn câu, PSC-DLG-10 và OID-DLG-02 dùng `manifest.modules.dialogueAi`; ghi chú phần AI đã bị ADR-035 bỏ, chờ CR W1 |
