@@ -1,4 +1,4 @@
-# T-0022 (POC-U1, NFR-RTM-01): chép một bản build Unity Web lên thư mục poc RIÊNG của GameStudio (C:\poc-gamestudio\<Name>).
+﻿# T-0022 (POC-U1, NFR-RTM-01): chép một bản build Unity Web lên thư mục poc RIÊNG của GameStudio (C:\poc-gamestudio\<Name>).
 # Caddy phục vụ thẳng thư mục này cho gamestudio.vinpride.com (khối mẫu: engine/unity/dev/caddy-gamestudio.txt),
 # không đi qua máy chủ poc và thư mục split của chuaonline, nên chuaonline xuất bản lại không làm mất bản build.
 # Chép nguyên bản build (giữ .unityweb); Caddy gắn Content-Encoding br nên trình duyệt tự giải nén Brotli.

@@ -1,4 +1,4 @@
-# T-0022 (POC-U1): Huy tự chạy (PowerShell quản trị). Tách gamestudio.vinpride.com khỏi khối chuaonline trong
+﻿# T-0022 (POC-U1): Huy tự chạy (PowerShell quản trị). Tách gamestudio.vinpride.com khỏi khối chuaonline trong
 # C:\caddy\Caddyfile, thêm khối riêng từ caddy-gamestudio.txt, kiểm cấu hình rồi khởi động lại tác vụ caddy-proxy.
 # Sao lưu: C:\caddy\Caddyfile.truoc-tach-gamestudio. Hoàn tác: chép lại bản sao lưu rồi khởi động lại caddy-proxy.
 param([string]$Caddyfile = 'C:\caddy\Caddyfile', [string]$Task = 'caddy-proxy')
