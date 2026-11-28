@@ -5,7 +5,7 @@ Engine web game 3D dùng lại được, kèm Web Studio, để tạo, chỉnh v
 - Brief gốc: `GAME-ENGINE-WEB3D-BRIEF.md`; ngữ cảnh khởi động phiên: `HANDOFF-API.md`.
 - Tài liệu đã duyệt: `docs/` (BRD, SRS, TSD, DDD, UIUX, ADR).
 - Fork từ [majidmanzarpour/threejs-game-skills](https://github.com/majidmanzarpour/threejs-game-skills) (MIT, tác giả Majid Manzarpour). Thay đổi so với bản gốc: `UPSTREAM.md`. README gốc: nhánh `vendor/upstream`.
-- Skill Claude Code: `.claude/skills/` (8 skill gốc; đã bỏ `threejs-3d-generator` theo QĐ-08).
+- Skill Claude Code: `.claude/skills/` (giữ `threejs-image-generator`, `threejs-audio-generator` của bộ gốc, `engine-intake` và 5 skill `engine-unity-*`; đã bỏ `threejs-3d-generator` theo QĐ-08 và 6 skill gắn Three.js theo CR-02).
 
 Runtime: Unity player Web dùng chung, game là gói dữ liệu (ADR-036, CR-02). Trạng thái: E1, chuẩn bị E2 (xem `HANDOFF-API.md` §6).
 

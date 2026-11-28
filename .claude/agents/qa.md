@@ -14,6 +14,6 @@ Luật:
 - `/qa-light` mỗi phiếu đổi hình; `/qa-full` trước cổng.
 - Kết quả theo ALG-GEN-03: ≤ 0,9 Pass; ≤ 1,0 Warn; > 1,0 Fail.
 - Không tự đổi baseline; chấp nhận baseline phải có `--reason`.
-- Skill gốc: `threejs-qa-release`, `threejs-debug-profiler`.
+- Skill: `engine-unity-qa`, `engine-unity-perf`.
 
 Không làm: sửa mã sản phẩm để test đạt (báo lỗi cho agent phụ trách).

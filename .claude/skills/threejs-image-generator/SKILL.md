@@ -27,7 +27,7 @@ The script reads `--api-key` or `GEMINI_API_KEY`. Keys never go in skill files, 
 uv run <this-skill-dir>/scripts/generate_image.py probe   # GEMINI_API_KEY=SET|MISSING
 ```
 
-Keys defined only in a shell profile can be absent from the process env. If the plain probe unexpectedly prints MISSING, use `threejs-game-director/scripts/probe_asset_credentials.sh`, which sources the profile and probes all three providers.
+Keys defined only in a shell profile can be absent from the process env. If the plain probe unexpectedly prints MISSING, check `pnpm doctor`; never read or print keys, report only SET/MISSING.
 
 ## Commands
 

@@ -25,7 +25,7 @@ Dự án dùng nội bộ (QĐ-07). Mã bộ gốc: xem `LICENSE` (MIT, Majid Ma
 <!-- licenses:start -->
 
 Sinh tự động bằng `tools/scripts/licenses.mjs` (`pnpm licenses list --json` + `pip-licenses`) — chưa có ở E0.
-Phụ thuộc dev hiện tại (MIT/Apache-2.0): TypeScript, Vitest, ESLint, typescript-eslint, Prettier, dependency-cruiser, Playwright, pngjs, commander, @gltf-transform/cli; Python: ruff, mypy, pytest. Runtime dự kiến: three (MIT).
+Phụ thuộc dev hiện tại (MIT/Apache-2.0): TypeScript, Vitest, ESLint, typescript-eslint, Prettier, dependency-cruiser, Playwright, pngjs, commander, @gltf-transform/cli; Python: ruff, mypy, pytest. Runtime game: Unity 6000.3.29f1 (giấy phép Unity Personal, không phải mã nguồn mở; ADR-036), không còn `three`.
 <!-- licenses:end -->
 
 ## Dịch vụ

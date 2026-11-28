@@ -12,7 +12,7 @@ interface Result {
 }
 
 describe('structure-check', () => {
-  it('repo đạt: 8 agent, 8 skill gốc, 15 lệnh, CLAUDE.md < 150', () => {
+  it('repo đạt: 8 agent, 2 skill gốc + 5 engine-unity-*, 15 lệnh, CLAUDE.md < 150', () => {
     const r = checkStructure() as Result;
     expect(r.errors).toEqual([]);
     expect(r.ok).toBe(true);

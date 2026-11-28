@@ -48,6 +48,9 @@ Ghi công và lịch sử thay đổi so với bộ gốc (QĐ-01, QĐ-07; BR-37
 | `README.md` | sua | Thêm mục "Bắt đầu" | E0-02 |
 | `.claude/{agents,commands,rules,hooks,templates}/`, `.claude/settings*.json`, `CLAUDE.md` | them | Studio AI của GameStudio (TSD-09 §2.1); thay `AGENTS.md` đã xoá ở E0-01 | E0-04 |
 | `docs/**`, `GAME-ENGINE-WEB3D-BRIEF.md`, `HANDOFF-API.md` | them | Tài liệu dự án GameStudio | E0-01 |
+| `.claude/skills/{threejs-game-director,threejs-gameplay-systems,threejs-aaa-graphics-builder,threejs-game-ui-designer,threejs-debug-profiler,threejs-qa-release}/**` | xoa | Gắn Three.js; runtime chuyển sang Unity (CR-02, ADR-036, FR-DEV-02); thay bằng skill `engine-unity-*` (`build`, `gameplay`, `render`, `perf`, `qa`) viết mới, không thuộc bộ gốc | T-0024 |
+| `.claude/skills/threejs-audio-generator/SKILL.md`, `threejs-image-generator/SKILL.md` | sua | Bỏ trỏ tới `probe_asset_credentials.sh` của skill đã xoá (dùng `pnpm doctor`); âm thanh chạy trong Unity player, xuất bản AAC (ADR-037) | T-0024 |
+| `tools/scripts/structure-check.mjs` | sua | Danh sách skill: giữ 2 skill gốc, cấm 6 skill Three.js, bắt buộc 5 skill `engine-unity-*` | T-0024 |
 
 ## Quy trình lấy bản mới (ALG-DEV-09)
 

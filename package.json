@@ -18,8 +18,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "depcruise": "depcruise engine web --config .dependency-cruiser.cjs",
-    "check:scripts": "node --check .claude/skills/threejs-qa-release/scripts/inspect-threejs-canvas.mjs && python scripts/check-python-syntax.py scripts/check-python-syntax.py .claude/skills/threejs-gameplay-systems/scripts/create_threejs_game.py .claude/skills/threejs-image-generator/scripts/generate_image.py .claude/skills/threejs-audio-generator/scripts/threejs_audio_asset.py .claude/skills/threejs-game-director/scripts/check_evidence.py",
-    "test:helpers": "python -B -m unittest discover -s scripts/tests -p test_*.py && node --test scripts/tests/inspect-canvas.test.mjs"
+    "check:scripts": "python scripts/check-python-syntax.py scripts/check-python-syntax.py .claude/skills/threejs-image-generator/scripts/generate_image.py .claude/skills/threejs-audio-generator/scripts/threejs_audio_asset.py",
+    "test:helpers": "python -B -m unittest discover -s scripts/tests -p test_*.py"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

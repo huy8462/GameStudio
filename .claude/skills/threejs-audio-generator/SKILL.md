@@ -5,7 +5,7 @@ description: "Generate, convert, clean, and integrate audio for Three.js browser
 
 # Three.js Audio Generator
 
-Game-ready audio for Three.js projects: SFX, music, voice work, cleanup, and runtime integration. Provider: ElevenLabs.
+Game-ready audio for GameStudio games (Unity Web player, ADR-036; upstream wording says Three.js): SFX, music, voice work, cleanup, and runtime integration. Provider: ElevenLabs.
 
 Resolve `<this-skill-dir>` from the actual loaded skill file. Resolve sibling skills beside it first, then use the runner's discovered paths. Do not mix installed versions or assume a particular home directory.
 
@@ -27,7 +27,7 @@ The script reads `--api-key` or `ELEVENLABS_API_KEY`. Keys never go in skill fil
 python3 <this-skill-dir>/scripts/threejs_audio_asset.py probe   # ELEVENLABS_API_KEY=SET|MISSING
 ```
 
-Keys defined only in a shell profile can be absent from the process env; `threejs-game-director/scripts/probe_asset_credentials.sh` sources the profile and probes all three providers.
+Keys defined only in a shell profile can be absent from the process env. Do not read or print keys; report only SET/MISSING (`pnpm doctor`, GameStudio CLAUDE.md rule 3).
 
 Add `--validate` to call `GET /user` and confirm the key actually works (prints `VALID_USER=...`) when a key is present but generation fails. A valid key can still be blocked by credit or plan limits, which surface as an `HTTP 4xx` from a real generation attempt — report that as a plan blocker rather than a missing key.
 
@@ -66,7 +66,7 @@ python3 <this-skill-dir>/scripts/threejs_audio_asset.py voice-change \
 - Ambience: 8–30s with `--loop`, prompt influence 0.3–0.55.
 - Music: `music --prompt` (`--duration` 3–600s, `--instrumental`) or `--plan FILE` with a `composition_plan` JSON for sectioned tracks (`--seed` works only with plans). The API has no loop flag; lengths, looping, and layering are in the reference's Music Strategy.
 - Voice: TTS for clean generated lines; `voice-change` when timing and acting from a scratch performance matter. Isolate noisy speech first.
-- Runtime: generate into the game project and load through Web Audio. Follow the project's asset/version-control policy; do not commit or publish unless asked. No API keys in browser code.
+- Runtime (GameStudio): the Unity player plays published audio as AAC (M4A), not Opus/Ogg (ADR-037); generated mp3/wav are sources, converted at packaging. `references/audio-workflows.md` describes a Web Audio manager from the upstream Three.js set: treat it as background only. Follow the project's asset/version-control policy; do not commit or publish unless asked. No API keys in browser code.
 
 ## Recovery and Coordination
 

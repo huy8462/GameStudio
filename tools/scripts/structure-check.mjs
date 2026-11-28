@@ -8,10 +8,13 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(fileURLToPath(import.meta.url), '..', '..', '..');
 const C = join(ROOT, '.claude');
-const UPSTREAM_SKILLS = [
-  'threejs-game-director', 'threejs-gameplay-systems', 'threejs-aaa-graphics-builder', 'threejs-game-ui-designer',
-  'threejs-debug-profiler', 'threejs-qa-release', 'threejs-image-generator', 'threejs-audio-generator',
+const UPSTREAM_SKILLS = ['threejs-image-generator', 'threejs-audio-generator'];
+// 6 skill gắn Three.js đã bỏ, thay bằng engine-unity-* (CR-02, ADR-036, FR-DEV-02).
+const REMOVED_SKILLS = [
+  'threejs-3d-generator', 'threejs-game-director', 'threejs-gameplay-systems', 'threejs-aaa-graphics-builder',
+  'threejs-game-ui-designer', 'threejs-debug-profiler', 'threejs-qa-release',
 ];
+const UNITY_SKILLS = ['engine-unity-build', 'engine-unity-gameplay', 'engine-unity-render', 'engine-unity-perf', 'engine-unity-qa'];
 const COMMANDS = [
   'start', 'new-game', 'ticket', 'build-zone', 'qa-light', 'qa-full', 'perf-snapshot', 'visual-diff', 'gate-check',
   'asset-recipe', 'adr', 'publish-poc', 'handoff', 'resume-game', 'import-game',
@@ -35,7 +38,14 @@ export function checkStructure() {
   }
   const skills = existsSync(join(C, 'skills')) ? readdirSync(join(C, 'skills')) : [];
   for (const s of UPSTREAM_SKILLS) if (!skills.includes(s)) errors.push(`Thiếu skill gốc ${s} (FR-DEV-02).`);
-  if (skills.includes('threejs-3d-generator')) errors.push('Còn skill threejs-3d-generator (QĐ-08).');
+  for (const s of REMOVED_SKILLS) if (skills.includes(s)) errors.push(`Còn skill ${s} đã bỏ (QĐ-08, CR-02, FR-DEV-02).`);
+  for (const s of UNITY_SKILLS) if (!skills.includes(s)) errors.push(`Thiếu skill ${s} (CR-02, FR-DEV-02).`);
+  for (const s of [...UNITY_SKILLS, 'engine-intake']) {
+    const f = join(C, 'skills', s, 'SKILL.md');
+    const t = existsSync(f) ? readFileSync(f, 'utf8').replace(/\r\n/g, '\n') : '';
+    if (!new RegExp(`^---\nname: ${s}\ndescription: `).test(t)) errors.push(`Skill ${s}: frontmatter thiếu name/description (FR-DEV-02).`);
+    if (t.split('\n').length > 150) errors.push(`Skill ${s} quá 150 dòng.`);
+  }
   const engineSkills = skills.filter((s) => s.startsWith('engine-')).length;
   if (engineSkills < 10) warnings.push(`Skill engine-*: ${engineSkills}/10–15 (thêm dần từ E1, FR-DEV-02).`);
   const cmds = list(join(C, 'commands'), '.md');
