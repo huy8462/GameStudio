@@ -2,13 +2,15 @@
 
 Đọc hf/ của terrain.erode (độ cao đã xói, mask), sinh cho zone: splat-0.png (RGBA, 0,5 m/px; splat-1.png khi > 4 lớp),
 surface.png (chỉ số bề mặt, 1 m/px), layers.json (DTO-WLD-03), preview/splat.png. Luật lấy từ world.json `splat`
-nếu có, không thì bộ mặc định (heightfield.splat). Dep `materials` tạm bỏ (bước chưa có).
+nếu có, không thì bộ mặc định (heightfield.splat). T-0025: dep `materials` thêm lại; `materialRef` của lớp tra trong
+materials.json, khớp thì layers.json ghi `material` (thư mục trong đầu ra bước materials), không khớp thì cảnh báo.
 Chạy: uv run python -I main.py --ctx ctx.json (IF-CLI-02).
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import math
 import sys
 from pathlib import Path
@@ -56,6 +58,26 @@ def zone_bbox(data: dict[str, Any], zone_id: str | None) -> tuple[float, float, 
             zs = [float(p[1]) for p in z["polygon"]]
             return math.floor(min(xs)), math.floor(min(zs)), math.ceil(max(xs)), math.ceil(max(zs))
     return None
+
+
+def resolve_materials(
+    layers: list[dict[str, Any]], up: dict[str, Any] | None
+) -> tuple[list[dict[str, Any]], list[str]]:
+    """Gắn `material` (thư mục) cho lớp có `materialRef` khớp vật liệu của bước materials (T-0025)."""
+    index: dict[str, str] = {}
+    if up is not None:
+        doc = json.loads((Path(up["outDir"]) / "materials.json").read_text(encoding="utf-8"))
+        index = {str(m["ref"]): str(m["dir"]) for m in doc.get("materials", [])}
+    out: list[dict[str, Any]] = []
+    warnings: list[str] = []
+    for layer in layers:
+        ref = layer.get("materialRef")
+        if ref in index:
+            out.append({**layer, "material": index[str(ref)]})
+        else:
+            out.append(dict(layer))
+            warnings.append(f"lớp {layer.get('id')}: materialRef {ref} không có trong bước materials")
+    return out, warnings
 
 
 def main() -> int:  # noqa: PLR0915 (luồng một bước)
@@ -121,13 +143,15 @@ def main() -> int:  # noqa: PLR0915 (luồng một bước)
         counts[: len(layers)] += np.bincount(np.argmax(w, axis=0).ravel(), minlength=len(layers))[: len(layers)]
     write_png(out / "surface.png", surface)
     write_png(out / "preview" / "splat.png", preview)
-    gsio.write_json(out / "layers.json", {"layers": layers, "rules": rules})
+    layers_out, warnings = resolve_materials(layers, ctx["upstream"].get("materials"))
+    gsio.write_json(out / "layers.json", {"layers": layers_out, "rules": rules})
     share = {
         f"share_{layer['id']}": float(counts[i] / max(1, counts[: len(layers)].sum())) for i, layer in enumerate(layers)
     }
     gsio.write_partial_report(
         out,
         metrics={"splatW": tx.width, "splatH": tx.height, "layers": len(layers), "maxLayers": k, **share},
+        warnings=warnings,
         artifacts=["preview/splat.png"],
         summary=f"terrain.splat {ctx['zone']}: {len(layers)} lớp, splat {tx.width}x{tx.height} ({tx.px:g} m/px)",
     )

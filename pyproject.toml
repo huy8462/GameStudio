@@ -36,7 +36,7 @@ ignore = ["PLR2004"]
 
 [tool.ruff.lint.isort]
 # Mô-đun trong engine/build/py (thêm vào sys.path bởi pytest và main.py của bước).
-known-first-party = ["gsio", "gsrng", "heightfield"]
+known-first-party = ["detmath", "gsio", "gsrng", "hdri", "heightfield", "texproc"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["S101", "PLR2004"]

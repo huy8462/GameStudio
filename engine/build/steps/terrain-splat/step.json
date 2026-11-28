@@ -1,8 +1,8 @@
 {
   "id": "terrain.splat",
-  "version": "2",
-  "description": "EP-WLD-05, MOD-WLD-08, PSC-WLD-08: splat map, surface.png, layers.json (T-0011). Tạm bỏ dep 'materials' (chưa có bước): thêm lại khi có.",
-  "deps": ["terrain.erode"],
+  "version": "3",
+  "description": "EP-WLD-05, MOD-WLD-08, PSC-WLD-08: splat map, surface.png, layers.json (T-0011). T-0025: dep materials, layers.json ghi material cho materialRef khớp.",
+  "deps": ["terrain.erode", "materials"],
   "inputs": {
     "dataPointers": ["/world.json/splat", "/world.json/zones/[id={zone}]"],
     "files": [],

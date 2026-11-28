@@ -1,0 +1,119 @@
+{
+  "id": "materials",
+  "version": "1",
+  "description": "T-0025 (MOD-AST-11, 12, PSC-AST-09, 10, FR-AST-14, 15, 18): vật liệu thủ tục numpy (baseColor, normal, ORM, material.json) và HDRI cubemap GGX + SH. Công thức mặc định cho 4 lớp splat; game ghi đè bằng assets/materials/*.json.",
+  "deps": [],
+  "inputs": {
+    "dataPointers": ["/palette.json/colors"],
+    "files": ["assets/materials/*.json", "assets/hdri/*.hdr", "assets/hdri/*.provenance.json"],
+    "params": {
+      "size": 2048,
+      "materials": [
+        {
+          "id": "dat-co",
+          "tiling": [4, 4],
+          "paletteRole": "nen-co",
+          "graph": [
+            { "id": "n", "op": "noise", "scale": 6, "octaves": 5, "persistence": 0.55 },
+            { "id": "ngon", "op": "noise", "scale": 64, "octaves": 2, "persistence": 0.5, "ridged": true },
+            { "id": "h", "op": "blend", "a": "n", "b": "ngon", "mode": "mix", "t": 0.45 }
+          ],
+          "height": "h",
+          "baseColor": {
+            "node": "h",
+            "ramp": [
+              [0, "#3e5426"],
+              [0.55, "palette:nen-co"],
+              [1, "#8a9a4e"]
+            ],
+            "tint": { "node": "n", "amount": 0.08 }
+          },
+          "roughness": { "node": "ngon", "range": [0.95, 0.8] },
+          "normal": { "strength": 1.2 }
+        },
+        {
+          "id": "dat-tran",
+          "tiling": [4, 4],
+          "paletteRole": "nen-dat",
+          "graph": [
+            { "id": "n", "op": "noise", "scale": 4, "octaves": 6, "persistence": 0.5 },
+            { "id": "soi", "op": "voronoi", "cells": 48, "mode": "f1" },
+            { "id": "soi2", "op": "levels", "in": "soi", "lo": 0.0, "hi": 0.35, "invert": true, "smooth": true },
+            { "id": "h", "op": "blend", "a": "n", "b": "soi2", "mode": "mix", "t": 0.3 }
+          ],
+          "height": "h",
+          "baseColor": {
+            "node": "h",
+            "ramp": [
+              [0, "#4a3d2e"],
+              [0.5, "palette:nen-dat"],
+              [1, "#8c7a5e"]
+            ]
+          },
+          "roughness": { "range": [0.95, 0.85] },
+          "normal": { "strength": 2.5 }
+        },
+        {
+          "id": "da-nui",
+          "tiling": [6, 6],
+          "paletteRole": "nen-da",
+          "graph": [
+            { "id": "khoi", "op": "voronoi", "cells": 6, "mode": "edge" },
+            { "id": "nut", "op": "levels", "in": "khoi", "lo": 0.0, "hi": 0.25, "smooth": true },
+            { "id": "n", "op": "noise", "scale": 8, "octaves": 5, "persistence": 0.6, "ridged": true },
+            { "id": "h", "op": "blend", "a": "nut", "b": "n", "mode": "mix", "t": 0.4 }
+          ],
+          "height": "h",
+          "baseColor": {
+            "node": "h",
+            "ramp": [
+              [0, "#4f4c45"],
+              [0.6, "palette:nen-da"],
+              [1, "#b0ac9f"]
+            ],
+            "tint": { "node": "n", "amount": 0.06 }
+          },
+          "roughness": { "node": "n", "range": [0.9, 0.7] },
+          "normal": { "strength": 3 },
+          "heightMap": true
+        },
+        {
+          "id": "cat-bai",
+          "tiling": [4, 4],
+          "graph": [
+            { "id": "song", "op": "noise", "scale": 3, "octaves": 3, "persistence": 0.5 },
+            { "id": "hat", "op": "noise", "scale": 128, "octaves": 1 },
+            { "id": "h", "op": "blend", "a": "song", "b": "hat", "mode": "mix", "t": 0.25 }
+          ],
+          "height": "h",
+          "baseColor": {
+            "node": "h",
+            "ramp": [
+              [0, "#bfa877"],
+              [1, "#e3d3a6"]
+            ]
+          },
+          "roughness": 0.9,
+          "normal": { "strength": 0.8 }
+        }
+      ],
+      "hdri": [
+        {
+          "id": "troi-thu-tuc",
+          "equirectWidth": 1024,
+          "face": 128,
+          "mips": 6,
+          "samples": 128,
+          "skyFace": 256,
+          "sky": { "sunElevationDeg": 35, "sunAzimuthDeg": 30, "sunIntensity": 40 }
+        }
+      ]
+    }
+  },
+  "runner": "python",
+  "entry": "main.py",
+  "perZone": false,
+  "outputs": ["materials.json", "materials/*/material.json", "hdri/*/env.ktx2", "hdri/*/sky.ktx2", "hdri/*/sh.json"],
+  "tools": ["python", "numpy", "ktx"],
+  "timeoutS": 1800
+}

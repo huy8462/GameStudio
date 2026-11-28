@@ -27,6 +27,12 @@ function game(worldPatch: Record<string, unknown> = {}): string {
   writeFileSync(gp, JSON.stringify({ ...JSON.parse(readFileSync(gp, 'utf8')), id: 'thu-dia-hinh' }));
   const wp = join(dir, 'data/world.json');
   writeFileSync(wp, JSON.stringify({ ...JSON.parse(readFileSync(wp, 'utf8')), ...worldPatch }));
+  // T-0025: vật liệu và HDRI nhỏ cho test nhanh (assets/materials/_settings.json của bước materials).
+  mkdirSync(join(dir, 'assets/materials'), { recursive: true });
+  writeFileSync(
+    join(dir, 'assets/materials/_settings.json'),
+    JSON.stringify({ size: 64, hdri: { equirectWidth: 128, face: 16, mips: 3, samples: 8, skyFace: 16 } }),
+  );
   mkdirSync(join(dir, 'brief/v1'), { recursive: true });
   writeFileSync(join(dir, 'brief/v1/hash.txt'), `sha256:${'d'.repeat(64)}\n`);
   return dir;
@@ -51,6 +57,7 @@ describe(
       const r1 = await build(a);
       expect(r1.exit, r1.report.warnings.join('\n')).toBe(EXIT.OK);
       expect(r1.report.checks.map((c) => `${c.id}:${c.message ?? ''}`)).toEqual([
+        'materials@-:ran',
         'world.fetch@-:ran',
         'world.heightfield@-:ran',
         'terrain.erode@-:ran',
@@ -63,6 +70,30 @@ describe(
         expect(existsSync(join(splat, f)), f).toBe(true);
       }
       expect(existsSync(join(splat, 'splat-1.png'))).toBe(false); // 4 lớp mặc định → một ảnh
+      // T-0025: lớp splat trỏ vật liệu thật của bước materials.
+      const layers = JSON.parse(readFileSync(join(splat, 'layers.json'), 'utf8')) as {
+        layers: { id: string; material?: string }[];
+      };
+      expect(layers.layers.map((l) => l.material)).toEqual([
+        'materials/dat-co',
+        'materials/dat-tran',
+        'materials/da-nui',
+        'materials/cat-bai',
+      ]);
+      const mat = r1.outcome.steps.find((s) => s.step === 'materials')?.outDir ?? '';
+      for (const f of [
+        'materials.json',
+        'materials/dat-co/baseColor.png',
+        'materials/dat-co/normal.png',
+        'materials/da-nui/orm.png',
+        'materials/da-nui/height.png',
+        'materials/cat-bai/material.json',
+        'hdri/troi-thu-tuc/env.ktx2',
+        'hdri/troi-thu-tuc/sky.ktx2',
+        'hdri/troi-thu-tuc/sh.json',
+      ]) {
+        expect(existsSync(join(mat, f)), f).toBe(true);
+      }
       const hf = r1.outcome.steps.find((s) => s.step === 'world.heightfield');
       const out = join(hf?.outDir ?? '', 'hf');
       for (const f of ['height.r32', 'height.meta.json', 'mask-water.png', 'vectors.geojson', 'preview/top.png']) {
@@ -93,7 +124,7 @@ describe(
       const w = JSON.parse(readFileSync(wp, 'utf8')) as { procedural: Record<string, unknown> };
       writeFileSync(wp, JSON.stringify({ ...w, procedural: { ...w.procedural, roughness: 0.9 } }));
       const r = await build(a);
-      expect(r.report.checks.map((c) => c.message)).toEqual(['cached', 'ran', 'ran', 'ran', 'ran', 'ran']);
+      expect(r.report.checks.map((c) => c.message)).toEqual(['cached', 'cached', 'ran', 'ran', 'ran', 'ran', 'ran']);
       const ant = await build(game({ procedural: { preset: 'ant', maxHeight: 40, roughness: 0.5, features: [] } }));
       expect(ant.exit).toBe(EXIT.ENVIRONMENT);
       expect(ant.report.warnings.join(' ')).toMatch(/ant/);
@@ -125,6 +156,7 @@ describe(
       const w = JSON.parse(readFileSync(wp, 'utf8')) as Record<string, unknown>;
       writeFileSync(wp, JSON.stringify({ ...w, erosion: { iterations: 20, strength: 0.5 } }));
       expect((await build(a)).report.checks.map((c) => c.message)).toEqual([
+        'cached',
         'cached',
         'cached',
         'ran',
