@@ -5,6 +5,7 @@ import cacheIndexV1 from '../schemas/cache-index/1.json' with { type: 'json' };
 import commonV1 from '../schemas/common/1.json' with { type: 'json' };
 import gameV1 from '../schemas/game/1.json' with { type: 'json' };
 import importV1 from '../schemas/import/1.json' with { type: 'json' };
+import navSourcesV1 from '../schemas/nav-sources/1.json' with { type: 'json' };
 import paletteV1 from '../schemas/palette/1.json' with { type: 'json' };
 import reportV1 from '../schemas/report/1.json' with { type: 'json' };
 import statusV1 from '../schemas/status/1.json' with { type: 'json' };
@@ -16,8 +17,8 @@ import worldPartsV1 from '../schemas/world/parts-1.json' with { type: 'json' };
 export const SCHEMA_KINDS = ['budgets', 'game', 'palette', 'world'] as const;
 export type SchemaKind = (typeof SCHEMA_KINDS)[number];
 
-/** Schema của build (T-0004): step.json, report.json, cache/index.json; status/1 (T-0014); import/1 (T-0016); audio/1 sidecar âm thanh (T-0018). Không nằm trong data/ nên không có kindByPath. */
-export const BUILD_KINDS = ['step', 'report', 'cacheIndex', 'status', 'import', 'audio'] as const;
+/** Schema của build (T-0004): step.json, report.json, cache/index.json; status/1 (T-0014); import/1 (T-0016); audio/1 sidecar âm thanh (T-0018); nav-sources/1 nguồn NavMesh (T-0019). Không nằm trong data/ nên không có kindByPath. */
+export const BUILD_KINDS = ['step', 'report', 'cacheIndex', 'status', 'import', 'audio', 'navSources'] as const;
 export type BuildKind = (typeof BUILD_KINDS)[number];
 export type AnyKind = SchemaKind | BuildKind;
 
@@ -38,6 +39,7 @@ export const SCHEMA_DOCS: readonly object[] = [
   statusV1,
   importV1,
   audioV1,
+  navSourcesV1,
 ];
 
 /** $id của schema gốc theo kind. */
@@ -52,6 +54,7 @@ export const ROOT_IDS: Readonly<Record<AnyKind, string>> = {
   status: `${BASE}/status/1.json`,
   import: `${BASE}/import/1.json`,
   audio: `${BASE}/audio/1.json`,
+  navSources: `${BASE}/nav-sources/1.json`,
 };
 
 /** Đường dẫn tương đối `games/<id>/`, dùng '/'. */

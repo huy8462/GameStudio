@@ -1,4 +1,4 @@
-// T-0013: engine new-game (EP-INT-01, 02; TC-INT-12; AC-01-04): handoff từng bước → xác nhận → game build được 5 bước.
+// T-0013: engine new-game (EP-INT-01, 02; TC-INT-12; AC-01-04): handoff từng bước → xác nhận → game build được 6 bước (T-0019 thêm navmesh).
 import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
@@ -101,7 +101,7 @@ function setup() {
 }
 
 describe('engine new-game', { timeout: 240_000 }, () => {
-  it('handoff analyze → clarify → câu hỏi → mặc định → brief → xác nhận → engine build 5 bước thoát 0', async () => {
+  it('handoff analyze → clarify → câu hỏi → mặc định → brief → xác nhận → engine build 6 bước thoát 0', async () => {
     const { gamesDir, base, respond } = setup();
     let r = await runNewGame({ ...base, description: DESC });
     expect(r.exit).toBe(EXIT.NEEDS_CONFIRM);
@@ -164,6 +164,7 @@ describe('engine new-game', { timeout: 240_000 }, () => {
       'world.heightfield@-',
       'terrain.erode@-',
       'terrain.mesh@z1',
+      'navmesh@z1',
       'terrain.splat@z1',
     ]);
   });

@@ -1,0 +1,17 @@
+{
+  "id": "navmesh",
+  "version": "1",
+  "description": "EP-CHR-01, MOD-CHR-18, DTO-CHR-06 (T-0019): nav/sources.json cho player dựng NavMesh theo ô 64 m lúc nạp. Tạm chỉ dep terrain.mesh (water, placement chưa có bước): thêm lại khi có.",
+  "deps": ["terrain.mesh"],
+  "inputs": {
+    "dataPointers": [],
+    "files": [],
+    "params": { "voxelSize": 0.2, "tileSize": 64 }
+  },
+  "runner": "node",
+  "entry": "dist/index.js",
+  "perZone": true,
+  "outputs": ["nav/sources.json"],
+  "tools": ["node"],
+  "timeoutS": 300
+}

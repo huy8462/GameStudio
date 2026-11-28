@@ -19,6 +19,8 @@ namespace GameStudio
         /// <summary>Người chơi (do CameraPlayerSystem tạo); null trước khi hệ thống đó Init.</summary>
         public Transform Player;
         public PerfMonitor Perf;
+        /// <summary>NavMesh theo ô (T-0019); NavSystem gán lúc Init.</summary>
+        public NavService Nav;
         /// <summary>Vật liệu địa hình tạm (tới khi có bước materials).</summary>
         public Material TerrainMaterial;
     }

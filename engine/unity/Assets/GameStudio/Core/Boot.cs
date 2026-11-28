@@ -1,5 +1,5 @@
-// T-0022 (MOD-RTM-01, IF-RTM-01, SEQ-RTM-01, STM-RTM-01; PSC-RTM-01; ERR-RTM-02, 03, 04): trình tự khởi động.
-// chọn tier → nạp và kiểm manifest → tạo hệ thống theo Order → nạp core zone xuất phát → SanSang (trang hiện nút "Chơi").
+// T-0022, T-0019, T-0021 (MOD-RTM-01, IF-RTM-01, SEQ-RTM-01, STM-RTM-01; PSC-RTM-01; ERR-RTM-02, 03, 04): trình tự khởi động.
+// chọn tier → nạp và kiểm manifest → tạo hệ thống theo Order → nạp core zone xuất phát → làm ấm shader → SanSang (trang hiện nút "Chơi").
 using System;
 using System.Threading.Tasks;
 using UnityEngine; // GetAwaiter cho AsyncOperation
@@ -41,6 +41,7 @@ namespace GameStudio
 
                 engine.Register(new InputSystemGs());
                 engine.Register(new CameraPlayerSystem());
+                engine.Register(new NavSystem()); // T-0019: NavMesh theo ô lúc nạp zone
                 engine.Register(new RenderSystem());
                 foreach (var m in manifest.Modules) engine.EnableModule(m);
 
@@ -50,7 +51,12 @@ namespace GameStudio
                 ctx.Zones = zones;
                 await zones.LoadStart(manifest.StartZone);
 
-                // T-0021: làm ấm shader của tier đã chọn ở đây (PSC-RTM-01), xong mới MarkReady.
+                // T-0021 (PSC-RTM-01): làm ấm shader của tier đã chọn, xong mới MarkReady (trang mới hiện nút "Chơi").
+                GsBridge.Progress("warmup", 0, 1);
+                var warm = await ShaderWarmup.Run(ctx.Tier);
+                ctx.Perf?.Extra.Add("warmup", warm.Json());
+                ctx.Log.Info($"warmup variants={warm.Variants} ms={warm.Ms:0} stepMax={warm.StepMsMax:0.0}");
+                GsBridge.Progress("warmup", 1, 1);
 
                 engine.MarkReady();
             }

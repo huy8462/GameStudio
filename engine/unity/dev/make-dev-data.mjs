@@ -1,10 +1,12 @@
-// T-0022 (DTO-RTM-01 manifest/1): sinh dữ liệu thử cho bản build cục bộ của player.
+// T-0022, T-0019 (DTO-RTM-01 manifest/1, DTO-CHR-06): sinh dữ liệu thử cho bản build cục bộ của player.
 // Chép 16 chunk glb địa hình của POC-U1 (đầu ra thật của bước terrain.mesh) vào <out>/data và ghi manifest.json.
 // Đây là dữ liệu kiểm khung, không phải đầu ra packager. Dùng: node engine/unity/dev/make-dev-data.mjs [thư mục build]
 import { createHash } from 'node:crypto';
 import { copyFileSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { AGENT_TYPES, navSources } from '../../build/steps/navmesh/dist/index.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, '../../..');
@@ -34,6 +36,28 @@ const core = names.map((name) => {
   maxX = Math.max(maxX, (ix + 1) * CHUNK_M);
   maxZ = Math.max(maxZ, (iz + 1) * CHUNK_M);
   return { path: `zones/z1/${name}`, bytes: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') };
+});
+
+// T-0019: nav/sources.json như bước navmesh ghi (dải độ cao rộng vì không đọc độ cao từ glb).
+const chunkIdx = names.map((n) => n.replace('.glb', '').split('_').map(Number));
+const nav = navSources({
+  zone: 'z1',
+  chunks: chunkIdx.map(([cx, cz]) => ({ cx, cz })),
+  minH: -100,
+  maxH: 400,
+  agentTypes: AGENT_TYPES,
+  voxelSize: 0.2,
+  tileSize: CHUNK_M,
+  sources: [{ kind: 'terrain', ref: 'terrain.mesh/collider/height-lod1', area: 'walkable' }],
+});
+mkdirSync(join(zoneDir, 'nav'), { recursive: true });
+const navBytes = Buffer.from(`${JSON.stringify(nav, null, 2)}
+`);
+writeFileSync(join(zoneDir, 'nav/sources.json'), navBytes);
+core.push({
+  path: 'zones/z1/nav/sources.json',
+  bytes: navBytes.length,
+  sha256: createHash('sha256').update(navBytes).digest('hex'),
 });
 
 const manifest = {

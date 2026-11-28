@@ -17,6 +17,8 @@ namespace GameStudio.Build
     public static class PlayerBuild
     {
         public const string OutDir = "Build/player";
+        /// <summary>T-0019 thử nghiệm: GS_WEB_THREADS=1 bật đa luồng Web (cần COOP/COEP), ra Build/player-mt.</summary>
+        static bool Threads => Environment.GetEnvironmentVariable("GS_WEB_THREADS") == "1";
         public const float PlayerBudgetMB = 10f; // SRS-04 §6.3 playerMB (Huy chốt 26/11/2026)
 
         public static void Prepare()
@@ -37,6 +39,7 @@ namespace GameStudio.Build
             QualitySettings.SetQualityLevel((int)Tier.Vua, false);
             Debug.Log($"GS_BUILD qualityLevels={levels}");
             BootScene.Create(urp);
+            WarmupBuild.EnsureAll(); // T-0021: bộ biến thể làm ấm theo tier (sau khi có vật liệu của cảnh)
             AssetDatabase.SaveAssets();
             Debug.Log("GS_BUILD prepare ok");
         }
@@ -44,7 +47,7 @@ namespace GameStudio.Build
         public static void Build()
         {
             Prepare();
-            var outDir = Path.GetFullPath(OutDir);
+            var outDir = Path.GetFullPath(Threads ? OutDir + "-mt" : OutDir);
             if (Directory.Exists(outDir)) Directory.Delete(outDir, true);
             var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
             {
@@ -82,7 +85,8 @@ namespace GameStudio.Build
             PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Brotli;
             PlayerSettings.WebGL.decompressionFallback = true; // máy chủ poc chưa chắc gửi Content-Encoding
             PlayerSettings.WebGL.dataCaching = true;
-            PlayerSettings.WebGL.threadsSupport = false;
+            PlayerSettings.WebGL.threadsSupport = Threads;
+            Debug.Log($"GS_BUILD threads={Threads}");
             PlayerSettings.WebGL.maximumMemorySize = 1024;
             PlayerSettings.WebGL.nameFilesAsHashes = false;
             PlayerSettings.WebGL.template = "PROJECT:GameStudio";

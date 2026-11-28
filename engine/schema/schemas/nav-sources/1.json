@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gamestudio.local/schema/nav-sources/1.json",
+  "title": "nav-sources/1: nguồn NavMesh của zone cho player dựng theo ô (DTO-CHR-06, SCH-CHR-06 theo DDD-05, CFG-CHR-06; T-0019)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "zone", "agentTypes", "voxelSize", "tileSize", "bounds", "tiles", "sources"],
+  "$defs": {
+    "vec3": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+    "box": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["min", "max"],
+      "properties": { "min": { "$ref": "#/$defs/vec3" }, "max": { "$ref": "#/$defs/vec3" } }
+    }
+  },
+  "properties": {
+    "schema": { "const": "nav-sources/1" },
+    "zone": { "type": "string" },
+    "agentTypes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["agentType", "radius", "height", "maxSlope", "maxClimb"],
+        "properties": {
+          "agentType": { "enum": ["nguoi", "thu4_nho", "thu4_lon", "gia_cam"] },
+          "radius": { "type": "number", "exclusiveMinimum": 0 },
+          "height": { "type": "number", "exclusiveMinimum": 0 },
+          "maxSlope": { "type": "number", "minimum": 0, "maximum": 60 },
+          "maxClimb": { "type": "number", "minimum": 0 }
+        }
+      }
+    },
+    "voxelSize": { "type": "number", "exclusiveMinimum": 0 },
+    "tileSize": { "description": "Cạnh ô (m), trùng lưới chunk địa hình.", "type": "number", "exclusiveMinimum": 0 },
+    "bounds": { "$ref": "#/$defs/box" },
+    "tiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["x", "z", "bounds"],
+        "properties": {
+          "x": { "type": "integer" },
+          "z": { "type": "integer" },
+          "bounds": { "$ref": "#/$defs/box" }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "ref", "area"],
+        "properties": {
+          "kind": { "enum": ["terrain", "placement", "water_deep"] },
+          "ref": { "type": "string" },
+          "area": { "enum": ["walkable", "not_walkable"] }
+        }
+      }
+    }
+  }
+}

@@ -21,6 +21,7 @@ namespace GameStudio
         readonly Dictionary<string, ZoneState> states = new Dictionary<string, ZoneState>();
         readonly Dictionary<string, LoadedZone> loaded = new Dictionary<string, LoadedZone>();
         readonly Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
+        readonly Dictionary<string, string> texts = new Dictionary<string, string>();
 
         /// <summary>(đã xong, tổng) số tệp của lượt nạp hiện tại; Boot chuyển ra trang nạp (gs:progress).</summary>
         public event Action<int, int> Progress;
@@ -37,6 +38,8 @@ namespace GameStudio
         public ZoneState State(string zoneId) => states.TryGetValue(zoneId, out var s) ? s : ZoneState.ChuaNap;
         public LoadedZone Loaded(string zoneId) => loaded.TryGetValue(zoneId, out var z) ? z : null;
         public Texture2D Texture(string path) => textures.TryGetValue(path, out var t) ? t : null;
+        /// <summary>Tệp .json của phần core (vd. nav/sources.json, T-0019); null nếu không có.</summary>
+        public string Text(string path) => texts.TryGetValue(path, out var t) ? t : null;
 
         /// <summary>Nạp parts[tier].core của zone; xong thì CoreSanSang và phát OnZoneLoaded. Lỗi → ném, zone về ChuaNap.</summary>
         public async Task LoadStart(string zoneId)
@@ -103,6 +106,14 @@ namespace GameStudio
                 var tex = await Ktx2Loader.Load(url);
                 if (tex == null) return false;
                 textures[f.Path] = tex;
+                return true;
+            }
+            if (f.Path.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            {
+                using var req = UnityEngine.Networking.UnityWebRequest.Get(url);
+                await req.SendWebRequest();
+                if (req.result != UnityEngine.Networking.UnityWebRequest.Result.Success) return false;
+                texts[f.Path] = req.downloadHandler.text;
                 return true;
             }
             engine.Ctx.Log.Warn("Bỏ qua tệp core chưa hỗ trợ: " + f.Path);

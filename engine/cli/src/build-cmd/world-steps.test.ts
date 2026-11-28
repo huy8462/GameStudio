@@ -1,4 +1,4 @@
-// T-0007, T-0008, T-0010: bước thật world.fetch, world.heightfield, terrain.erode (python), terrain.mesh (node), terrain.splat qua engine build
+// T-0007, T-0008, T-0010: bước thật world.fetch, world.heightfield, terrain.erode (python), terrain.mesh (node), terrain.splat, navmesh (T-0019) qua engine build
 // (EP-WLD-01…04; DTO-WLD-02, 10; TC-WLD-02). terrain.mesh cần dist/ (pnpm -r build trước pnpm test).
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -55,6 +55,7 @@ describe(
         'world.heightfield@-:ran',
         'terrain.erode@-:ran',
         'terrain.mesh@z1:ran',
+        'navmesh@z1:ran',
         'terrain.splat@z1:ran',
       ]);
       const splat = r1.outcome.steps.find((s) => s.step === 'terrain.splat')?.outDir ?? '';
@@ -92,7 +93,7 @@ describe(
       const w = JSON.parse(readFileSync(wp, 'utf8')) as { procedural: Record<string, unknown> };
       writeFileSync(wp, JSON.stringify({ ...w, procedural: { ...w.procedural, roughness: 0.9 } }));
       const r = await build(a);
-      expect(r.report.checks.map((c) => c.message)).toEqual(['cached', 'ran', 'ran', 'ran', 'ran']);
+      expect(r.report.checks.map((c) => c.message)).toEqual(['cached', 'ran', 'ran', 'ran', 'ran', 'ran']);
       const ant = await build(game({ procedural: { preset: 'ant', maxHeight: 40, roughness: 0.5, features: [] } }));
       expect(ant.exit).toBe(EXIT.ENVIRONMENT);
       expect(ant.report.warnings.join(' ')).toMatch(/ant/);
@@ -123,7 +124,14 @@ describe(
       const wp = join(a, 'data/world.json');
       const w = JSON.parse(readFileSync(wp, 'utf8')) as Record<string, unknown>;
       writeFileSync(wp, JSON.stringify({ ...w, erosion: { iterations: 20, strength: 0.5 } }));
-      expect((await build(a)).report.checks.map((c) => c.message)).toEqual(['cached', 'cached', 'ran', 'ran', 'ran']);
+      expect((await build(a)).report.checks.map((c) => c.message)).toEqual([
+        'cached',
+        'cached',
+        'ran',
+        'ran',
+        'ran',
+        'ran',
+      ]);
     });
   },
 );
