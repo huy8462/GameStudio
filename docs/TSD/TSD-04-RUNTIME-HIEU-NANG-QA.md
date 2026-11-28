@@ -3,7 +3,7 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | TSD-04 |
-| Phiên bản | 1.3 |
+| Phiên bản | 1.4 |
 | Ngày | 22/11/2026 |
 | Tài liệu cha | TSD-00 `TSD-00-TONG-QUAN.md` |
 | SRS nguồn | SRS-04 v0.1 (FR-RTM-01…23, FR-QA-01…10, FR-CLI-01…07, NFR-RTM-01…03, NFR-QA-01…02, NFR-CLI-01) |
@@ -38,7 +38,7 @@ TSD này là "hợp đồng kỹ thuật" dùng chung: schema và dữ liệu, v
 | `Save/` | Lưu cục bộ qua IndexedDB của nền Web (`.jslib`) |
 | `Perf/` | fps, P5/P1, `ProfilerRecorder` (draw call, batch, tri), `FrameTimingManager`; gửi API-WEB-60 |
 | `Bridge/` | Cầu nối JS ↔ C#: `.jslib` xuất sự kiện ra trang, hàm nhận `SendMessage` cho khung xem trước (TSD-08 IF-WEB-05) |
-| `Editor/` | Chế độ editor trong player (gizmo, chọn, vẽ vùng), chỉ bật khi `mode='preview'` |
+| `EditorMode/` (CR-03, trước là `Editor/`) | Chế độ editor trong player (gizmo, chọn, vẽ vùng), chỉ bật khi `mode='preview'` |
 | `Shared/Rng`, `Shared/Expr` | Bản C# của `@gamestudio/rng` và `@gamestudio/expr`, kiểm chéo bằng bộ vector chung với TS/Python |
 | `Characters/`, `NpcAi/`, `Fx/` | TSD-05, TSD-02 |
 | `Combat/`, `Dialogue/` | Module tuỳ chọn, bật bằng dữ liệu (TSD-06, TSD-07) |
@@ -255,3 +255,4 @@ UI Toolkit trong Unity player (CR-02; trước là DOM overlay); cỡ chữ thâ
 | 1.2 | 23/11/2026 | Claude | CR-01 (SRS-04 v1.1): IF-CLI-04, SCH-RTM-06 mở rộng, SCH-RTM-09, 10, mục 5.3 ALG-CLI-04…08, TST-CLI-04…08, truy vết FR-CLI-08…12, NFR-CLI-02 |
 | 1.2 | 23/11/2026 | Huy | Duyệt phần bổ sung CR-01 |
 | 1.3 | 25/11/2026 | Claude | CR-02 (runtime Unity, ADR-036; Huy duyệt phân tích 25/11/2026): viết lại mục 2 cho Unity player (cấu trúc project, IF-RTM-01…05, vòng lặp, render); ALG-RTM-01, 04; UI Toolkit (3.2); SCH-RTM-01, 04; ALG-QA-01, 05; NFR-RTM-03; OIT-RTM-02 |
+| 1.4 | 28/11/2026 | Claude | CR-03 (Huy duyệt 28/11/2026): thư mục chế độ editor trong player đổi `Editor/` thành `EditorMode/` |

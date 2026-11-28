@@ -3,8 +3,8 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | DDD-04 |
-| Phiên bản | 1.2 |
-| Ngày | 26/11/2026 |
+| Phiên bản | 1.3 |
+| Ngày | 28/11/2026 |
 | Tài liệu cha | DDD-00 `DDD-00-TONG-QUAN.md` |
 | TSD nguồn | TSD-04 v1.2 (IF-RTM-01…05, SCH-RTM-01…10, ALG-RTM-01…07, IF-CLI-01…04, ALG-CLI-01…08, ALG-QA-01…06, TST-RTM-01…08, TST-QA-01…04, TST-CLI-01…08); TSD-00 v1.2 (ALG-GEN-05, SCH-GEN-07) |
 | SRS nguồn | SRS-04 v1.1 (FR-RTM-01…23, FR-QA-01…10, FR-CLI-01…12, NFR-RTM-01…03, NFR-QA-01…02, NFR-CLI-01, 02; CR-01 làm tiếp/cập nhật game) |
@@ -42,7 +42,7 @@ DDD này là hợp đồng chi tiết dùng chung: khung runtime (hệ thống, 
 | MOD-RTM-13 | `Perf/PerfMonitor.cs`, `Perf/Histogram.cs`, `Perf/RenderStats.cs` (`ProfilerRecorder`, `FrameTimingManager`), `Perf/PerfRoute.cs`, `Perf/Sender.cs` | fps, P5/P1, draw call/batch/tri, thời gian GPU khi có, route đo, gửi API-WEB-60 |
 | MOD-RTM-14 | `Interaction/ActionCatalog.cs` | Danh mục hành động và sự kiện mà dữ liệu game được dùng (IF-RTM-05); không còn API cho script TS riêng game (FR-RTM-04) |
 | MOD-RTM-15 | `engine/shared/expr/src/{lexer.ts, parser.ts, ast.ts, check.ts, compile.ts, index.ts}`; bản C# `Shared/Expr/{Lexer.cs, Parser.cs, Check.cs, Compile.cs}`; vector chung `engine/shared/expr/vectors/*.json` | Biểu thức an toàn: TS ở build/Web Studio, C# trong player, cùng bộ vector kiểm (bản C# của `@gamestudio/rng` ở `Shared/Rng/Pcg32.cs` dùng vector `gen_rng_vectors.py`) |
-| MOD-RTM-16 | `Editor/EditorMode.cs`, `Bridge/EditorBridgeReceiver.cs`, `Plugins/WebGL/gs-bridge.jslib`, `Editor/Gizmo.cs`, `Editor/Picking.cs` | Phía player của `EditorBridge` (TSD-08 IF-WEB-05), chỉ bật khi `mode='preview'` |
+| MOD-RTM-16 | `EditorMode/EditorMode.cs`, `Bridge/EditorBridgeReceiver.cs`, `Plugins/WebGL/gs-bridge.jslib`, `EditorMode/Gizmo.cs`, `EditorMode/Picking.cs` (CR-03: không dùng tên thư mục `Editor/`, tên này dành cho mã build-time như `Build/Editor/`) | Phía player của `EditorBridge` (TSD-08 IF-WEB-05), chỉ bật khi `mode='preview'` |
 | MOD-RTM-17 | `Test/TestApi.cs` + `Plugins/WebGL/gs-test.jslib` | `window.__gsTest` cho bot QA, chỉ khi `mode='test'` |
 
 ### 2.2 Build, QA, CLI
@@ -703,3 +703,4 @@ Bản test thêm `addInitScript` bọc `WebGL2RenderingContext.prototype.{drawEl
 | 1.0 | 23/11/2026 | Huy | Duyệt bộ DDD; thay đổi sau đây theo change request |
 | 1.1 | 25/11/2026 | Claude | CR-02 (runtime Unity, ADR-036; Huy duyệt phân tích 25/11/2026): viết lại mục 2.1 (MOD-RTM-01…17 sang C# `engine/unity`), 3.1 (giao diện C#), SEQ-RTM-01, 02, PSC-RTM-01, PSC-CLI-02 bước 8 (module thay chunk), TC-RTM-04; MOD-QA-04 giữ bọc WebGL2 |
 | 1.2 | 26/11/2026 | Claude | CR-02 sau POC-U1: PSC-RTM-01 làm ấm shader trước "Chơi"; PSC-CLI-02 bước 1 (M4A, nguồn navmesh), 5 (texture core ≤ 1024 ETC1S), 6 (glb có `scene` mặc định), 8, 9; PSC-QA bot dùng `Physics.CheckCapsule` thay BVH |
+| 1.3 | 28/11/2026 | Claude | CR-03 (Huy duyệt 28/11/2026): MOD-RTM-16 đổi thư mục `Editor/` thành `EditorMode/` |
