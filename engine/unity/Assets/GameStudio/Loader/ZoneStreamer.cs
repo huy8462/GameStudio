@@ -127,6 +127,28 @@ namespace GameStudio
             }
         }
 
+        /// <summary>T-0028: độ lệch lớn nhất (m) giữa đỉnh lưới hiển thị (mẫu tối đa 64 đỉnh mỗi mesh, bỏ skirt) và lưới độ cao.</summary>
+        static float RenderDeviation(Transform zoneRoot, HeightGrid g)
+        {
+            float worst = 0f;
+            foreach (var mf in zoneRoot.GetComponentsInChildren<MeshFilter>())
+            {
+                var mesh = mf.sharedMesh;
+                if (mesh == null || !mesh.isReadable) continue;
+                var v = mesh.vertices;
+                int stride = Mathf.Max(1, v.Length / 64);
+                for (int i = 0; i < v.Length; i += stride)
+                {
+                    var p = mf.transform.TransformPoint(v[i]);
+                    if (!g.Contains(p.x, p.z)) continue;
+                    float d = p.y - g.HeightAt(p.x, p.z);
+                    if (d < -1.5f) continue; // đỉnh skirt (thả xuống 2 m dưới mép chunk)
+                    worst = Mathf.Max(worst, Mathf.Abs(d));
+                }
+            }
+            return worst;
+        }
+
         /// <summary>T-0028: tìm cặp height-lod1.r32 + .meta.json trong phần core, dựng HeightGrid và MeshCollider LOD1.</summary>
         bool BuildTerrainCollider(string zoneId, FileRef[] files, Transform zoneRoot)
         {
@@ -141,6 +163,9 @@ namespace GameStudio
                 var ctx = engine.Ctx;
                 (ctx.Terrain ?? (ctx.Terrain = new TerrainHeights())).Set(zoneId, grid);
                 int n = TerrainColliderBuilder.Build(grid, zoneRoot);
+                float dev = RenderDeviation(zoneRoot, grid);
+                ctx.Perf?.Extra.Add("terrain", $"{{\"zone\":\"{zoneId}\",\"renderVsColliderMaxM\":{dev.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)}}}");
+                if (dev > 0.25f) ctx.Log.Warn($"zone {zoneId}: lưới hiển thị lệch collider tới {dev:0.##} m");
                 ctx.Log.Info($"zone {zoneId}: collider LOD1 {grid.Width}x{grid.Height} ô {grid.CellM} m, {n} khối");
                 return true;
             }
@@ -157,6 +182,10 @@ namespace GameStudio
             {
                 var node = new GameObject(f.Path);
                 node.transform.SetParent(parent, false);
+                // T-0028: glTFast đổi hệ tay phải → tay trái bằng cách lật trục X. Dữ liệu GameStudio (spawn, bounds,
+                // collider LOD1, nav) dùng thẳng toạ độ thế giới (x đông, z bắc), nên lật lại để lưới hiển thị trùng
+                // collider (trên A56 người chơi lún tới nửa thân khi đi xa gốc toạ độ).
+                node.transform.localScale = new Vector3(-1f, 1f, 1f);
                 return await GltfLoader.Load(url, node.transform, engine.Ctx.TerrainMaterial);
             }
             if (f.Path.EndsWith(".ktx2", StringComparison.OrdinalIgnoreCase))
