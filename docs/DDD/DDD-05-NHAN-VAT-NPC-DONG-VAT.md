@@ -3,8 +3,8 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | DDD-05 |
-| Phiên bản | 1.1 |
-| Ngày | 26/11/2026 |
+| Phiên bản | 1.2 |
+| Ngày | 28/11/2026 |
 | Tài liệu cha | DDD-00 `DDD-00-TONG-QUAN.md` |
 | TSD nguồn | TSD-05 v1.2 (IF-CHR-01…04, SCH-CHR-01…06, ALG-CHR-01…16, TST-CHR-01…10) |
 | SRS nguồn | SRS-05 v1.1 (FR-CHR-01…44, NFR-CHR-01…04) |
@@ -104,7 +104,7 @@ Sự kiện runtime (IF-CHR-04) dùng `EventBus` (DDD-04): `EVT_AGENT_STUCK (a =
 | DTO-CHR-03 | `animal.json` (SCH-CHR-03) | `{id, species, family, model: AssetRef, behavior: 'graph:<id>', personality, speed: {walk, run}, sounds: {[behaviorState]: AudioRef[]}, minDepth? /*cá*/, adoptable?: bool, perchTags?: string[] /*chim*/, fleeRadius?, combat?}` |
 | DTO-CHR-04 | Graph hành vi (SCH-CHR-04) | `{id, extends?: graphId, initial: stateId, states: [{id, action: ActionId, params: object}], transitions: [{from: stateId \| '*', to, when: string /*biểu thức*/, priority: int, cooldownS?: number}]}` |
 | DTO-CHR-05 | Luật xuất hiện (SCH-CHR-05) | `{id, zone, region, ref: 'animal:<id>' \| 'npc:template:<id>', min, max, hours: [[from,to]], group?: {size: [a,b], leader: bool}, seed}` |
-| DTO-CHR-06 | Nguồn navmesh (SCH-CHR-06, CR-02) | `build/<id>/<zone>/nav/sources.json` = `{agentTypes: [{agentType, radius, height, maxSlope, maxClimb}], voxelSize: 0.2, tileSize: 64, bounds, tiles: [{x, z, bounds}], sources: [{kind: 'terrain'\|'placement'\|'water_deep', ref, area: 'walkable'\|'not_walkable'}]}`; player dựng `NavMeshData` từng ô bằng `NavMeshBuilder.UpdateNavMeshDataAsync` |
+| DTO-CHR-06 | Nguồn navmesh (SCH-CHR-06, CR-02) | `build/<id>/<zone>/nav/sources.json` (schema `nav-sources/1`, CR-05) = `{schema: 'nav-sources/1', zone, agentTypes: [{agentType, radius, height, maxSlope, maxClimb}], voxelSize: 0.2, tileSize: 64, bounds, tiles: [{x, z, bounds}], sources: [{kind: 'terrain'\|'placement'\|'water_deep', ref, area: 'walkable'\|'not_walkable'}]}`; player dựng `NavMeshData` từng ô bằng `NavMeshBuilder.UpdateNavMeshDataAsync` |
 | DTO-CHR-07 | `family.json` (IF-CHR-03) | `{id, bones: string[] /*tên chuẩn*/, required: string[], boneMap: {[chuẩn]: string[] /*tên nguồn hay gặp*/}, restPose: {[bone]: [qx,qy,qz,qw]}, clips: {[name]: path}, baseSpeed: {walk, run}, agent: {type: AgentType, radius, height, maxSlope, maxClimb}, defaultGraph: graphId, footBones?: [l, r], headBone?}` |
 | DTO-CHR-08 | Bố trí `AgentStore` | Dung lượng `N = budgets[tier].skinnedCharacters.npc + .animal + flockInstances`; mảng (C# từ CR-02: `NativeArray<float/ushort/byte/…>` cùng độ dài và bố trí; tên kiểu ghi theo bản gốc): `pos Float32Array(3N)`, `vel(3N)`, `yaw(N)`, `state Uint16Array(N)` (chỉ số trạng thái graph), `prevState(N)`, `lod Uint8Array(N)` (0 gần, 1 vừa, 2 xa, 3 ngoài tầm nhìn), `kind Uint8Array(N)` (npc/animal/bird/fish), `species Uint16Array(N)`, `graph Uint16Array(N)`, `seed Uint32Array(N)`, `rngState Uint32Array(2N)`, `lastT Float32Array(N)`, `cooldownUntil Float32Array(N·8)` (8 chuyển có cooldown mỗi agent), `scratch Float32Array(16N)`, `crowdIdx Int16Array(N)`, `mixerSlot Int16Array(N)`, `flags Uint8Array(N)` (essential, invulnerable, closeUp, visible), `alive Uint8Array(N)`; danh sách trống `freeList Int32Array(N)` |
 
@@ -401,7 +401,7 @@ Pool 8 `AudioSource` 3D (`spatialBlend = 1`, rolloff tuyến tính; tier Thấp 
 | Mã | Câu hỏi | Đề xuất |
 |---|---|---|
 | OID-CHR-01 | Ngưỡng 30/80 m và tần số nhóm vừa/xa | Đo trên A56 ở E6 với 300 agent; Huy chốt (OI-CHR-07) |
-| OID-CHR-02 | Thời gian dựng NavMesh theo ô trên A56 (thay câu hỏi WASM recast, CR-02) | POC-U1 đo 1,8 s cho cả zone khi dựng một lần; đo lại bản theo ô ở E2/E6, mục tiêu không khung nào > 33 ms vì NavMesh |
+| OID-CHR-02 | Thời gian dựng NavMesh theo ô trên A56 (thay câu hỏi WASM recast, CR-02) | POC-U1 đo 1,8 s cho cả zone khi dựng một lần; đo lại bản theo ô ở E2/E6, T-0019 đo A56 bản theo ô: một luồng 64/64 việc làm khung > 33 ms; đa luồng (ADR-038) 3/64, max 50 ms. Mục tiêu (CR-05): không khung nào > 100 ms, ≤ 5 khung > 33 ms mỗi zone |
 
 ---
 
@@ -452,3 +452,4 @@ Pool 8 `AudioSource` 3D (`spatialBlend = 1`, rolloff tuyến tính; tier Thấp 
 | 0.1 | 22/11/2026 | Claude | Bản đầu từ TSD-05 v1.1 |
 | 1.0 | 23/11/2026 | Huy | Duyệt bộ DDD; thay đổi sau đây theo change request |
 | 1.1 | 26/11/2026 | Claude | CR-02 (ADR-036) và POC-U1: mục 2 runtime sang C# `engine/unity` (MOD-CHR-01…17), MOD-CHR-18 bước `navmesh` chỉ gom nguồn; mục 3 giao diện C#; DTO-CHR-06, EP-CHR-01; PSC-CHR-02 (`CharacterController`), 03, 04 (Playables), 07 (NavMesh theo ô bất đồng bộ), 15, 16; CFG-CHR-03…07; OID-CHR-02 |
+| 1.2 | 28/11/2026 | Claude | CR-05 (ADR-038; Huy chọn 28/11/2026): OID-CHR-02 ghi số đo T-0019 và mục tiêu mới; DTO-CHR-06 thêm `schema`, `zone` như bước navmesh đã ghi |

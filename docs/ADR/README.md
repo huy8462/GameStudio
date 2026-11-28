@@ -39,5 +39,6 @@
 | [ADR-035](ADR-035-web-studio-goi-claude-code-cli.md) | Web Studio gọi Claude Code qua CLI, người dùng tự đăng nhập | Đã chốt 23/11/2026; CLI trên máy người dùng qua cầu nối; NPC chỉ kịch bản tĩnh; thay ADR-031 phần Claude, ADR-014 phần AI khi chạy | Huy, QĐ-14, QĐ-15 |
 | [ADR-036](ADR-036-unity-runtime.md) | Runtime game và xem trước dùng Unity thay Three.js | Đã chốt 25/11/2026 (CR-02); player chung + dữ liệu | Huy, CR-02 |
 | [ADR-037](ADR-037-am-thanh-aac.md) | Âm thanh xuất bản dùng AAC (M4A) thay Opus | Đã chốt 26/11/2026; thay ADR-024 phần âm thanh | Huy, POC-U1 |
+| [ADR-038](ADR-038-player-web-da-luong.md) | Unity player Web bật đa luồng, trang chơi gửi COOP/COEP | Đã chốt 28/11/2026; thay cài đặt một luồng của POC-U1/T-0022 | Huy, CR-05, T-0019 |
 
 Mẫu ADR theo TSD-09 SCH-DEV-07 (bối cảnh, quyết định, hệ quả, phương án đã loại). Muốn đổi một quyết định đã chốt thì viết ADR mới ghi trường "Thay thế", không sửa ADR cũ.

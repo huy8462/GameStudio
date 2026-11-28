@@ -3,13 +3,13 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | DDD-00 |
-| Phiên bản | 1.2 |
-| Ngày | 26/11/2026 |
+| Phiên bản | 1.3 |
+| Ngày | 28/11/2026 |
 | Chủ sở hữu / người duyệt | Huy |
 | Người soạn | Claude |
 | Nguồn | TSD-00…09 v1.1, riêng TSD-00, 01, 04, 09 v1.2 và TSD-08 v1.3 (đã duyệt, CR-01); SRS-00…09 v1.0, riêng SRS-00 v1.2, SRS-01, 04, 09 v1.1, SRS-06 v1.1, SRS-08 v1.2 (đã duyệt); ADR-016…033 (đã chốt), BRD-00 v0.5 |
 | Quyết định áp dụng | QĐ-13 chiến đấu/săn bắt là module tuỳ chọn, mặc định tắt; QĐ-14 hội thoại NPC tĩnh, AI khi chạy tuỳ chọn và chỉ qua cổng AI phía server; QĐ-15 Web Studio riêng, chỉ người được mời (CH-23); TD-01…18 (ADR-016…033) |
-| Trạng thái | Đã duyệt (Huy, 23/11/2026); **v1.1 runtime Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại |
+| Trạng thái | Đã duyệt (Huy, 23/11/2026); **v1.1 runtime Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại; v1.3 tiêu đề COOP/COEP cho trang chơi (CR-05, ADR-038) |
 
 > DDD đi một tầng dưới TSD: TSD nói **dùng gì và theo thuật toán nào**, DDD nói **viết vào tệp nào, lớp và hàm nào, chữ ký kiểu ra sao, bảng CSDL có cột và chỉ mục gì, API nhận và trả gì, luồng gọi và máy trạng thái ra sao, xử lý lỗi và cấu hình thế nào, kiểm thử những ca nào**. Mục tiêu là một phiếu Claude Code có thể mở đúng một mục DDD, viết mã và test mà không phải đoán. DDD không định nghĩa lại mã của SRS/TSD, không tự chốt số SRS còn mở. Hai số còn mở theo SRS được thiết kế thành **tham số cấu hình** với giá trị khởi tạo: LOD hành vi 30/80 m (OI-CHR-07) và ngân sách chiến đấu tier Vừa 3 kẻ tấn công / 20 đạn (OI-CBT-05).
 
@@ -376,7 +376,7 @@ Mạng `egress-*` đi qua proxy egress (Squid hoặc Caddy forward proxy) có da
 ---
 
 ## 9. Bảo mật chung (chi tiết TSD-00 mục 8)
-- Header do Caddy đặt cho mọi phản hồi: `Strict-Transport-Security: max-age=31536000; includeSubDomains`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Content-Security-Policy` như TSD-00 mục 8.2; trang chơi thêm `worker-src 'self' blob:`; `connect-src 'self'` (cổng AI cùng gốc qua `/api/dialogue/*`).
+- Header do Caddy đặt cho mọi phản hồi: `Strict-Transport-Security: max-age=31536000; includeSubDomains`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Content-Security-Policy` như TSD-00 mục 8.2; trang chơi thêm `worker-src 'self' blob:`, `Cross-Origin-Opener-Policy: same-origin`, `Cross-Origin-Embedder-Policy: require-corp` (player Web đa luồng, ADR-038); `connect-src 'self'` (cổng AI cùng gốc qua `/api/dialogue/*`).
 - Khoá ký JWT: tệp `JWT_KEYS_FILE` (JSON `{kid: {purpose: 'preview'|'perf'|'dlg', secret, createdAt}}`), xoay bằng thêm `kid` mới, giữ `kid` cũ tới khi token cũ hết hạn (TD-15).
 - Quét bí mật ba lớp (pre-commit, CI, trước xuất bản) dùng chung `gitleaks.toml` (DDD-09).
 
@@ -489,3 +489,4 @@ DDD-01…09 có mục "Truy vết" ánh xạ FR/NFR và thành phần TSD sang t
 | 1.0 | 23/11/2026 | Huy | Duyệt bộ DDD; thay đổi sau đây theo change request |
 | 1.1 | 25/11/2026 | Claude | CR-02 (runtime Unity, ADR-036): MOD-GEN-14 thành Unity player `engine/unity`; luật dependency-cruiser (2), (3); dòng NFR-GEN-10 |
 | 1.2 | 26/11/2026 | Claude | CR-02 phần còn lại sau POC-U1: cột "Gói" của danh mục DDD-02…07 trỏ vào `engine/unity`, CFG-GEN-04 |
+| 1.3 | 28/11/2026 | Claude | CR-05 (ADR-038, Huy chọn 28/11/2026): mục 9 trang chơi gửi COOP/COEP |

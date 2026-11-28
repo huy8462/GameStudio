@@ -1,12 +1,12 @@
-# CR-05: Player Web đa luồng để dựng NavMesh ngoài luồng chính (đề xuất)
+# CR-05: Player Web đa luồng để dựng NavMesh ngoài luồng chính
 
 | Mục | Nội dung |
 |---|---|
 | Mã | CR-05 |
 | Yêu cầu | Phát hiện ở T-0019 (đo A56 28/11/2026) |
-| Trạng thái | **Đề xuất, chờ Huy chọn** (hướng 1/2/3 trong luồng) |
+| Trạng thái | **Đã duyệt và đã áp** (Huy chọn hướng 1, 28/11/2026) |
 | Người soạn | Claude, 28/11/2026 |
-| ADR kèm | ADR-038 (mới, chưa viết): player Web bật `threadsSupport`; nơi phục vụ gửi COOP/COEP |
+| ADR kèm | ADR-038: player Web bật `threadsSupport`; nơi phục vụ gửi COOP/COEP |
 
 ## 1. Lý do
 
@@ -21,14 +21,15 @@ Bản Web một luồng chạy `NavMeshBuilder.UpdateNavMeshDataAsync` ngay tron
 | Heap WASM | 68 MB | 96 MB |
 | Player (Brotli) | 9,18 MB | 9,10 MB |
 
-## 2. Thay đổi đề xuất (hướng 1)
+## 2. Thay đổi đã áp (hướng 1)
 
 | Tài liệu | Chỗ sửa |
 |---|---|
 | ADR-038 (mới) | Player Web đa luồng; điều kiện: host gửi `Cross-Origin-Opener-Policy: same-origin`, `Cross-Origin-Embedder-Policy: require-corp`; mọi tài nguyên cùng nguồn hoặc có CORP |
-| TSD-05 OIT-CHR-01 | "không khung nào > 33 ms" → "không khung nào > 100 ms; ≤ 5 khung > 33 ms mỗi zone" (hướng 1) |
-| SRS-04 / TSD-04 (cài đặt build Web, NFR bộ nhớ) | Ghi `threadsSupport`, heap tăng ~30 MB; yêu cầu tiêu đề COOP/COEP cho poc và xuất bản (W4) |
-| DDD-04 `PlayerBuild` | Bỏ biến môi trường thử `GS_WEB_THREADS`, bật mặc định |
+| TSD-05 1.2 → 1.3 | OIT-CHR-01: "không khung nào > 33 ms" → "không khung nào > 100 ms; ≤ 5 khung > 33 ms mỗi zone" |
+| DDD-05 1.1 → 1.2 | OID-CHR-02 số đo và mục tiêu mới; DTO-CHR-06 thêm `schema`, `zone` |
+| DDD-00 1.2 → 1.3 | Mục 9: trang chơi gửi COOP/COEP |
+| Mã `PlayerBuild` | Bỏ biến môi trường thử `GS_WEB_THREADS`, bật đa luồng mặc định (SRS-04, TSD-04 không ghi cài đặt luồng nên không sửa) |
 
 ## 3. Tác động
 

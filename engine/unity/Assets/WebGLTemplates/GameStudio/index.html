@@ -44,6 +44,10 @@
       // ERR-RTM-01: không có WebGL2 thì dừng, không tải player.
       var probe = document.createElement('canvas').getContext('webgl2');
       if (!probe) { fail('Trình duyệt này chưa hỗ trợ WebGL2 nên không chạy được game.'); return; }
+#if USE_THREADS
+      // ADR-038: player đa luồng cần SharedArrayBuffer, tức trang phải được phục vụ kèm COOP/COEP.
+      if (!window.crossOriginIsolated) { fail('Máy chủ chưa bật cô lập nguồn gốc (COOP/COEP) nên không chạy được game.'); return; }
+#endif
 
       var d = Number(q.get('dpr'));
       var cap = Number.isFinite(d) && d > 0 && d <= 4 ? d : 1.5;

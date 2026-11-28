@@ -1,4 +1,4 @@
-// T-0022 (ADR-036, POC-U1 §1; NFR-RTM-01; SRS-04 §6.3 playerMB): build player Unity Web bằng mã, chạy batchmode.
+// T-0022, T-0019 (ADR-036, ADR-038, POC-U1 §1; NFR-RTM-01; SRS-04 §6.3 playerMB): build player Unity Web bằng mã, chạy batchmode.
 // Gọi: Unity.exe -batchmode -quit -nographics -buildTarget WebGL -projectPath engine/unity
 //        -executeMethod GameStudio.Build.PlayerBuild.Build -logFile <log>
 // Dòng log "GS_BUILD ..." là kết quả đọc bằng máy. Prepare chỉ sinh asset và cảnh (không build).
@@ -17,8 +17,6 @@ namespace GameStudio.Build
     public static class PlayerBuild
     {
         public const string OutDir = "Build/player";
-        /// <summary>T-0019 thử nghiệm: GS_WEB_THREADS=1 bật đa luồng Web (cần COOP/COEP), ra Build/player-mt.</summary>
-        static bool Threads => Environment.GetEnvironmentVariable("GS_WEB_THREADS") == "1";
         public const float PlayerBudgetMB = 10f; // SRS-04 §6.3 playerMB (Huy chốt 26/11/2026)
 
         public static void Prepare()
@@ -47,7 +45,7 @@ namespace GameStudio.Build
         public static void Build()
         {
             Prepare();
-            var outDir = Path.GetFullPath(Threads ? OutDir + "-mt" : OutDir);
+            var outDir = Path.GetFullPath(OutDir);
             if (Directory.Exists(outDir)) Directory.Delete(outDir, true);
             var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
             {
@@ -85,8 +83,8 @@ namespace GameStudio.Build
             PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Brotli;
             PlayerSettings.WebGL.decompressionFallback = true; // máy chủ poc chưa chắc gửi Content-Encoding
             PlayerSettings.WebGL.dataCaching = true;
-            PlayerSettings.WebGL.threadsSupport = Threads;
-            Debug.Log($"GS_BUILD threads={Threads}");
+            // ADR-038 (CR-05, T-0019): đa luồng để NavMesh dựng ngoài luồng chính; trang phải có COOP/COEP.
+            PlayerSettings.WebGL.threadsSupport = true;
             PlayerSettings.WebGL.maximumMemorySize = 1024;
             PlayerSettings.WebGL.nameFilesAsHashes = false;
             PlayerSettings.WebGL.template = "PROJECT:GameStudio";

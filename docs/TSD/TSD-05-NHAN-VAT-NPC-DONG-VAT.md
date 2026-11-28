@@ -3,13 +3,13 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | TSD-05 |
-| Phiên bản | 1.2 |
-| Ngày | 26/11/2026 |
+| Phiên bản | 1.3 |
+| Ngày | 28/11/2026 |
 | Tài liệu cha | TSD-00 `TSD-00-TONG-QUAN.md` |
 | SRS nguồn | SRS-05 v0.1 (FR-CHR-01…44, NFR-CHR-01…04) |
 | Gói | Runtime `characters/`, `npc-ai/`, `camera-player/`; bước build `navmesh`, `characters.bake` (animation texture); thư viện họ `engine/families/<family>/` |
 | Pha | E2, E4, E6, E7; web W3 |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026); **v1.2 theo CR-02 (Unity) sau POC-U1**, chờ Huy xem lại |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026); **v1.2 theo CR-02 (Unity) sau POC-U1**, chờ Huy xem lại; v1.3 OIT-CHR-01 theo CR-05 (ADR-038, Huy chọn 28/11/2026) |
 
 ---
 
@@ -139,7 +139,7 @@ Tính năng mức C: tuỳ biến ngoại hình người chơi (FR-CHR-12) chỉ
 
 | Mã | Câu hỏi | Đề xuất |
 |---|---|---|
-| OIT-CHR-01 | (CR-02, thay câu hỏi WASM recast) Thời gian dựng NavMesh theo ô trên A56 | POC-U1: 1,8 s cả zone; E2/E6 đo bản theo ô, mục tiêu không khung nào > 33 ms vì NavMesh; nếu chậm thì giảm ô kề dựng trước |
+| OIT-CHR-01 | (CR-02, thay câu hỏi WASM recast) Thời gian dựng NavMesh theo ô trên A56 | POC-U1: 1,8 s cả zone; E2/E6 đo bản theo ô, mục tiêu (CR-05, ADR-038) không khung nào > 100 ms vì NavMesh và ≤ 5 khung > 33 ms mỗi zone nạp, với player Web đa luồng; T-0019 đo A56: ô người chơi 0,26 s, cả zone 1,44 s, 3 khung > 33 ms (max 50 ms) |
 | OIT-CHR-02 | VAT 16-bit có được hỗ trợ đủ trên A56 | Kiểm `EXT_color_buffer_half_float`; dự phòng RGBA8 mã hoá hai kênh |
 
 ## 10. Truy vết
@@ -186,3 +186,4 @@ Tính năng mức C: tuỳ biến ngoại hình người chơi (FR-CHR-12) chỉ
 | 1.0 | 22/11/2026 | Huy | Duyệt toàn bộ tài liệu |
 | 1.1 | 22/11/2026 | Claude | Chốt các số "(đề xuất)" có nguồn từ SRS sau khi Huy duyệt SRS |
 | 1.2 | 26/11/2026 | Claude | CR-02 (ADR-036) sau POC-U1: sơ đồ, IF-CHR-02 (AI Navigation), ALG-CHR-02 (`CharacterController`), ALG-CHR-07 (NavMesh theo ô lúc nạp), ALG-CHR-15, OIT-CHR-01 |
+| 1.3 | 28/11/2026 | Claude | CR-05 (ADR-038; Huy chọn hướng 1 ngày 28/11/2026): OIT-CHR-01 đổi mục tiêu khung khi dựng NavMesh, player Web đa luồng |
