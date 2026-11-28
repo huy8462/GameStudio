@@ -62,6 +62,11 @@ try {
   await page.waitForFunction(want, null, { timeout: timeoutMs, polling: 500 }).catch(() => {});
   out.state = await page.evaluate(() => globalThis.__GS_STATE__ ?? null);
   out.perf = await page.evaluate(() => globalThis.__GS_PERF__ ?? null);
+  // T-0028: GS_CHECK_SHOT=<tệp.png> chụp màn hình sau 3 s (xem cảnh, không phải ảnh góc chuẩn của QA).
+  if (process.env.GS_CHECK_SHOT) {
+    await page.waitForTimeout(3000);
+    await page.screenshot({ path: process.env.GS_CHECK_SHOT });
+  }
 } finally {
   await browser.close();
   server.close();

@@ -127,6 +127,23 @@ namespace GameStudio.Tests
         }
 
         [Test]
+        public void ThanTam_VienNangDungKichThuocVaPhapTuyenHuongRa()
+        {
+            var m = PlayerSystem.CapsuleMesh(0.35f, 1.8f, 16, 6);
+            Assert.AreEqual(0f, m.bounds.min.y, 1e-4f);
+            Assert.AreEqual(1.8f, m.bounds.max.y, 1e-4f);
+            Assert.AreEqual(0.7f, m.bounds.size.x, 1e-3f);
+            var v = m.vertices; var n = m.normals; var t = m.triangles;
+            for (int i = 0; i < t.Length; i += 3)
+            {
+                var c = Vector3.Cross(v[t[i + 1]] - v[t[i]], v[t[i + 2]] - v[t[i]]);
+                if (c.sqrMagnitude < 1e-10f) continue; // tam giác suy biến ở hai cực
+                Assert.Greater(Vector3.Dot(c, n[t[i]] + n[t[i + 1]] + n[t[i + 2]]), 0f, "tam giác " + i / 3);
+            }
+            UnityEngine.Object.DestroyImmediate(m);
+        }
+
+        [Test]
         public void Camera_KeoGanKhiCoVatChan()
         {
             var g = Grid(33, 33, 4, -64, -64, (x, z) => 0f);

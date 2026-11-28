@@ -81,6 +81,7 @@ namespace GameStudio
                 throw;
             }
 
+            ApplyBaseLayer(files);
             if (!BuildTerrainCollider(zoneId, files, go.transform))
             {
                 // Dữ liệu không có collider LOD1: collider từ lưới hiển thị (như POC, T-0022).
@@ -93,6 +94,37 @@ namespace GameStudio
             loaded[zoneId] = lz;
             states[zoneId] = ZoneState.CoreSanSang;
             engine.NotifyZoneLoaded(lz);
+        }
+
+        /// <summary>
+        /// T-0028 (tạm, tới phiếu vật liệu splat): gắn baseColor lõi của lớp splat đầu tiên (layers.json → material)
+        /// làm _BaseMap của vật liệu địa hình, để thấy chi tiết và độ dốc. UV0 của terrain.mesh lặp mỗi 4 m.
+        /// Chỉ đổi texture (URP Lit không thêm từ khoá), nên bộ biến thể làm ấm T-0021 vẫn đủ.
+        /// </summary>
+        void ApplyBaseLayer(FileRef[] files)
+        {
+            var mat = engine.Ctx.TerrainMaterial;
+            if (mat == null) return;
+            for (int i = 0; i < files.Length; i++)
+            {
+                if (!files[i].Path.EndsWith("layers.json", StringComparison.Ordinal) || !texts.TryGetValue(files[i].Path, out var json)) continue;
+                var doc = MiniJson.Obj(MiniJson.Parse(json));
+                var layers = MiniJson.Arr(doc != null && doc.TryGetValue("layers", out var lv) ? lv : null);
+                var first = layers != null && layers.Count > 0 ? MiniJson.Obj(layers[0]) : null;
+                var dir = first != null ? MiniJson.Str(first, "material") : null; // "materials/dat-co"
+                if (string.IsNullOrEmpty(dir)) return;
+                var suffix = "/core/" + dir.Substring(dir.LastIndexOf('/') + 1) + "-basecolor.ktx2";
+                foreach (var kv in textures)
+                {
+                    if (!kv.Key.EndsWith(suffix, StringComparison.Ordinal)) continue;
+                    kv.Value.wrapMode = TextureWrapMode.Repeat;
+                    mat.SetTexture("_BaseMap", kv.Value);
+                    mat.SetColor("_BaseColor", Color.white);
+                    engine.Ctx.Log.Info("địa hình: lớp nền " + kv.Key);
+                    return;
+                }
+                return;
+            }
         }
 
         /// <summary>T-0028: tìm cặp height-lod1.r32 + .meta.json trong phần core, dựng HeightGrid và MeshCollider LOD1.</summary>
