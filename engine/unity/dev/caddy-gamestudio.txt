@@ -18,5 +18,8 @@ gamestudio.vinpride.com {
 	@ktx2 path *.ktx2
 	header @ktx2 Content-Type image/ktx2
 	header Cache-Control "no-cache"
+	# T-0019: cô lập nguồn gốc cho bản Web đa luồng (SharedArrayBuffer). Bản một luồng chỉ nạp tệp cùng nguồn nên không ảnh hưởng.
+	header Cross-Origin-Opener-Policy same-origin
+	header Cross-Origin-Embedder-Policy require-corp
 	file_server
 }

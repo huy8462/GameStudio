@@ -91,6 +91,9 @@
           dataUrl: 'Build/{{{ DATA_FILENAME }}}',
           frameworkUrl: 'Build/{{{ FRAMEWORK_FILENAME }}}',
           codeUrl: 'Build/{{{ CODE_FILENAME }}}',
+#if USE_THREADS
+          workerUrl: 'Build/{{{ WORKER_FILENAME }}}',
+#endif
           streamingAssetsUrl: 'StreamingAssets',
           companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
           productName: {{{ JSON.stringify(PRODUCT_NAME) }}},

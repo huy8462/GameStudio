@@ -32,6 +32,9 @@ const server = createServer((req, res) => {
   res.writeHead(200, {
     'Content-Type': types[extname(file)] ?? 'application/octet-stream',
     'Content-Length': statSync(file).size,
+    // Bản đa luồng (T-0019, Build/player-mt) cần cô lập nguồn gốc để có SharedArrayBuffer.
+    'Cross-Origin-Opener-Policy': 'same-origin',
+    'Cross-Origin-Embedder-Policy': 'require-corp',
   });
   createReadStream(file).pipe(res);
 });
