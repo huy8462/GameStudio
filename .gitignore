@@ -55,3 +55,6 @@ data.bak-*/
 __pycache__/
 **/__pycache__/
 *.pyc
+
+# T-0022: mã build-time của Unity player (git trên Windows không phân biệt hoa thường nên build/ chặn cả thư mục này).
+!engine/unity/Assets/GameStudio/Build/

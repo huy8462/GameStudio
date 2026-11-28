@@ -1,0 +1,11 @@
+# T-0022: thư mục Unity tự sinh và bản build (neo ở gốc dự án để không chặn Assets/GameStudio/Build).
+/Library/
+/Temp/
+/Logs/
+/obj/
+/Build/
+/UserSettings/
+/*.csproj
+/*.sln
+/*.slnx
+/logs/

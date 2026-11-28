@@ -1,0 +1,12 @@
+{
+  "//": "T-0022 (DTO-RTM-04, SCH-RTM-08). Luật GPU xét trước, không khớp thì theo defaults. Xclipse 540 là GPU của Galaxy A56 (thiết bị đích, tier Vừa).",
+  "rules": [
+    { "gpuRegex": "Xclipse 5[0-9]{2}", "tier": "vua", "note": "Galaxy A55/A56 (Exynos 1480/1580)" },
+    { "gpuRegex": "SwiftShader|Basic Render|llvmpipe", "tier": "thap", "note": "render phần mềm" }
+  ],
+  "defaults": {
+    "cao": { "deviceMemoryMin": 12 },
+    "vua": { "deviceMemoryMin": 8, "minScreenPx": 1080 }
+  },
+  "dprMax": { "thap": 1.0, "vua": 1.5, "cao": 2.0, "toi_da": 2.5 }
+}

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <!-- T-0022 (IF-RTM-01, SEQ-RTM-01, EP-RTM-01, ERR-RTM-01; CMP-GEN-33): trang nạp player Unity Web.
+       Tham số: ?manifest=<url> (mặc định data/manifest.json), ?mode=play|preview|test, ?seed=, ?tier=, ?dpr= (trần DPR, mặc định 1,5),
+       ?perf=1 (tự bấm Chơi, đo 20 s, hiện JSON), ?autoplay=1 (tự bấm Chơi), ?dev=1. -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>{{{ PRODUCT_NAME }}}</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #1b1f24; overflow: hidden; font-family: system-ui, sans-serif; }
+    #unity-canvas { width: 100vw; height: 100vh; display: block; background: #1b1f24; touch-action: none; }
+    #gs-load { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 16px; background: #1b1f24; color: #fff; z-index: 5; }
+    #gs-bar { width: min(60vw, 320px); height: 6px; background: #3a424d; border-radius: 3px; overflow: hidden; }
+    #gs-bar > div { width: 0; height: 100%; background: #7fc97f; transition: width .2s; }
+    #gs-play { display: none; min-width: 160px; min-height: 48px; padding: 12px 32px; font-size: 20px; border: 0; border-radius: 8px;
+      background: #7fc97f; color: #10240f; }
+    #gs-result { position: fixed; left: 4px; right: 4px; bottom: 4px; height: 38vh; display: none;
+      font: 11px/1.3 monospace; background: rgba(0,0,0,.8); color: #fff; z-index: 9; }
+    #gs-copy { position: fixed; right: 8px; top: 8px; z-index: 10; padding: 12px; font-size: 16px; display: none; }
+  </style>
+</head>
+<body>
+  <canvas id="unity-canvas" tabindex="-1"></canvas>
+  <div id="gs-load">
+    <div id="gs-text">Đang tải…</div>
+    <div id="gs-bar"><div></div></div>
+    <button id="gs-play">Chơi</button>
+  </div>
+  <textarea id="gs-result" readonly></textarea>
+  <button id="gs-copy">Sao chép JSON</button>
+  <script>
+    (function () {
+      var q = new URLSearchParams(location.search);
+      var $ = function (s) { return document.querySelector(s); };
+      var text = $('#gs-text'), bar = $('#gs-bar > div'), play = $('#gs-play'), load = $('#gs-load');
+      var ta = $('#gs-result'), copy = $('#gs-copy');
+      var auto = q.get('perf') === '1' || q.get('autoplay') === '1';
+      var unity = null;
+
+      function fail(msg) { text.textContent = msg; $('#gs-bar').style.display = 'none'; play.style.display = 'none'; }
+
+      // ERR-RTM-01: không có WebGL2 thì dừng, không tải player.
+      var probe = document.createElement('canvas').getContext('webgl2');
+      if (!probe) { fail('Trình duyệt này chưa hỗ trợ WebGL2 nên không chạy được game.'); return; }
+
+      var d = Number(q.get('dpr'));
+      var cap = Number.isFinite(d) && d > 0 && d <= 4 ? d : 1.5;
+      window.__GS_DPR__ = Math.min(window.devicePixelRatio || 1, cap);
+
+      // Nửa đầu thanh tiến độ là tải player, nửa sau là manifest + phần core của zone xuất phát.
+      window.addEventListener('gs:progress', function (e) {
+        var p = e.detail;
+        if (p.phase === 'core' && p.total > 0) bar.style.width = (50 + 50 * p.loaded / p.total) + '%';
+      });
+      window.addEventListener('gs:state', function (e) {
+        var s = e.detail.state;
+        if (s === 'SanSang') {
+          bar.style.width = '100%';
+          if (auto) { start(); return; }
+          text.textContent = 'Sẵn sàng';
+          $('#gs-bar').style.display = 'none';
+          play.style.display = 'block';
+        } else if (s === 'DangChay') {
+          load.style.display = 'none';
+        } else if (s === 'Loi') {
+          load.style.display = 'flex';
+          fail(e.detail.message || 'Có lỗi khi tải game.');
+        }
+      });
+      window.addEventListener('gs:perf', function (e) {
+        ta.value = e.detail; ta.style.display = 'block'; copy.style.display = 'block';
+      });
+
+      function start() { if (unity) unity.SendMessage('GameStudio', 'Play'); }
+      play.onclick = start; // chạm của người chơi cũng mở khoá âm thanh của trình duyệt
+      copy.onclick = function () {
+        ta.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (e) {}
+        if (navigator.clipboard) navigator.clipboard.writeText(ta.value).then(function () { copy.textContent = 'Đã sao chép'; }, function () {});
+        copy.textContent = ok ? 'Đã sao chép' : 'Chọn chữ trong khung để chép';
+      };
+
+      var script = document.createElement('script');
+      script.src = 'Build/{{{ LOADER_FILENAME }}}';
+      script.onerror = function () { fail('Không tải được player.'); };
+      script.onload = function () {
+        createUnityInstance($('#unity-canvas'), {
+          dataUrl: 'Build/{{{ DATA_FILENAME }}}',
+          frameworkUrl: 'Build/{{{ FRAMEWORK_FILENAME }}}',
+          codeUrl: 'Build/{{{ CODE_FILENAME }}}',
+          streamingAssetsUrl: 'StreamingAssets',
+          companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+          productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+          productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+          devicePixelRatio: window.__GS_DPR__,
+          matchWebGLToCanvasSize: true
+        }, function (p) { bar.style.width = Math.round(p * 50) + '%'; })
+          .then(function (instance) {
+            unity = instance;
+            var seed = Number(q.get('seed'));
+            instance.SendMessage('GameStudio', 'Boot', JSON.stringify({
+              manifestUrl: new URL(q.get('manifest') || 'data/manifest.json', location.href).href,
+              mode: q.get('mode') || (q.get('test') === '1' ? 'test' : 'play'),
+              seed: Number.isFinite(seed) ? Math.trunc(seed) : 0,
+              tier: q.get('tier') || 'auto',
+              liveRuntimeData: false
+            }));
+          })
+          .catch(function (e) { fail('Lỗi: ' + e); console.error(e); });
+      };
+      document.body.appendChild(script);
+    })();
+  </script>
+</body>
+</html>

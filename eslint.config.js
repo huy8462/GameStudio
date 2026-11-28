@@ -10,6 +10,10 @@ export default tseslint.config(
       '**/dist/**',
       // Đầu ra build của game (games/<id>/build) bỏ qua; engine/build là mã nguồn bước build, phải lint (T-0010).
       '**/cache/**',
+      // Thư mục Unity tự sinh và bản build player (T-0022).
+      'engine/unity/Library/**',
+      'engine/unity/Temp/**',
+      'engine/unity/Build/**',
       '**/generated/**',
       '.claude/**',
       'scripts/**',

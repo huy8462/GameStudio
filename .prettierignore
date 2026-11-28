@@ -23,3 +23,16 @@ games/*/build/
 **/cache/
 **/generated/
 .venv/
+# T-0022: tệp Unity tự ghi (định dạng riêng) và mẫu trang có token {{{ }}} của Unity.
+engine/unity/Library/
+engine/unity/Temp/
+engine/unity/Logs/
+engine/unity/logs/
+engine/unity/Build/
+engine/unity/UserSettings/
+engine/unity/obj/
+engine/unity/Packages/
+engine/unity/ProjectSettings/
+engine/unity/Assets/WebGLTemplates/
+engine/unity/Assets/**/*.asmdef
+engine/unity/Assets/**/*.jslib
