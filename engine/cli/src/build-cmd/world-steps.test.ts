@@ -64,6 +64,7 @@ describe(
         'terrain.mesh@z1:ran',
         'navmesh@z1:ran',
         'terrain.splat@z1:ran',
+        'packager@-:ran',
       ]);
       const splat = r1.outcome.steps.find((s) => s.step === 'terrain.splat')?.outDir ?? '';
       for (const f of ['splat-0.png', 'surface.png', 'layers.json', 'preview/splat.png']) {
@@ -112,6 +113,34 @@ describe(
         expect(existsSync(join(mesh, f)), f).toBe(true);
       }
 
+      // T-0026: manifest/1 cho Unity player.
+      const pk = r1.outcome.steps.find((s) => s.step === 'packager')?.outDir ?? '';
+      const man = JSON.parse(readFileSync(join(pk, 'manifest.json'), 'utf8')) as {
+        schema: string;
+        startZone: string;
+        tiers: string[];
+        spawn: { pos: number[] };
+        zones: {
+          id: string;
+          parts: Record<string, { core: { path: string; bytes: number }[]; full: { path: string }[] }>;
+        }[];
+        environment: { hdri: { id: string }[]; materials: { path: string }[] };
+      };
+      expect(man).toMatchObject({ schema: 'manifest/1', startZone: 'z1', tiers: ['thap', 'vua', 'cao', 'toi_da'] });
+      const vua = man.zones[0]?.parts['vua'];
+      const core = vua?.core.map((f) => f.path) ?? [];
+      expect(core.filter((p) => p.endsWith('.glb')).every((p) => p.endsWith('/lod2.glb'))).toBe(true);
+      expect(core.filter((p) => p.endsWith('.glb'))).toHaveLength(64);
+      expect(core).toContain('zones/z1/nav/sources.json');
+      expect(core).toContain('tex/t2048-1024/core/z1-splat-0.ktx2');
+      expect(core).toContain('tex/t2048-1024/core/dat-co-basecolor.ktx2');
+      expect(vua?.full.map((f) => f.path)).toContain('zones/z1/terrain/0_0/lod0.glb');
+      for (const f of vua?.core ?? []) expect(existsSync(join(pk, f.path)), f.path).toBe(true);
+      const glb = readFileSync(join(pk, 'zones/z1/terrain/0_0/lod2.glb'));
+      expect(JSON.parse(glb.subarray(20, 20 + glb.readUInt32LE(12)).toString('utf8'))).toMatchObject({ scene: 0 });
+      expect(man.environment.hdri.map((h) => h.id)).toEqual(['troi-thu-tuc']);
+      expect(man.environment.materials).toHaveLength(4);
+
       expect((await build(a)).report.cached).toBe(true);
       const r3 = await build(game());
       expect(r3.outcome.steps.map((s) => s.outputHash)).toEqual(r1.outcome.steps.map((s) => s.outputHash));
@@ -124,7 +153,16 @@ describe(
       const w = JSON.parse(readFileSync(wp, 'utf8')) as { procedural: Record<string, unknown> };
       writeFileSync(wp, JSON.stringify({ ...w, procedural: { ...w.procedural, roughness: 0.9 } }));
       const r = await build(a);
-      expect(r.report.checks.map((c) => c.message)).toEqual(['cached', 'cached', 'ran', 'ran', 'ran', 'ran', 'ran']);
+      expect(r.report.checks.map((c) => c.message)).toEqual([
+        'cached',
+        'cached',
+        'ran',
+        'ran',
+        'ran',
+        'ran',
+        'ran',
+        'ran',
+      ]);
       const ant = await build(game({ procedural: { preset: 'ant', maxHeight: 40, roughness: 0.5, features: [] } }));
       expect(ant.exit).toBe(EXIT.ENVIRONMENT);
       expect(ant.report.warnings.join(' ')).toMatch(/ant/);
@@ -159,6 +197,7 @@ describe(
         'cached',
         'cached',
         'cached',
+        'ran',
         'ran',
         'ran',
         'ran',

@@ -1,0 +1,25 @@
+{
+  "name": "@gamestudio/step-packager",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Buoc build packager (MOD-CLI-04, PSC-CLI-02, DTO-RTM-01): dong goi zone x tier, core/full, manifest/1 cho Unity player.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "step.json"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@gamestudio/packager": "workspace:*",
+    "@gamestudio/schema": "workspace:*"
+  }
+}

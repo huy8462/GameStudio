@@ -1,5 +1,5 @@
-// T-0013: engine new-game (EP-INT-01, 02; TC-INT-12; AC-01-04): handoff từng bước → xác nhận → game build được 6 bước (T-0019 thêm navmesh).
-import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+// T-0013: engine new-game (EP-INT-01, 02; TC-INT-12; AC-01-04): handoff từng bước → xác nhận → game build được 8 bước (T-0019 thêm navmesh, T-0025 materials, T-0026 packager).
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -101,7 +101,7 @@ function setup() {
 }
 
 describe('engine new-game', { timeout: 240_000 }, () => {
-  it('handoff analyze → clarify → câu hỏi → mặc định → brief → xác nhận → engine build 6 bước thoát 0', async () => {
+  it('handoff analyze → clarify → câu hỏi → mặc định → brief → xác nhận → engine build 8 bước thoát 0', async () => {
     const { gamesDir, base, respond } = setup();
     let r = await runNewGame({ ...base, description: DESC });
     expect(r.exit).toBe(EXIT.NEEDS_CONFIRM);
@@ -150,6 +150,12 @@ describe('engine new-game', { timeout: 240_000 }, () => {
     // Chạy lại sau xác nhận: không ghi đè.
     expect((await runNewGame({ ...base, resume: sid, confirm: true })).report.status).toBe('DaXacNhan');
 
+    // T-0025: vật liệu và HDRI nhỏ để build trong test nhanh (bước materials đọc _settings.json).
+    mkdirSync(join(game, 'assets/materials'), { recursive: true });
+    writeFileSync(
+      join(game, 'assets/materials/_settings.json'),
+      JSON.stringify({ size: 64, hdri: { equirectWidth: 128, face: 16, mips: 3, samples: 8, skyFace: 16 } }),
+    );
     const b = await runBuildCommand({
       gameDir: game,
       stepsDir: join(ROOT, 'engine/build/steps'),
@@ -160,12 +166,14 @@ describe('engine new-game', { timeout: 240_000 }, () => {
     });
     expect(b.exit, b.report.warnings.join('\n')).toBe(EXIT.OK);
     expect(b.report.checks.map((c) => c.id)).toEqual([
+      'materials@-',
       'world.fetch@-',
       'world.heightfield@-',
       'terrain.erode@-',
       'terrain.mesh@z1',
       'navmesh@z1',
       'terrain.splat@z1',
+      'packager@-',
     ]);
   });
 

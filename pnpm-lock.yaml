@@ -217,6 +217,15 @@ importers:
         specifier: workspace:*
         version: link:../../../schema
 
+  engine/build/steps/packager:
+    dependencies:
+      '@gamestudio/packager':
+        specifier: workspace:*
+        version: link:../../packager
+      '@gamestudio/schema':
+        specifier: workspace:*
+        version: link:../../../schema
+
   engine/build/steps/terrain-mesh:
     dependencies:
       '@gltf-transform/core':
