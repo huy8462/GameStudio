@@ -1,6 +1,6 @@
 {
   "$schema": "./schema/versions.schema.json",
-  "//": "SCH-DEV-03 / DTO-DEV-03 / CFG-GEN-01. Chốt ở E0 (phiếu E0-03, 23/11/2026). Nâng bản = phiếu riêng có chạy golden test (ADR-017). Blender theo ADR-034.",
+  "//": "SCH-DEV-03 / DTO-DEV-03 / CFG-GEN-01. Chốt ở E0 (phiếu E0-03, 23/11/2026). Nâng bản = phiếu riêng có chạy golden test (ADR-017). Blender theo ADR-034. Unity theo ADR-036/CR-02 (bỏ three).",
   "node": { "version": "24.21.0", "match": "minor", "check": ["node", "--version"], "parse": "v(\\d+\\.\\d+\\.\\d+)" },
   "pnpm": { "version": "12.16.1", "match": "exact", "check": ["pnpm", "--version"], "parse": "^(\\d+\\.\\d+\\.\\d+)" },
   "python": {
@@ -70,7 +70,20 @@
     "timeoutS": 30
   },
   "chromium": { "version": "1255", "match": "exact", "probe": "chromium" },
-  "three": { "version": "0.187.0", "match": "exact", "probe": "pinned" },
+  "unity": {
+    "version": "6000.3.29f1",
+    "match": "exact",
+    "probe": "unity",
+    "roles": ["dev"],
+    "packages": {
+      "com.unity.render-pipelines.universal": "17.3.0",
+      "com.unity.cloud.gltfast": "6.21.0",
+      "com.unity.meshopt.decompress": "0.3.0-exp.1",
+      "com.unity.cloud.ktx": "3.8.0",
+      "com.unity.ai.navigation": "2.0.17",
+      "com.unity.inputsystem": "1.20.1"
+    }
+  },
   "claudeCode": {
     "version": "2.1.319",
     "match": "minor",

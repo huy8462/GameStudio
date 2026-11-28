@@ -32,7 +32,12 @@
         "match": { "enum": ["exact", "minor"] },
         "check": { "$ref": "#/$defs/argv" },
         "parse": { "type": "string", "description": "Regex, nhóm 1 là phiên bản" },
-        "probe": { "enum": ["blender", "chromium", "pinned"] },
+        "probe": { "enum": ["blender", "chromium", "unity"] },
+        "packages": {
+          "type": "object",
+          "description": "Chỉ probe unity: gói Unity ghim bản, khớp engine/unity/Packages/manifest.json và packages-lock.json",
+          "additionalProperties": { "type": "string" }
+        },
         "roles": { "type": "array", "items": { "enum": ["dev", "worker", "ci"] } },
         "optional": { "type": "boolean" },
         "timeoutS": { "type": "number", "exclusiveMinimum": 0 },

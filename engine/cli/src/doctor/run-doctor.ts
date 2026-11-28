@@ -1,9 +1,11 @@
 // runDoctor (DDD-09 §3.2 IF-DEV-03, PSC-DEV-06). Thoát 5 khi có mục bắt buộc missing/mismatch.
 import { readFileSync } from 'node:fs';
+import { dirname } from 'node:path';
 
 import { EXIT } from '../exit-codes.js';
 import { checkBlender } from './blender-check.js';
-import { checkChromium, checkPinned, checkTool } from './checks.js';
+import { checkChromium, checkTool } from './checks.js';
+import { checkUnity } from './unity-check.js';
 import { checkEnv } from './env-roles.js';
 import type { Runner } from './exec.js';
 import { runCommand } from './exec.js';
@@ -46,7 +48,8 @@ export async function runDoctor(o: DoctorOptions): Promise<{ report: DoctorRepor
     if (!appliesTo(spec, role)) continue;
     if (spec.probe === 'blender') jobs.push(checkBlender(spec, versions.addons, o.probePath, run));
     else if (spec.probe === 'chromium') jobs.push(Promise.resolve(checkChromium(spec, env)));
-    else if (spec.probe === 'pinned') jobs.push(Promise.resolve([checkPinned(id, spec)]));
+    else if (spec.probe === 'unity')
+      jobs.push(Promise.resolve(checkUnity(spec, dirname(dirname(o.versionsPath)), env)));
     else jobs.push(checkTool(id, spec, run));
   }
   const checks = (await Promise.all(jobs)).flat();

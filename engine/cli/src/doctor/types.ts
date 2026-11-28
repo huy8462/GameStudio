@@ -35,15 +35,17 @@ export interface FeatureSpec {
 export interface ToolSpec {
   version: string;
   match: MatchRule;
-  /** argv lấy phiên bản; không có khi `probe` = 'pinned'. */
+  /** argv lấy phiên bản; không có khi có `probe`. */
   check?: string[];
   /** Regex, nhóm 1 là phiên bản. */
   parse?: string;
-  probe?: 'blender' | 'chromium' | 'pinned';
+  probe?: 'blender' | 'chromium' | 'unity';
   roles?: Role[];
   optional?: boolean;
   timeoutS?: number;
   features?: FeatureSpec[];
+  /** Chỉ cho probe 'unity': gói Unity ghim bản `{"com.unity.x": "1.2.3"}` (POC-U1). */
+  packages?: Record<string, string>;
 }
 
 export interface AddonSpec {

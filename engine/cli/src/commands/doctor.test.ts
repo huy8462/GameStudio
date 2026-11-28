@@ -29,7 +29,7 @@ describe('tools/versions.json của repo', () => {
       'gitleaks',
       'playwright',
       'chromium',
-      'three',
+      'unity',
       'claudeCode',
     ]) {
       expect(ids).toContain(id);

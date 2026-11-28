@@ -92,15 +92,3 @@ export function checkChromium(spec: ToolSpec, env: NodeJS.ProcessEnv): DoctorChe
     }),
   ];
 }
-
-/** Thư viện cố định ở E0 nhưng chưa gói nào dùng (vd. three): chỉ ghi nhận bản đã chốt. */
-export function checkPinned(id: string, spec: ToolSpec): DoctorCheck {
-  return mkCheck({
-    id,
-    kind: 'version',
-    want: spec.version,
-    have: spec.version,
-    status: 'ok',
-    message: `${id}: cố định ${spec.version} (chưa có gói dùng).`,
-  });
-}

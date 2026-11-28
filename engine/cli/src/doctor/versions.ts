@@ -53,7 +53,7 @@ function parseTool(id: string, v: unknown): ToolSpec {
   const spec: ToolSpec = { version: str(v['version'], `${id}.version`), match };
   const probe = v['probe'];
   if (probe !== undefined) {
-    if (probe !== 'blender' && probe !== 'chromium' && probe !== 'pinned') throw new Error(`${id}.probe: không hợp lệ`);
+    if (probe !== 'blender' && probe !== 'chromium' && probe !== 'unity') throw new Error(`${id}.probe: không hợp lệ`);
     spec.probe = probe;
   }
   if (v['check'] !== undefined) spec.check = strArray(v['check'], `${id}.check`);
@@ -68,6 +68,12 @@ function parseTool(id: string, v: unknown): ToolSpec {
   }
   if (v['optional'] === true) spec.optional = true;
   if (typeof v['timeoutS'] === 'number') spec.timeoutS = v['timeoutS'];
+  if (v['packages'] !== undefined) {
+    if (!isObj(v['packages'])) throw new Error(`${id}.packages: cần object`);
+    spec.packages = Object.fromEntries(
+      Object.entries(v['packages']).map(([k, x]) => [k, str(x, `${id}.packages.${k}`)]),
+    );
+  }
   if (v['features'] !== undefined) {
     if (!Array.isArray(v['features'])) throw new Error(`${id}.features: cần mảng`);
     spec.features = v['features'].map((f, i) => parseFeature(f, `${id}.features[${i}]`));
