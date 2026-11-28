@@ -3,14 +3,14 @@
 | Mục | Nội dung |
 |---|---|
 | Mã tài liệu | SRS-04 |
-| Phiên bản | 1.4 |
-| Ngày | 26/11/2026 |
+| Phiên bản | 1.5 |
+| Ngày | 28/11/2026 |
 | Tài liệu cha | SRS-00 `SRS-00-TONG-QUAN.md` |
 | BRD nguồn | BRD-04 v0.1; BRD-00 v0.5 (BR-06…09, BR-22…31, BR-40, BR-111 phần bản build); BRD-10 (BR-119, 122…125, v1.1) |
 | Module | Runtime: `core`, `camera-player` (phần chung), `ui-audio`, `interaction` (phần chung); Build: `packager`; `qa`; `cli` |
 | Nhóm mã | `RTM` (runtime, dữ liệu, ngân sách), `QA` (kiểm thử tự động), `CLI` (dòng lệnh, đóng gói, xuất bản) |
 | Pha | E0 (baseline), E1 (core, schema, QA khung, CLI), E2 (tier, zone, điều khiển), E3 (visual regression), E6 (bot playtest, vòng chơi) |
-| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.1 bổ sung luồng làm tiếp và cập nhật game theo CR-01, Huy duyệt 23/11/2026; **v1.2 runtime Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại; v1.3 ngân sách tải theo POC-U1, Huy chốt 26/11/2026; v1.4 mục 6.3, 6.5 và QT-RTM-02 theo POC-U1, chờ Huy xem lại |
+| Trạng thái | Đã duyệt (Huy, 22/11/2026); v1.1 bổ sung luồng làm tiếp và cập nhật game theo CR-01, Huy duyệt 23/11/2026; **v1.2 runtime Unity theo CR-02** (Huy duyệt phân tích 25/11/2026), chờ Huy xem lại; v1.3 ngân sách tải theo POC-U1, Huy chốt 26/11/2026; v1.4 mục 6.3, 6.5 và QT-RTM-02 theo POC-U1, chờ Huy xem lại; v1.5 chốt `coreTextureMax` 1024 (CR-04, Huy chốt 28/11/2026) |
 
 ---
 
@@ -265,7 +265,7 @@ Thay đổi **chỉ runtime** (không làm đổi hash bước nào, áp nóng t
 | `zoneDownloadMB` | 35 | 50 | 80 | 120 | CH-03 (đề xuất) |
 | `coreZoneMB` (lõi zone xuất phát) | 8 | 8 | 8 | 8 | POC-U1, Huy chốt 26/11/2026 |
 | `playerMB` (Unity player, Brotli, dùng chung mọi tier) | 10 | 10 | 10 | 10 | POC-U1 (đo 9,18 MB), Huy chốt 26/11/2026 |
-| `coreTextureMax` (texture trong phần lõi, ETC1S) | 1024 | 1024 | 1024 | 1024 | POC-U1 (đề xuất): KTX2 2048 UASTC mất 8,0 s chuyển mã lần đầu trên A56 |
+| `coreTextureMax` (texture trong phần lõi, ETC1S) | 1024 | 1024 | 1024 | 1024 | POC-U1: KTX2 2048 UASTC mất 8,0 s chuyển mã lần đầu trên A56; lõi 1024 ETC1S đo A56 689,8 ms (T-0020), Huy chốt 28/11/2026 (CR-04) |
 | `skinnedCharacters` | 10 | 20 người + 30 thú | 35 + 50 | 50 + 80 | CH-15 (đề xuất) |
 | `closeUpCharacters` | 2 | 4 | 6 | 8 | CH-15 |
 | `flockInstances` | 100 | 200 | 400 | 600 | CH-15 |
@@ -452,3 +452,4 @@ CR-02, POC-U1 (26/11/2026): baseline E0 đo bằng scaffold Three.js không còn
 | 1.2 | 25/11/2026 | Claude | CR-02 (runtime Unity, QĐ-16, ADR-036; Huy duyệt phân tích 25/11/2026): FR-RTM-03 (Unity player thay gói npm), FR-RTM-04 (logic qua dữ liệu, bỏ script TS riêng game), luồng khởi động bước 2, đo heap WASM, bước `navmesh` (NavMesh dựng lúc nạp), cây thư mục game, NFR-RTM-01, 03 |
 | 1.3 | 26/11/2026 | Claude | POC-U1 (docs/POC/POC-U1.md): NFR-RTM-01 đổi thành lần đầu ≤ 20 s, đã cache Unity player ≤ 10 s trên 4G 9 Mbps tier Vừa; Huy chốt 26/11/2026 |
 | 1.4 | 26/11/2026 | Claude | CR-02 sau POC-U1: mục 6.3 thêm `coreZoneMB`, `playerMB` (Huy chốt), `coreTextureMax` (đề xuất) và ghi chú số đo Unity; mục 6.5 thêm `modules`; QT-RTM-02 đường dẫn mã render Unity |
+| 1.5 | 28/11/2026 | Claude | CR-04: mục 6.3 `coreTextureMax` 1024 từ đề xuất thành chốt sau đo A56 của T-0020 (tải + chuyển mã 8 KTX2 lõi 689,8 ms, POC 8,0 s); Huy chốt 28/11/2026 ("Chốt 1024") |
