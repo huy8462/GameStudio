@@ -69,10 +69,11 @@ describe('engine doctor', () => {
     expect(report.checks.find((c) => c.id === 'blender')?.have).toBe('đầu dò không trả kết quả');
   });
 
-  it('ffmpeg thiếu libopus → missing, mã thoát 5', async () => {
-    const { report, exitCode } = await doctor({ ...GOOD, 'ffmpeg -encoders': ok(' V..... libx264') });
+  it('ffmpeg thiếu bộ mã aac (ADR-037) → missing, mã thoát 5; aac_mf hay libopus không được tính', async () => {
+    const encoders = ' A....D libopus  libopus Opus\n A....D aac_mf  AAC via MediaFoundation (codec aac)';
+    const { report, exitCode } = await doctor({ ...GOOD, 'ffmpeg -encoders': ok(encoders) });
     expect(exitCode).toBe(5);
-    expect(report.checks.find((c) => c.id === 'ffmpeg.libopus')?.status).toBe('missing');
+    expect(report.checks.find((c) => c.id === 'ffmpeg.aac')?.status).toBe('missing');
   });
 
   it('công cụ tuỳ chọn thiếu (Claude Code) không làm hỏng', async () => {

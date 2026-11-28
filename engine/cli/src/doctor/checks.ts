@@ -17,7 +17,7 @@ export function missingCheck(id: string, kind: CheckKind, want: string, optional
   return mkCheck({ id, kind, want, have: why, status: 'missing', optional, message: mismatchMsg(id, want, why) });
 }
 
-/** Kiểm một công cụ có `check` + `parse`, kèm `features` (vd. ffmpeg có libopus, ktx có create). */
+/** Kiểm một công cụ có `check` + `parse`, kèm `features` (vd. ffmpeg có bộ mã aac, ktx có create). */
 export async function checkTool(id: string, spec: ToolSpec, run: Runner): Promise<DoctorCheck[]> {
   if (spec.check === undefined || spec.parse === undefined) return [];
   const want = wantLabel(spec.version, spec.match);

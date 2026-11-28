@@ -6,7 +6,7 @@ Lệnh `engine` (MOD-GEN-16, MOD-CLI-01, IF-CLI-01). Thư viện `commander`; `-
 
 `engine doctor [--role dev|worker|ci] [--json] [--versions <path>]`: kiểm môi trường theo `tools/versions.json` (SCH-DEV-03, IF-DEV-03, ALG-DEV-06).
 
-- Phiên bản: node, pnpm, python (qua `uv run`), uv, ktx (+ `ktx create`), gltf-transform, ffmpeg (+ `libopus`), gitleaks, playwright, chromium của Playwright, Claude Code (tuỳ chọn). `three` chỉ ghi nhận bản đã chốt.
+- Phiên bản: node, pnpm, python (qua `uv run`), uv, ktx (+ `ktx create`), gltf-transform, ffmpeg (+ bộ mã `aac`, ADR-037), gitleaks, playwright, chromium của Playwright, Claude Code (tuỳ chọn). `three` chỉ ghi nhận bản đã chốt.
 - Blender 5.2 (ADR-034) và add-on: chạy `src/doctor/blender-probe.py` trong Blender, so phiên bản trong `blender_manifest.toml` và SHA-256 thư mục add-on (sắp theo đường dẫn, bỏ `__pycache__`).
 - Biến môi trường theo vai trò (`src/doctor/env-roles.ts`): chỉ báo `co`/`khong`, không in, không băm, không đo độ dài giá trị (FR-DEV-22).
 - Thoát 0 khi đạt; 5 khi một mục bắt buộc `missing`/`mismatch` (ERR-DEV-04, ERR-DEV-05). Mục `optional` chỉ cảnh báo.

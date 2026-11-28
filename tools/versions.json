@@ -54,7 +54,7 @@
     "check": ["ffmpeg", "-hide_banner", "-version"],
     "parse": "ffmpeg version n(\\d+\\.\\d+\\.\\d+)",
     "roles": ["dev", "worker"],
-    "features": [{ "id": "libopus", "check": ["ffmpeg", "-hide_banner", "-encoders"], "expect": "libopus" }]
+    "features": [{ "id": "aac", "check": ["ffmpeg", "-hide_banner", "-encoders"], "expect": "^ A[A-Z.]{5} aac\\s" }]
   },
   "gitleaks": {
     "version": "8.30.1",

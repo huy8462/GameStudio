@@ -19,7 +19,7 @@ export const VERSIONS = {
     match: 'minor',
     check: ['ffmpeg', '-version'],
     parse: 'ffmpeg version n(\\d+\\.\\d+\\.\\d+)',
-    features: [{ id: 'libopus', check: ['ffmpeg', '-encoders'], expect: 'libopus' }],
+    features: [{ id: 'aac', check: ['ffmpeg', '-encoders'], expect: '^ A[A-Z.]{5} aac\\s' }],
   },
   claudeCode: {
     version: '2.1.0',
@@ -50,7 +50,7 @@ export const GOOD: Answers = {
   'node --version': ok('v24.21.0'),
   blender: probeOut({ version: '1.2.0', sha256: SHA_A }),
   'ffmpeg -version': ok('ffmpeg version n9.0.2-62 Copyright'),
-  'ffmpeg -encoders': ok(' A....D libopus  libopus Opus'),
+  'ffmpeg -encoders': ok(' V....D libx264  H.264\n A....D aac                  AAC (Advanced Audio Coding)'),
   'claude --version': ok('2.1.319 (Claude Code)'),
 };
 

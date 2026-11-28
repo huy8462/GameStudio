@@ -63,4 +63,14 @@ describe('engine validate', () => {
     expect(r.files[0]?.errors[0]?.instancePath).toBe('/a');
     expect(exitOf(r)).toBe(EXIT.DATA);
   });
+
+  it('--schema trỏ tới schema đã đăng ký (audio/1, T-0018): files.opus là lỗi, thoát 4', () => {
+    const schema = join(ROOT, 'engine/schema/schemas/audio/1.json');
+    const side = (files: string): string =>
+      `{"schema":"audio/1","id":"a","kind":"sfx","loop":false,"lufs":-16,"durationS":1,"files":${files},"tags":[]}`;
+    expect(exitOf(validateWithSchema(TMP, schema, [put('a.audio.json', side('{"aac":"a.m4a"}'))]))).toBe(EXIT.OK);
+    const r = validateWithSchema(TMP, schema, [put('b.audio.json', side('{"aac":"a.m4a","opus":"a.webm"}'))]);
+    expect(r.files[0]?.errors[0]?.instancePath).toBe('/files');
+    expect(exitOf(r)).toBe(EXIT.DATA);
+  });
 });

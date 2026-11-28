@@ -1,4 +1,5 @@
 // Danh mục schema và bảng kindByPath (DDD-00 §3.3, SCH-GEN-01…03). Nguồn duy nhất cho validate.ts và gen-validators.
+import audioV1 from '../schemas/audio/1.json' with { type: 'json' };
 import budgetsV1 from '../schemas/budgets/1.json' with { type: 'json' };
 import cacheIndexV1 from '../schemas/cache-index/1.json' with { type: 'json' };
 import commonV1 from '../schemas/common/1.json' with { type: 'json' };
@@ -15,8 +16,8 @@ import worldPartsV1 from '../schemas/world/parts-1.json' with { type: 'json' };
 export const SCHEMA_KINDS = ['budgets', 'game', 'palette', 'world'] as const;
 export type SchemaKind = (typeof SCHEMA_KINDS)[number];
 
-/** Schema của build (T-0004): step.json, report.json, cache/index.json; status/1 (T-0014); import/1 (T-0016). Không nằm trong data/ nên không có kindByPath. */
-export const BUILD_KINDS = ['step', 'report', 'cacheIndex', 'status', 'import'] as const;
+/** Schema của build (T-0004): step.json, report.json, cache/index.json; status/1 (T-0014); import/1 (T-0016); audio/1 sidecar âm thanh (T-0018). Không nằm trong data/ nên không có kindByPath. */
+export const BUILD_KINDS = ['step', 'report', 'cacheIndex', 'status', 'import', 'audio'] as const;
 export type BuildKind = (typeof BUILD_KINDS)[number];
 export type AnyKind = SchemaKind | BuildKind;
 
@@ -36,6 +37,7 @@ export const SCHEMA_DOCS: readonly object[] = [
   cacheIndexV1,
   statusV1,
   importV1,
+  audioV1,
 ];
 
 /** $id của schema gốc theo kind. */
@@ -49,6 +51,7 @@ export const ROOT_IDS: Readonly<Record<AnyKind, string>> = {
   cacheIndex: `${BASE}/cache-index/1.json`,
   status: `${BASE}/status/1.json`,
   import: `${BASE}/import/1.json`,
+  audio: `${BASE}/audio/1.json`,
 };
 
 /** Đường dẫn tương đối `games/<id>/`, dùng '/'. */

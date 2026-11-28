@@ -99,7 +99,10 @@ export function validateWithSchema(root: string, schemaPath: string, paths: read
   if (!schema.ok) {
     return finish([{ path: toPosix(relative(root, schemaPath)), kind: 'custom', errors: [schema.error] }], 0);
   }
-  const fn = createAjv().compile(schema.data as object);
+  // Tệp schema trùng $id với schema đã đăng ký (vd. schemas/audio/1.json, T-0018): dùng bản đã đăng ký, không compile lần hai.
+  const ajv = createAjv();
+  const id = (schema.data as { $id?: unknown }).$id;
+  const fn = (typeof id === 'string' ? ajv.getSchema(id) : undefined) ?? ajv.compile(schema.data as object);
   const files = paths.map((abs): FileResult => {
     const rel = toPosix(relative(root, abs));
     const parsed = readJson(abs);

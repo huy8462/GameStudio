@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gamestudio.local/schema/audio/1.json",
+  "title": "audio/1: sidecar âm thanh (SCH-AST-05, DTO-AST-05, FR-AST-24, ADR-037: chỉ AAC/M4A)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "kind", "loop", "lufs", "durationS", "files", "tags"],
+  "properties": {
+    "schema": { "const": "audio/1" },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$" },
+    "kind": { "enum": ["sfx", "ambience", "music", "voice"] },
+    "loop": { "type": "boolean" },
+    "loopPoints": {
+      "description": "Đoạn lặp trên dòng thời gian của clip đã giải mã (đã trừ độ trễ priming AAC).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["startS", "endS"],
+      "properties": {
+        "startS": { "type": "number", "minimum": 0 },
+        "endS": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "lufs": { "const": -16 },
+    "durationS": { "type": "number", "exclusiveMinimum": 0 },
+    "files": {
+      "description": "Một định dạng duy nhất (ADR-037). Không còn files.opus.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aac"],
+      "properties": {
+        "aac": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*\\.m4a$" }
+      }
+    },
+    "tags": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "surface": { "description": "Bề mặt cho tiếng bước chân (SurfaceKey, SRS-02 §6.4).", "type": "string" }
+  },
+  "if": { "properties": { "loop": { "const": true } }, "required": ["loop"] },
+  "then": { "required": ["loopPoints"] }
+}
