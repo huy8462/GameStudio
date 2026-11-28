@@ -16,11 +16,13 @@ namespace GameStudio
         public Mode Mode;
         public InputState Input;
         public Manifest Manifest;
-        /// <summary>Người chơi (do CameraPlayerSystem tạo); null trước khi hệ thống đó Init.</summary>
+        /// <summary>Người chơi (do PlayerSystem tạo); null trước khi hệ thống đó Init.</summary>
         public Transform Player;
         public PerfMonitor Perf;
         /// <summary>NavMesh theo ô (T-0019); NavSystem gán lúc Init.</summary>
         public NavService Nav;
+        /// <summary>Độ cao địa hình theo zone (T-0028, collider LOD1); null khi dữ liệu không có collider LOD1.</summary>
+        public TerrainHeights Terrain;
         /// <summary>Vật liệu địa hình tạm (tới khi có bước materials).</summary>
         public Material TerrainMaterial;
     }

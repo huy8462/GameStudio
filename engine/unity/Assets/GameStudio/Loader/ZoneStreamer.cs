@@ -1,4 +1,6 @@
-// T-0022 (MOD-RTM-05, PSC-RTM-02 phần nạp core, STM-RTM-02, CFG-RTM-01; SEQ-RTM-01): nạp phần core của zone.
+// T-0022, T-0028 (MOD-RTM-05, PSC-RTM-02 phần nạp core, STM-RTM-02, CFG-RTM-01; SEQ-RTM-01; MOD-WLD-13): nạp phần core của zone.
+// T-0028: zone có collider/height-lod1.{r32,meta.json} (packager T-0026) → MeshCollider LOD1 theo ô 64 m + ctx.Terrain;
+// không có (dữ liệu thử cũ) → MeshCollider từ lưới hiển thị như T-0022.
 // Chưa có: prefetch zone kề, giải phóng, phần full, lightmap, thử lại 2/4/8 s, hàng đợi tải GPU theo lát.
 using System;
 using System.Collections.Generic;
@@ -22,6 +24,7 @@ namespace GameStudio
         readonly Dictionary<string, LoadedZone> loaded = new Dictionary<string, LoadedZone>();
         readonly Dictionary<string, Texture2D> textures = new Dictionary<string, Texture2D>();
         readonly Dictionary<string, string> texts = new Dictionary<string, string>();
+        readonly Dictionary<string, byte[]> binaries = new Dictionary<string, byte[]>();
 
         /// <summary>(đã xong, tổng) số tệp của lượt nạp hiện tại; Boot chuyển ra trang nạp (gs:progress).</summary>
         public event Action<int, int> Progress;
@@ -78,15 +81,38 @@ namespace GameStudio
                 throw;
             }
 
-            // Collider tạm từ mesh vừa nạp (như POC); collider/height-lod1 thuộc phiếu loader sau.
-            foreach (var mf in go.GetComponentsInChildren<MeshFilter>())
-                if (mf.sharedMesh != null) mf.gameObject.AddComponent<MeshCollider>().sharedMesh = mf.sharedMesh;
+            if (!BuildTerrainCollider(zoneId, files, go.transform))
+            {
+                // Dữ liệu không có collider LOD1: collider từ lưới hiển thị (như POC, T-0022).
+                foreach (var mf in go.GetComponentsInChildren<MeshFilter>())
+                    if (mf.sharedMesh != null) mf.gameObject.AddComponent<MeshCollider>().sharedMesh = mf.sharedMesh;
+            }
             Physics.SyncTransforms();
 
             var lz = new LoadedZone { Id = zoneId, Root = go.transform, Bounds = zone.Bounds };
             loaded[zoneId] = lz;
             states[zoneId] = ZoneState.CoreSanSang;
             engine.NotifyZoneLoaded(lz);
+        }
+
+        /// <summary>T-0028: tìm cặp height-lod1.r32 + .meta.json trong phần core, dựng HeightGrid và MeshCollider LOD1.</summary>
+        bool BuildTerrainCollider(string zoneId, FileRef[] files, Transform zoneRoot)
+        {
+            for (int i = 0; i < files.Length; i++)
+            {
+                var p = files[i].Path;
+                if (!p.EndsWith("height-lod1.r32", StringComparison.Ordinal)) continue;
+                var metaPath = p.Substring(0, p.Length - 4) + ".meta.json";
+                if (!binaries.TryGetValue(p, out var bytes) || !texts.TryGetValue(metaPath, out var meta)) continue;
+                var grid = HeightGrid.Parse(meta, bytes);
+                binaries.Remove(p); // dữ liệu đã chép vào lưới
+                var ctx = engine.Ctx;
+                (ctx.Terrain ?? (ctx.Terrain = new TerrainHeights())).Set(zoneId, grid);
+                int n = TerrainColliderBuilder.Build(grid, zoneRoot);
+                ctx.Log.Info($"zone {zoneId}: collider LOD1 {grid.Width}x{grid.Height} ô {grid.CellM} m, {n} khối");
+                return true;
+            }
+            return false;
         }
 
         /// <summary>Gọi mỗi 0,5 s bởi RenderSystem. Khung chưa prefetch/giải phóng (phần còn lại PSC-RTM-02).</summary>
@@ -114,6 +140,14 @@ namespace GameStudio
                 await req.SendWebRequest();
                 if (req.result != UnityEngine.Networking.UnityWebRequest.Result.Success) return false;
                 texts[f.Path] = req.downloadHandler.text;
+                return true;
+            }
+            if (f.Path.EndsWith(".r32", StringComparison.OrdinalIgnoreCase))
+            {
+                using var req = UnityEngine.Networking.UnityWebRequest.Get(url);
+                await req.SendWebRequest();
+                if (req.result != UnityEngine.Networking.UnityWebRequest.Result.Success) return false;
+                binaries[f.Path] = req.downloadHandler.data;
                 return true;
             }
             engine.Ctx.Log.Warn("Bỏ qua tệp core chưa hỗ trợ: " + f.Path);

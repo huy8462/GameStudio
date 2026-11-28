@@ -10,10 +10,14 @@ Unity player dùng chung cho mọi game (CR-02, ADR-036; DDD-04 §2.1 MOD-RTM-01
 | `Loader/` | `Manifest` + `ManifestCheck`, `ZoneStreamer` (nạp core), `GltfLoader`, `Ktx2Loader` | MOD-RTM-04, 05 |
 | `Tier/` | `Tier`, `Detect`, `ApplyTier`, `tier-table.json` | MOD-RTM-07 |
 | `Render/` | `RenderSystem`, `UrpTierAssets/` và `Materials/` (do build sinh) | MOD-RTM-06 |
-| `Input/`, `CameraPlayer/` | `InputState` từ bàn phím/chuột/cảm ứng; người chơi + camera theo sau | MOD-RTM-08 |
+| `Input/` | `InputState` từ bàn phím/chuột/cảm ứng | MOD-RTM-08 |
+| `CameraPlayer/` | `PlayerSystem`, `PlayerController` (CharacterController, STM-CHR-01), `ThirdPersonCamera` (SphereCast) | MOD-CHR-01, 02 |
+| `World/Terrain/` | `HeightGrid`/`TerrainHeights` (heightAt, normalAt; `ctx.Terrain`), `TerrainColliderBuilder` (MeshCollider LOD1 theo ô 64 m) | MOD-WLD-13 |
 | `Perf/` | `PerfMonitor` (`?perf=1`), `Histogram`, `RenderStats` | MOD-RTM-13 |
 | `Bridge/`, `Plugins/WebGL/` | `GsBridge` + `gs-bridge.jslib`, `gs-device.jslib` | IF-RTM-01 |
 | `Shared/Json/` | `MiniJson` (đọc JSON có bảng theo khoá) | |
+| `Shared/Rng/` | `Pcg32` (PCG32 XSH-RR, `DeriveSeed`, `Fork`), khớp từng bit với `@gamestudio/rng` | MOD-GEN-01, 02 |
+| `Shared/Expr/` | `ExprCompiler.TryCompile` (lexer, Pratt parser, kiểm tĩnh, gập hằng, closure ngắn mạch), namespace `GameStudio.Expr` | MOD-RTM-15 |
 | `Build/Editor/` | `PlayerBuild`, `UrpTiers`, `BootScene` (chỉ chạy trong Editor) | |
 | `Tests/` | test EditMode (Unity Test Framework) | |
 
@@ -44,4 +48,4 @@ Tham số trang: `?manifest=<url>`, `?navslice=<m>` (lát dựng NavMesh, T-0019
 
 ## Chưa có (phiếu sau)
 
-Prefetch/giải phóng zone, phần `full`, lightmap; `TierMonitor`; tìm đường, crowd, kẹt của NPC (E6); UI Toolkit, âm thanh, lưu, tương tác; `EditorBridge` và `ApplyRuntimeData`; `window.__gsTest`; bản C# của `rng`/`expr`; `unity` trong `engine doctor`.
+Prefetch/giải phóng zone, phần `full`, lightmap; `TierMonitor`; tìm đường, crowd, kẹt của NPC (E6); UI Toolkit, âm thanh, lưu, tương tác; `EditorBridge` và `ApplyRuntimeData`; `window.__gsTest`; vật liệu splat và HDRI lúc chạy; `Ngoi`/`Boi`, camera ngôi một, nút hành động trên màn hình. Dữ liệu thật: build game bằng `engine build` (bước `packager`, T-0026) rồi mở `?manifest=<đường dẫn>/manifest.json`.

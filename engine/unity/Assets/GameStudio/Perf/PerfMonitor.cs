@@ -15,7 +15,7 @@ namespace GameStudio
 
         public readonly bool Enabled;
         public readonly Dictionary<string, string> Extra = new Dictionary<string, string>();
-        /// <summary>true khi lớp đo đang lái camera (CameraPlayerSystem nhường).</summary>
+        /// <summary>true khi lớp đo đang lái camera (PlayerSystem nhường).</summary>
         public bool DrivingCamera { get; private set; }
         public bool Done { get; private set; }
         public string Status { get; private set; } = "";

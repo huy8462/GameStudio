@@ -40,7 +40,7 @@ namespace GameStudio
                 ctx.Log.Info($"tier={TierNames.Key(tier)} reason={choice.Reason} manual={choice.Manual}");
 
                 engine.Register(new InputSystemGs());
-                engine.Register(new CameraPlayerSystem());
+                engine.Register(new PlayerSystem());
                 engine.Register(new NavSystem()); // T-0019: NavMesh theo ô lúc nạp zone
                 engine.Register(new RenderSystem());
                 foreach (var m in manifest.Modules) engine.EnableModule(m);
