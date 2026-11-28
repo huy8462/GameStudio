@@ -1,0 +1,22 @@
+# T-0022 (POC-U1): khối Caddy cho gamestudio.vinpride.com, phục vụ thẳng C:/poc-gamestudio (publish-poc.ps1 chép vào).
+# Thay cho việc dùng chung khối chuaonline (đi qua máy chủ poc và thư mục split, bị thay khi chuaonline xuất bản lại).
+# Áp: bỏ "gamestudio.vinpride.com" khỏi dòng "chuaonline.vinpride.com, gamestudio.vinpride.com {" trong C:\caddy\Caddyfile,
+# dán khối dưới vào sau khối đó, "caddy validate", rồi khởi động lại tác vụ caddy-proxy.
+gamestudio.vinpride.com {
+	root * C:/poc-gamestudio
+	# Đường cũ /split/<build>/... vẫn chạy.
+	uri strip_prefix /split
+	# Bản build Unity nén Brotli (.unityweb): trình duyệt tự giải nén, không cần giải nén bằng JS.
+	@unitybr path *.unityweb
+	header @unitybr Content-Encoding br
+	@unitywasm path *.wasm.unityweb
+	header @unitywasm Content-Type application/wasm
+	@unityjs path *.js.unityweb
+	header @unityjs Content-Type application/javascript
+	@unitydata path *.data.unityweb
+	header @unitydata Content-Type application/octet-stream
+	@ktx2 path *.ktx2
+	header @ktx2 Content-Type image/ktx2
+	header Cache-Control "no-cache"
+	file_server
+}

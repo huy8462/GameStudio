@@ -1,0 +1,17 @@
+import { chromium } from '@playwright/test';
+const url = process.argv[2];
+const out = { url, state: null, errors: [], failed: [], perf: null, t: 0 };
+const b = await chromium.launch({ args: ['--enable-gpu', '--ignore-gpu-blocklist'] });
+const p = await b.newPage();
+p.on('pageerror', (e) => out.errors.push(String(e).slice(0, 200)));
+p.on('console', (m) => m.type() === 'error' && out.errors.push(m.text().slice(0, 200)));
+p.on('response', (r) => r.status() >= 400 && out.failed.push(`${r.status()} ${r.url()}`));
+const t0 = performance.now();
+await p.goto(url, { waitUntil: 'load' });
+await p.waitForFunction(() => globalThis.__GS_PERF__ || globalThis.__POC_PERF__ || ['DangChay','Loi'].includes(globalThis.__GS_STATE__), null, { timeout: 150000, polling: 500 }).catch(() => {});
+out.t = Math.round(performance.now() - t0);
+out.state = await p.evaluate(() => globalThis.__GS_STATE__ ?? null);
+const perf = await p.evaluate(() => globalThis.__GS_PERF__ ?? globalThis.__POC_PERF__ ?? null);
+out.perf = perf && JSON.stringify(perf).slice(0, 600);
+await b.close();
+console.log(JSON.stringify(out));

@@ -40,7 +40,7 @@ node engine/unity/dev/make-dev-data.mjs
 node engine/unity/dev/check-local.mjs
 ```
 
-Tham số trang: `?manifest=<url>`, `?tier=thap|vua|cao|toi_da`, `?perf=1`, `?autoplay=1`, `?dev=1`, `?dpr=<trần>`, `?mode=play|preview|test`. Máy dev không có GPU nên fps cục bộ chỉ để biết chạy được; số thật đo trên A56. Đưa bản build lên máy chủ poc là gửi ra ngoài: hỏi Huy trước.
+Tham số trang: `?manifest=<url>`, `?tier=thap|vua|cao|toi_da`, `?perf=1`, `?autoplay=1`, `?dev=1`, `?dpr=<trần>`, `?mode=play|preview|test`. Máy dev không có GPU nên fps cục bộ chỉ để biết chạy được; số thật đo trên A56. Đưa bản build lên máy chủ poc là gửi ra ngoài: hỏi Huy trước. Xuất bản: `dev/publish-poc.ps1 -Src <build> -Name gamestudio-<tên>` chép vào `C:\poc-gamestudio\<tên>`, Caddy phục vụ riêng (`dev/caddy-gamestudio.txt`), không chung thư mục `split` của chuaonline.
 
 ## Chưa có (phiếu sau)
 
