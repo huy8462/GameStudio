@@ -59,6 +59,20 @@
         "maxTexture": { "enum": [512, 1024, 2048, 4096, 8192] },
         "memoryMB": { "type": "number", "exclusiveMinimum": 0 },
         "zoneDownloadMB": { "type": "number", "exclusiveMinimum": 0 },
+        "coreTextureMax": {
+          "description": "Cạnh dài tối đa của texture trong phần lõi zone, luôn ETC1S (SRS-04 §6.3, POC-U1; T-0020). Tuỳ chọn để game cũ vẫn hợp lệ.",
+          "enum": [256, 512, 1024, 2048, 4096]
+        },
+        "coreZoneMB": {
+          "description": "Dung lượng tải phần lõi của zone xuất phát (SRS-04 §6.3, POC-U1).",
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "playerMB": {
+          "description": "Dung lượng Unity player đã nén Brotli, dùng chung mọi tier (SRS-04 §6.3, POC-U1).",
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
         "skinnedHumans": { "$ref": "#/$defs/count" },
         "skinnedAnimals": { "$ref": "#/$defs/count" },
         "closeUpCharacters": { "$ref": "#/$defs/count" },

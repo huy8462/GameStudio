@@ -1,6 +1,6 @@
 # engine/
 
-Thư viện engine và công cụ build (TSD-00 §4.1, DDD-00 §4.1). Gói tạo dần theo pha; hiện có `cli/` (lệnh `doctor`, `validate`, `build [--stale]`, `new-game`, `status`, `import`, `brief draft|confirm`; bộ điều phối `src/orchestrator/`), `status/` (tiến độ game, `planStale`, thuần), `shared/rng/`, `shared/expr/` (biểu thức an toàn, ADR-022), `intake/` (lõi tiếp nhận mô tả, DDD-01; không gọi API Claude, ADR-035), `schema/` (jcs, hash, budget, pointer, patch, schema dữ liệu game và build, validators biên dịch sẵn), `build/py/` (`gsrng`, `gsio`, `heightfield/` gồm io, noise, procedural, erode, png), `build/steps/` (`world-fetch`, `world-heightfield`, `terrain-erode`, `terrain-splat` bằng python; `terrain-mesh` là gói node `@gamestudio/step-terrain-mesh`, cần `pnpm -r build`). Python: numpy 2.5.5, numba 0.68.1 ghim (`tools/versions.json`); nhân numba `parallel=False, fastmath=False`.
+Thư viện engine và công cụ build (TSD-00 §4.1, DDD-00 §4.1). Gói tạo dần theo pha; hiện có `cli/` (lệnh `doctor`, `validate`, `build [--stale]`, `new-game`, `status`, `import`, `brief draft|confirm`; bộ điều phối `src/orchestrator/`), `status/` (tiến độ game, `planStale`, thuần), `shared/rng/`, `shared/expr/` (biểu thức an toàn, ADR-022), `intake/` (lõi tiếp nhận mô tả, DDD-01; không gọi API Claude, ADR-035), `schema/` (jcs, hash, budget, pointer, patch, schema dữ liệu game và build, validators biên dịch sẵn), `build/py/` (`gsrng`, `gsio`, `heightfield/` gồm io, noise, procedural, erode, png), `build/steps/` (`world-fetch`, `world-heightfield`, `terrain-erode`, `terrain-splat` bằng python; `terrain-mesh` là gói node `@gamestudio/step-terrain-mesh`, cần `pnpm -r build`), `build/audio/` (`@gamestudio/audio`: −16 LUFS, vòng lặp, AAC/M4A theo ADR-037; cần ffmpeg), `build/packager/` (`@gamestudio/packager`: hiện có bước texture full/lõi/fallback; cần ktx, ffmpeg), `unity/` (Unity player, khung T-0022). Python: numpy 2.5.5, numba 0.68.1 ghim (`tools/versions.json`); nhân numba `parallel=False, fastmath=False`.
 
 Bước python (`build/steps/<id>/main.py`, IF-CLI-02): thêm `build/py` vào `sys.path` (vì `python -I`), import `gsio` trước (stdout UTF-8, `single_thread_env()` trước numpy), ghi tệp bằng `gsio.write_text/write_json` (`newline="\n"`), báo `gsio.progress`, trả mã 4/5/6 theo SRS-04 §7.2. Test: `uv run pytest`, `uv run mypy`.
 
@@ -10,7 +10,7 @@ Bước python (`build/steps/<id>/main.py`, IF-CLI-02): thêm `build/py` vào `s
 | `shared/rng/` | `@gamestudio/rng` | MOD-GEN-10 | E1 |
 | `shared/expr/` | `@gamestudio/expr` | MOD-GEN-11 | E1 |
 | `intake/` | `@gamestudio/intake` | MOD-GEN-13 | E1 |
-| `runtime/` | `@gamestudio/engine` | MOD-GEN-14 | E2 |
+| `unity/` | Unity player dùng chung (C#, không phải gói pnpm; CR-02, ADR-036), xem `unity/README.md` | MOD-RTM-01…17 | E2 (khung T-0022) |
 | `qa/` | `@gamestudio/qa` | MOD-GEN-15 | E1 |
 | `cli/` | `@gamestudio/cli` (lệnh `engine`) | MOD-GEN-16 | E0 (`doctor`), E1 |
 | `status/` | `@gamestudio/status` | MOD-GEN-21 | E1 |
