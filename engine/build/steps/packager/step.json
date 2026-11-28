@@ -1,7 +1,7 @@
 {
   "id": "packager",
-  "version": "1",
-  "description": "T-0026 (MOD-CLI-04, PSC-CLI-02 bước 1, 5–10, DTO-RTM-01): đóng gói zone × tier cho Unity player: core (địa hình LOD2, collider, nav, layers, texture lõi ≤ coreTextureMax ETC1S), full (LOD0, 1, 3, texture full), glb có scene mặc định, modules, manifest.json. Cần ktx, ffmpeg, ffprobe.",
+  "version": "2",
+  "description": "T-0026 (MOD-CLI-04, PSC-CLI-02 bước 1, 5–10, DTO-RTM-01): đóng gói zone × tier cho Unity player: core (địa hình LOD1, collider, nav, layers, texture lõi ≤ coreTextureMax ETC1S), full (LOD0, 2, 3, texture full), glb có scene mặc định, modules, manifest.json. Cần ktx, ffmpeg, ffprobe.",
   "deps": ["materials", "terrain.erode", "terrain.mesh", "terrain.splat", "navmesh"],
   "inputs": {
     "dataPointers": ["/game.json", "/world.json/zones", "/world.json/regions", "/budgets.json/tiers"],

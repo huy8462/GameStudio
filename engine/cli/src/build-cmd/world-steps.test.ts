@@ -129,14 +129,14 @@ describe(
       expect(man).toMatchObject({ schema: 'manifest/1', startZone: 'z1', tiers: ['thap', 'vua', 'cao', 'toi_da'] });
       const vua = man.zones[0]?.parts['vua'];
       const core = vua?.core.map((f) => f.path) ?? [];
-      expect(core.filter((p) => p.endsWith('.glb')).every((p) => p.endsWith('/lod2.glb'))).toBe(true);
+      expect(core.filter((p) => p.endsWith('.glb')).every((p) => p.endsWith('/lod1.glb'))).toBe(true);
       expect(core.filter((p) => p.endsWith('.glb'))).toHaveLength(64);
       expect(core).toContain('zones/z1/nav/sources.json');
       expect(core).toContain('tex/t2048-1024/core/z1-splat-0.ktx2');
       expect(core).toContain('tex/t2048-1024/core/dat-co-basecolor.ktx2');
       expect(vua?.full.map((f) => f.path)).toContain('zones/z1/terrain/0_0/lod0.glb');
       for (const f of vua?.core ?? []) expect(existsSync(join(pk, f.path)), f.path).toBe(true);
-      const glb = readFileSync(join(pk, 'zones/z1/terrain/0_0/lod2.glb'));
+      const glb = readFileSync(join(pk, 'zones/z1/terrain/0_0/lod1.glb'));
       expect(JSON.parse(glb.subarray(20, 20 + glb.readUInt32LE(12)).toString('utf8'))).toMatchObject({ scene: 0 });
       expect(man.environment.hdri.map((h) => h.id)).toEqual(['troi-thu-tuc']);
       expect(man.environment.materials).toHaveLength(4);

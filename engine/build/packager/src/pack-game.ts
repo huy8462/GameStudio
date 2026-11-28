@@ -68,8 +68,9 @@ export interface PackGameResult {
 
 const MB = 1024 * 1024;
 const round = (v: number): number => Math.round(v * 1000) / 1000;
-const LOD_CORE = [2];
-const LOD_FULL = [0, 1, 3];
+// T-0028: core vẽ LOD1, trùng đỉnh với collider LOD1 (cùng bước cellM·2) nên người chơi không lún vào mặt hiển thị.
+const LOD_CORE = [1];
+const LOD_FULL = [0, 2, 3];
 const MAP_KEYS = ['baseColor', 'normal', 'orm', 'height'] as const;
 
 interface MaterialsIndex {

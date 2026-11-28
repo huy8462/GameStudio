@@ -20,8 +20,8 @@ Packager theo zone × tier (MOD-CLI-04, PSC-CLI-02, ALG-CLI-02): texture (T-0020
 
 | Phần | Tệp |
 |---|---|
-| core (mỗi tier) | `zones/<z>/terrain/<cx>_<cz>/lod2.glb`, `zones/<z>/collider/*`, `zones/<z>/nav/sources.json`, `zones/<z>/layers.json`, texture lõi của splat zone và mọi vật liệu |
-| full | `lod0`, `lod1`, `lod3` glb, texture full |
+| core (mỗi tier) | `zones/<z>/terrain/<cx>_<cz>/lod1.glb`, `zones/<z>/collider/*`, `zones/<z>/nav/sources.json`, `zones/<z>/layers.json`, texture lõi của splat zone và mọi vật liệu |
+| full | `lod0`, `lod2`, `lod3` glb, texture full |
 | dùng chung | `tex/t<maxTexture>-<coreTextureMax>/{core,full,fallback}/` (tier cùng cặp ngân sách dùng chung), `materials/<id>.json` (material.json + `textures` trỏ id texture), `env/<hdri>/{env,sky}.ktx2, sh.json` |
 
 - Mọi glb ghi `scene: 0` (`withDefaultScene`, sửa chunk JSON, BIN giữ nguyên).
@@ -31,7 +31,7 @@ Packager theo zone × tier (MOD-CLI-04, PSC-CLI-02, ALG-CLI-02): texture (T-0020
 
 ## Giới hạn hiện tại
 
-- Core chỉ lấy LOD2 (DDD ghi LOD2–3): player chưa có LODGroup, nạp cả hai sẽ chồng lưới.
+- Core vẽ LOD1 (DDD ghi LOD2–3): trùng đỉnh với collider LOD1 nên người chơi không lún vào mặt hiển thị (T-0028); player chưa có LODGroup.
 - Trường `environment` (HDRI, vật liệu) nằm ngoài DTO-RTM-01, chờ CR; player hiện bỏ qua. Chưa có `surfaceMap`, `lightmaps`, `player`, `credits`.
 - Chưa có: kiểm asset/provenance (bước 2), gộp mesh, atlas vật liệu (3, 4), nén Meshopt lại (glb của terrain.mesh đã nén), lõi theo bán kính 60 m quanh spawn.
 - Fallback JPG dùng `-q:v 4` (xấp xỉ chất lượng 85); alpha xét theo định dạng điểm ảnh nguồn.
