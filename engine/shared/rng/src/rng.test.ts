@@ -8,6 +8,8 @@ import { Pcg32, deriveSeed } from './index.js';
 interface Vectors {
   sequences: { seed: number; stream: number; u32: number[] }[];
   ints: { seed: number; stream: number; cases: { min: number; max: number; values: number[] }[] };
+  shuffle: { seed: number; stream: number; cases: { n: number; result: number[] }[] };
+  pick: { seed: number; stream: number; items: number[]; values: number[] };
   deriveSeed: { parts: (string | number)[]; value: number }[];
   fork: { parent: { seed: number; stream: number }; id: string; parentNextAfterFork: number; child: number[] };
 }
@@ -54,6 +56,17 @@ describe('Pcg32', () => {
     expect([...a].sort((x, y) => x - y)).toEqual(Array.from({ length: 20 }, (_, i) => i));
     expect(r.pick(['a'])).toBe('a');
     expect(() => r.pick([])).toThrow(RangeError);
+  });
+
+  it('shuffle và pick khớp vector Python (TS = Python = C#)', () => {
+    const r = new Pcg32(V.shuffle.seed, V.shuffle.stream);
+    for (const c of V.shuffle.cases) {
+      const a = Array.from({ length: c.n }, (_, i) => i);
+      r.shuffleInPlace(a);
+      expect(a).toEqual(c.result);
+    }
+    const p = new Pcg32(V.pick.seed, V.pick.stream);
+    expect(V.pick.values.map(() => p.pick(V.pick.items))).toEqual(V.pick.values);
   });
 
   it('state() trả trạng thái 64 bit cho test', () => {

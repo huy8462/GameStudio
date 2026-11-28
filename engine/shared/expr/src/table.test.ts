@@ -1,251 +1,41 @@
 // TST-RTM-03: bảng ≥ 200 biểu thức (đúng, sai cú pháp, hàm cấm, định danh lạ, sai kiểu, sai số đối).
+// Bảng nằm ở ../vectors/table.json, dùng chung với bản C# (engine/unity, ExprTests; T-0027, RR-CR02-04).
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { compile } from './compile.js';
 import { makeEnv, SPEC, VALUES } from './fixture.test-util.js';
 import type { ExprErrorCode, ExprValue } from './types.js';
 
-const VALID: [string, ExprValue][] = [
-  ['1', 1],
-  ['3.5', 3.5],
-  ['true', true],
-  ['false', false],
-  ["'xin chao'", 'xin chao'],
-  ["''", ''],
-  ['hour', 18],
-  ['hour >= 18', true],
-  ['hour < 6 || hour >= 18', true],
-  ['hour >= 6 && hour < 18', false],
-  ['flag.cua_mo', true],
-  ['!flag.cua_mo', false],
-  ['!!flag.cua_mo', true],
-  ['flag.cua_mo && !flag.da_gap', true],
-  ['counter.lua >= 5', true],
-  ['counter.lua > 5', false],
-  ['counter.lua + 1 == 6', true],
-  ['quest.trau.state == 2', true],
-  ['quest.trau.state != 1', true],
-  ['quest.trau.state == 1 || quest.trau.state == 2', true],
-  ["name == 'ong_lao'", true],
-  ["name == 'ba_lao'", false],
-  ['atk - def', 8],
-  ['atk * 2 - def', 20],
-  ['max(atk - def, 1)', 8],
-  ['max(def - atk, 1)', 1],
-  ['min(atk, def)', 4],
-  ['round(atk * 1.25)', 15],
-  ['round(atk / 5) * 2', 4],
-  ['rand() < 0.5', true],
-  ['rand() * 100', 25],
-  ['event(7)', true],
-  ['event(8)', false],
-  ['event(3 + 4) && flag.cua_mo', true],
-  ['(1 + 2) * 3', 9],
-  ['1 + 2 * 3', 7],
-  ['(atk + def) / 2', 8],
-  ['atk % 5', 2],
-  ['-atk', -12],
-  ['-(atk - def)', -8],
-  ['- -3', 3],
-  ['10 / 4', 2.5],
-  ['7 % 3 == 1', true],
-  ['1 < 2 == true', true],
-  ['true == (1 < 2)', true],
-  ['(hour >= 18) == flag.cua_mo', true],
-  ['  hour\t>=\n18  ', true],
-  ['max(min(atk, 10), def)', 10],
-  ['round(max(atk, def) / 3 + 0.4)', 4],
-  ["name != '' && counter.lua > 0", true],
-  ["'a\\'b' == 'a\\'b'", true],
-  ['counter.lua * 0', 0],
-  ['0.1 + 0.2 > 0.3', true],
-  ['flag.da_gap || flag.da_gap || flag.cua_mo', true],
-  ['flag.cua_mo && flag.cua_mo && flag.da_gap', false],
-  ['!(hour < 18)', true],
-  ['!(flag.cua_mo && flag.da_gap)', true],
-  ['((((hour))))', 18],
-  ['max(1, 2) + min(3, 4) * round(1.6)', 8],
-  ['atk >= def * 3', true],
-];
-
-const ERRORS: [string, ExprErrorCode][] = [
-  // sai cú pháp
-  ['', 'syntax'],
-  ['   ', 'syntax'],
-  ['1 +', 'syntax'],
-  ['+ 1', 'syntax'],
-  ['* 2', 'syntax'],
-  ['(1 + 2', 'syntax'],
-  ['1 + 2)', 'syntax'],
-  ['()', 'syntax'],
-  ['hour hour', 'syntax'],
-  ['1 2', 'syntax'],
-  ['hour >= ', 'syntax'],
-  ['&& true', 'syntax'],
-  ['true &&', 'syntax'],
-  ['max(1,', 'syntax'],
-  ['max(1 2)', 'syntax'],
-  ['max(,1)', 'syntax'],
-  ['max(1,)', 'syntax'],
-  ['max 1', 'syntax'],
-  ['a = 1', 'syntax'],
-  ['a === b', 'syntax'],
-  ['hour >== 1', 'syntax'],
-  ['hour => 1', 'syntax'],
-  ['1 ? 2 : 3', 'syntax'],
-  ['x[0]', 'syntax'],
-  ['{}', 'syntax'],
-  ['a; b', 'syntax'],
-  ['"chuoi"', 'syntax'],
-  ['`t`', 'syntax'],
-  ["'chua dong", 'syntax'],
-  ["'\\x'", 'syntax'],
-  ['Hour', 'syntax'],
-  ['HOUR > 1', 'syntax'],
-  ['flag.', 'syntax'],
-  ['.flag', 'syntax'],
-  ['flag..x', 'syntax'],
-  ['1.', 'syntax'],
-  ['.5', 'syntax'],
-  ['1e3', 'syntax'],
-  ['0x10', 'syntax'],
-  ['2hour', 'syntax'],
-  ['hour @ 1', 'syntax'],
-  ['hour # 1', 'syntax'],
-  ['a & b', 'syntax'],
-  ['a | b', 'syntax'],
-  ['hour.', 'syntax'],
-  ['((1)', 'syntax'],
-  ['(1))', 'syntax'],
-  [',', 'syntax'],
-  [')', 'syntax'],
-  ['!', 'syntax'],
-  ['-', 'syntax'],
-  ['max()(1)', 'syntax'],
-  ['(max)(1, 2)', 'syntax'],
-  ['đ', 'syntax'],
-  ['1 +'.repeat(200) + ' 1', 'syntax'],
-  ['('.repeat(33) + '1' + ')'.repeat(33), 'syntax'],
-  // hàm không trong danh sách trắng
-  ['eval(1)', 'unknown_fn'],
-  ['function(1)', 'unknown_fn'],
-  ['require(1)', 'unknown_fn'],
-  ['fetch(1)', 'unknown_fn'],
-  ['alert(1)', 'unknown_fn'],
-  ['settimeout(1, 2)', 'unknown_fn'],
-  ['dist(1)', 'unknown_fn'],
-  ['flag(1)', 'unknown_fn'],
-  ['hour(1)', 'unknown_fn'],
-  ['math.max(1, 2)', 'unknown_fn'],
-  ['max.x(1, 2)', 'unknown_fn'],
-  ['tostring()', 'unknown_fn'],
-  ['valueof()', 'unknown_fn'],
-  ['__proto__()', 'unknown_fn'],
-  ['constructor()', 'unknown_fn'],
-  ['hasownproperty(1)', 'unknown_fn'],
-  ['abs(1)', 'unknown_fn'],
-  ['floor(atk)', 'unknown_fn'],
-  ['flag.cua_mo && open(1)', 'unknown_fn'],
-  ['max(1, pow(2, 3))', 'unknown_fn'],
-  // định danh lạ
-  ['x', 'unknown_ident'],
-  ['window', 'unknown_ident'],
-  ['globalthis', 'unknown_ident'],
-  ['process', 'unknown_ident'],
-  ['this', 'unknown_ident'],
-  ['__proto__', 'unknown_ident'],
-  ['constructor', 'unknown_ident'],
-  ['prototype', 'unknown_ident'],
-  ['flag', 'unknown_ident'],
-  ['flag.khong_co', 'unknown_ident'],
-  ['counter', 'unknown_ident'],
-  ['counter.lua.x', 'unknown_ident'],
-  ['quest.trau', 'unknown_ident'],
-  ['quest.trau.state.x', 'unknown_ident'],
-  ['hour.constructor', 'unknown_ident'],
-  ['max', 'unknown_ident'],
-  ['true.x', 'unknown_ident'],
-  ['null', 'unknown_ident'],
-  ['undefined', 'unknown_ident'],
-  ['nan', 'unknown_ident'],
-  ['hour + minute', 'unknown_ident'],
-  ['max(atk, armor)', 'unknown_ident'],
-  // sai kiểu
-  ['hour && true', 'type'],
-  ['true || 1', 'type'],
-  ['!hour', 'type'],
-  ['-flag.cua_mo', 'type'],
-  ["-'a'", 'type'],
-  ['hour == true', 'type'],
-  ["hour != '18'", 'type'],
-  ['name == 1', 'type'],
-  ["name + 'x'", 'type'],
-  ["'a' < 'b'", 'type'],
-  ['true + 1', 'type'],
-  ['flag.cua_mo > 0', 'type'],
-  ['flag.cua_mo * 2', 'type'],
-  ['max(true, 1)', 'type'],
-  ["round('1')", 'type'],
-  ['event(flag.cua_mo)', 'type'],
-  ['event(7) + 1', 'type'],
-  ['max(1, 2) && true', 'type'],
-  ['1 < 2 < 3', 'type'],
-  ['(hour >= 18) + 1', 'type'],
-  ['name % 2', 'type'],
-  ['!(atk - def)', 'type'],
-  // sai số đối
-  ['max(1)', 'arity'],
-  ['max(1, 2, 3)', 'arity'],
-  ['min()', 'arity'],
-  ['round()', 'arity'],
-  ['round(1, 2)', 'arity'],
-  ['rand(1)', 'arity'],
-  ['event()', 'arity'],
-  ['event(1, 2)', 'arity'],
-];
-
-/** Sinh: mỗi toán tử số × cặp toán hạng, cả dạng hằng (gập) và dạng định danh (chạy). */
-const NUM_OPS: [string, (a: number, b: number) => ExprValue][] = [
-  ['+', (a, b) => a + b],
-  ['-', (a, b) => a - b],
-  ['*', (a, b) => a * b],
-  ['/', (a, b) => a / b],
-  ['%', (a, b) => a % b],
-  ['<', (a, b) => a < b],
-  ['<=', (a, b) => a <= b],
-  ['>', (a, b) => a > b],
-  ['>=', (a, b) => a >= b],
-  ['==', (a, b) => a === b],
-  ['!=', (a, b) => a !== b],
-];
-const PAIRS: [number, number][] = [
-  [12, 4],
-  [4, 12],
-  [5, 5],
-];
-const GENERATED: [string, ExprValue][] = [];
-for (const [op, f] of NUM_OPS) {
-  for (const [a, b] of PAIRS) GENERATED.push([`${a} ${op} ${b}`, f(a, b)]);
-  GENERATED.push([`atk ${op} def`, f(VALUES.atk as number, VALUES.def as number)]);
+interface Table {
+  spec: { idents: [string, string][]; fns: [string, number, string][] };
+  values: Record<string, ExprValue>;
+  valid: { src: string; type: string; value: ExprValue }[];
+  errors: { src: string; code: ExprErrorCode; pos: number }[];
 }
 
+const T = JSON.parse(readFileSync(new URL('../vectors/table.json', import.meta.url), 'utf8')) as Table;
+
 describe('bảng biểu thức TST-RTM-03', () => {
-  it('đủ ≥ 200 dòng', () => {
-    expect(VALID.length + ERRORS.length + GENERATED.length).toBeGreaterThanOrEqual(200);
+  it('đủ ≥ 200 dòng và khớp ngữ cảnh fixture', () => {
+    expect(T.valid.length + T.errors.length).toBeGreaterThanOrEqual(200);
+    expect(T.spec.idents).toEqual(Object.entries(SPEC.idents));
+    expect(T.spec.fns).toEqual(Object.entries(SPEC.fns).map(([k, v]) => [k, v.args, v.ret]));
+    expect(T.values).toEqual(VALUES);
   });
 
-  it.each([...VALID, ...GENERATED])('đúng: %s → %s', (src, want) => {
+  it.each(T.valid.map((v) => [v.src, v.value, v.type] as const))('đúng: %s → %s', (src, want, type) => {
     const r = compile(src, SPEC);
     if (!r.ok) throw new Error(`${r.error.code}@${r.error.pos}: ${r.error.message}`);
+    expect(r.value.type).toBe(type);
     expect(r.value.eval(makeEnv())).toBe(want);
   });
 
-  it.each(ERRORS)('lỗi: %s → %s', (src, code) => {
+  it.each(T.errors.map((e) => [e.src, e.code, e.pos] as const))('lỗi: %s → %s@%s', (src, code, pos) => {
     const r = compile(src, SPEC);
     expect(r.ok).toBe(false);
     if (!r.ok) {
       expect(r.error.code).toBe(code);
-      expect(r.error.pos).toBeGreaterThanOrEqual(0);
-      expect(r.error.pos).toBeLessThanOrEqual(Math.max(src.length, 512));
+      expect(r.error.pos).toBe(pos);
     }
   });
 });

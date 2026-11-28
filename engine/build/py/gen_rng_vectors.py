@@ -39,12 +39,24 @@ def main() -> None:
     for c in derive_cases:
         c["value"] = derive_seed(*c["parts"])
 
+    sh = Pcg32(11, 5)
+    shuffle_cases = []
+    for n in (1, 2, 10, 52):
+        items = list(range(n))
+        sh.shuffle_in_place(items)
+        shuffle_cases.append({"n": n, "result": items})
+    pk = Pcg32(11, 6)
+    pick_items = list(range(100, 110))
+    pick_values = [pk.pick(pick_items) for _ in range(20)]
+
     data = {
         "//": "Sinh bởi engine/build/py/gen_rng_vectors.py (ALG-GEN-01). Không sửa tay.",
         "algorithm": "pcg32-xsh-rr; seed theo pcg32_srandom_r(seed, stream) với seed/stream uint32",
         "sequences": seq,
         "ints": {"seed": 7, "stream": 3, "cases": int_cases},
         "deriveSeed": derive_cases,
+        "shuffle": {"seed": 11, "stream": 5, "cases": shuffle_cases},
+        "pick": {"seed": 11, "stream": 6, "items": pick_items, "values": pick_values},
         "fork": {"parent": {"seed": 42, "stream": 54}, "id": "vegetation",
                  "parentNextAfterFork": parent.next_u32(), "child": [child.next_u32() for _ in range(10)]},
     }
